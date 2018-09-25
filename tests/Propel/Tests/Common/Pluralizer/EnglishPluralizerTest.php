@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Pluralizer;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Common\Pluralizer\SimpleEnglishPluralizer;
 use Propel\Common\Pluralizer\StandardEnglishPluralizer;
 
@@ -17,7 +18,7 @@ use Propel\Common\Pluralizer\StandardEnglishPluralizer;
  * Tests for the StandardEnglishPluralizer class
  *
  */
-class EnglishPluralizerTest extends \PHPUnit_Framework_TestCase
+class EnglishPluralizerTest extends TestCase
 {
     public function getPluralFormDataProvider()
     {

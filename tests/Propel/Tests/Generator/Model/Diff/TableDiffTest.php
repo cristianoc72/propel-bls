@@ -2,6 +2,7 @@
 
 namespace Propel\Tests\Generator\Model\Diff;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Diff\ColumnDiff;
@@ -12,7 +13,7 @@ use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\DefaultPlatform;
 
-class TableDiffTest extends \PHPUnit_Framework_TestCase
+class TableDiffTest extends TestCase
 {
     public function testDefaultObjectState()
     {

@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Runtime\Util;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Runtime\Util\PropelDateTime;
 
 use \DateTime;
@@ -21,7 +22,7 @@ use \DateTimeZone;
  * @author Alan Pinstein
  * @author Soenke Ruempler
  */
-class PropelDateTimeTest extends \PHPUnit_Framework_TestCase
+class PropelDateTimeTest extends TestCase
 {
 
     /**

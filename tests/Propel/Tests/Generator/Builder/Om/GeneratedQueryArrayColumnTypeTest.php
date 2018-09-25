@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Generator\Builder\Om;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Generator\Util\QuickBuilder;
 
 use Propel\Runtime\Propel;
@@ -20,7 +21,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
  *
  * @author Francois Zaninotto
  */
-class GeneratedQueryArrayColumnTypeTest extends \PHPUnit_Framework_TestCase
+class GeneratedQueryArrayColumnTypeTest extends TestCase
 {
     public function setUp()
     {

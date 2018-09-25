@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Util;
 
+use PHPUnit\Framework\TestCase;
 use Propel\Common\Util\SetColumnConverter;
 
 /**
@@ -17,7 +18,7 @@ use Propel\Common\Util\SetColumnConverter;
  * 
  * @author Moritz Schroeder <moritz.schroeder@molabs.de> 
  */
-class SetColumnConverterTest extends \PHPUnit_Framework_TestCase
+class SetColumnConverterTest extends TestCase
 {
     /**
      * @param array  $values

@@ -95,6 +95,7 @@ EOF;
         $this->getFilesystem()->dumpFile('doctrine.yaml', $yamlConf);
 
         $manager = new TestableConfigurationManager();
+        $this->assertEquals('2.0.0-dev', $manager->getConfigProperty('general.version'));
     }
 
     public function testBackupConfigFilesAreIgnored()
@@ -431,8 +432,8 @@ EOF;
      */
     public function testRuntimeOrGeneratorConnectionIsNotInConfiguredConnectionsThrowsException($yamlConf, $section)
     {
-        $this->setExpectedException("Propel\Common\Config\Exception\InvalidConfigurationException",
-            "`wrongsource` isn't a valid configured connection (Section: propel.$section.connections).");
+        $this->expectExceptionMessage("`wrongsource` isn't a valid configured connection (Section: propel.$section.connections).");
+        $this->expectException("Propel\Common\Config\Exception\InvalidConfigurationException");
 
         $this->getFilesystem()->dumpFile('propel.yaml', $yamlConf);
         $manager = new ConfigurationManager();
@@ -443,8 +444,8 @@ EOF;
      */
     public function testRuntimeOrGeneratorDefaultConnectionIsNotInConfiguredConnectionsThrowsException($yamlConf, $section)
     {
-        $this->setExpectedException("Propel\Common\Config\Exception\InvalidConfigurationException",
-            "`wrongsource` isn't a valid configured connection (Section: propel.$section.defaultConnection).");
+        $this->expectException("Propel\Common\Config\Exception\InvalidConfigurationException");
+        $this->expectExceptionMessage("`wrongsource` isn't a valid configured connection (Section: propel.$section.defaultConnection).");
 
         $this->getFilesystem()->dumpFile('propel.yaml', $yamlConf);
         $manager = new ConfigurationManager();

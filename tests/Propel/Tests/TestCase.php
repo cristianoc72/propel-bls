@@ -10,8 +10,9 @@
 
 namespace Propel\Tests;
 
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
-class TestCase extends \PHPUnit_Framework_TestCase
+class TestCase extends BaseTestCase
 {
     protected function getDriver()
     {
