@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Symfony\Component\Config\Loader\DelegatingLoader as BaseDelegatingLoader;

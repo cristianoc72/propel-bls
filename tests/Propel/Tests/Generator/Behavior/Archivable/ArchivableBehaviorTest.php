@@ -189,7 +189,7 @@ EOF;
 EOF;
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
-        $builder->getSQL();
+        $this->assertContains('CREATE TABLE archivable_test_01_archive', $builder->getSQL(), 'The schema is correctly built');
     }
 
     public function tablePrefixDataProvider()

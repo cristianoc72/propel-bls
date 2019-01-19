@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config;
 
 use Symfony\Component\Config\FileLocator as BaseFileLocator;
@@ -25,7 +27,7 @@ class FileLocator extends BaseFileLocator
      * By default, the locator looks for configuration file in the current directory (where bin/propel script is running)
      * or in a 'conf' or 'config' subdirectory.
      *
-     * @param null array $configDirectories The directories list where to look for configuration file(s)
+     * @param string|array $configDirectories The directories list where to look for configuration file(s)
      */
     public function __construct($configDirectories = null)
     {

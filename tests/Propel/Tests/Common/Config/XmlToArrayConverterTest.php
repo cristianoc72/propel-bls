@@ -50,7 +50,7 @@ class XmlToArrayConverterTest extends ConfigTestCase
 
     /**
      * @expectedException \Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage XmlToArrayConverter::convert method expects an xml file to parse, or a string containing valid xml
+     * @expectedExceptionMessage Invalid xml content
      */
     public function testInvalidFileNameThrowsException()
     {

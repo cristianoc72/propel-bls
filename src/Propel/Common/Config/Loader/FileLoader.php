@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InputOutputException;
@@ -61,11 +63,13 @@ abstract class FileLoader extends BaseFileLoader
      * Replaces parameter placeholders (%name%) by their values for all parameters.
      *
      * @param array $configuration The configuration array to resolve
+     *
+     * @return array Processed parameters
      */
-    public function resolveParams(array $configuration)
+    public function resolveParams(array $configuration): array
     {
         if ($this->resolved) {
-            return;
+            throw new RuntimeException("Try to parse parameters more than one time");
         }
 
         $this->config = $configuration;
@@ -82,13 +86,13 @@ abstract class FileLoader extends BaseFileLoader
     }
 
     /**
-     * Get the pathof a given resource
+     * Get the path of a given resource
      *
      * @param mixed $file The resource
      *
      * @return array|string
      * @throws \InvalidArgumentException                            If the file is not found
-     * @throws \Propel\Common\Config\Exception\InputOutputException If the path isnot readable
+     * @throws \Propel\Common\Config\Exception\InputOutputException If the path is not readable
      */
     protected function getPath($file)
     {
@@ -104,15 +108,13 @@ abstract class FileLoader extends BaseFileLoader
     /**
      * Check if a resource has a given extension
      *
-     * @param $ext mixed  An extension or an arrayof extensions
-     * @param $resource  string A resource
+     * @param mixed $ext An extension or an array of extensions
+     * @param string $resource A resource
+     *
+     * @return bool
      */
-    protected function checkSupports($ext, $resource)
+    protected function checkSupports($ext, string $resource): bool
     {
-        if (!is_string($resource)) {
-            return false;
-        }
-
         $info = pathinfo($resource);
         $extension = $info['extension'];
 
@@ -140,7 +142,7 @@ abstract class FileLoader extends BaseFileLoader
         return false;
     }
 
-    private function isResolved()
+    private function isResolved(): bool
     {
         return ($this->resolved);
     }
@@ -182,7 +184,7 @@ abstract class FileLoader extends BaseFileLoader
      * @throws \Propel\Common\Config\Exception\RuntimeException         if a problem occurs
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException if a parameter is non-existent
      */
-    private function resolveString($value, array $resolving = [])
+    private function resolveString(string $value, array $resolving = [])
     {
         if (preg_match('/^%([^%\s]+)%$/', $value, $match)) {
             if (null !== $ret = $this->parseEnvironmentParams($match[1])) {
@@ -266,7 +268,7 @@ abstract class FileLoader extends BaseFileLoader
     {
         $found = false;
 
-        $ret = $this->getValue($property_key, null, $found);
+        $ret = $this->getValue($property_key, $found);
 
         if (false === $found) {
             throw new InvalidArgumentException("Parameter '$property_key' not found in configuration file.");
@@ -284,7 +286,7 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @return mixed The value or null if not found
      */
-    private function getValue($property_key, $config = null, &$found)
+    private function getValue(string $property_key, bool &$found, array $config = null)
     {
         if (null === $config) {
             $config = $this->config;
@@ -297,7 +299,7 @@ abstract class FileLoader extends BaseFileLoader
                 return $value;
             }
             if (is_array($value)) {
-                $ret = $this->getValue($property_key, $value, $found);
+                $ret = $this->getValue($property_key, $found, $value);
 
                 if (null !== $ret) {
                     return $ret;
@@ -314,7 +316,7 @@ abstract class FileLoader extends BaseFileLoader
      * @return string|null
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException if the environment variable is not set
      */
-    private function parseEnvironmentParams($value)
+    private function parseEnvironmentParams(string $value): ?string
     {
         // env.variable is an environment variable
         $env = explode('.', $value);

@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Config;
 
 use Propel\Common\Config\ConfigurationManager;
@@ -16,6 +18,8 @@ use Propel\Common\Pluralizer\StandardEnglishPluralizer;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Table;
+use Propel\Generator\Platform\PlatformInterface;
+use Propel\Generator\Reverse\SchemaParserInterface;
 use \Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Generator\Util\BehaviorLocator;
 
@@ -26,7 +30,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
      */
     protected $behaviorLocator = null;
 
-    public function __construct($extraConf = [])
+    public function __construct(array $extraConf = [])
     {
         if (null === $extraConf) {
             $extraConf = [];
@@ -69,7 +73,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
      * @param  string           $type
      * @return DataModelBuilder
      */
-    public function getConfiguredBuilder(Table $table, $type)
+    public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder
     {
         $class = $this->getConfigProperty('generator.objectModel.builders.' . $type);
 
@@ -88,7 +92,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
      *
      * @return PluralizerInterface
      */
-    public function getConfiguredPluralizer()
+    public function getConfiguredPluralizer(): PluralizerInterface
     {
         return new StandardEnglishPluralizer();
     }
@@ -96,7 +100,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
     /**
      * {@inheritdoc}
      */
-    public function getConfiguredPlatform(ConnectionInterface $con = null, $database = null)
+    public function getConfiguredPlatform(ConnectionInterface $con = null, string $database = null): ?PlatformInterface
     {
         return null;
     }
@@ -104,12 +108,12 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
     /**
      * {@inheritdoc}
      */
-    public function getConfiguredSchemaParser(ConnectionInterface $con = null, $database = null)
+    public function getConfiguredSchemaParser(ConnectionInterface $con = null, string $database = null): ?SchemaParserInterface
     {
         return null;
     }
 
-    public function getBehaviorLocator()
+    public function getBehaviorLocator(): BehaviorLocator
     {
         if (!$this->behaviorLocator) {
             $this->behaviorLocator = new BehaviorLocator($this);

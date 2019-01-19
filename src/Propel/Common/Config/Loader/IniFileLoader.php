@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\Exception\InvalidArgumentException;
@@ -39,7 +41,7 @@ class IniFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return $this->checkSupports(['ini', 'properties'], $resource);
     }
@@ -57,7 +59,7 @@ class IniFileLoader extends FileLoader
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException When ini file is not valid
      * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $ini = parse_ini_file($this->getPath($file), true, INI_SCANNER_RAW);
 
@@ -77,7 +79,7 @@ class IniFileLoader extends FileLoader
      * @param  array $data
      * @return array
      */
-    private function parse(array $data)
+    private function parse(array $data): array
     {
         $config = [];
 
@@ -104,7 +106,7 @@ class IniFileLoader extends FileLoader
      * @param  mixed $value
      * @return array
      */
-    private function buildNestedSection($sections, $value)
+    private function buildNestedSection(array $sections, $value): array
     {
         if (count($sections) == 0) {
             return $this->parseSection($value);
@@ -124,12 +126,12 @@ class IniFileLoader extends FileLoader
      * @param  array $section
      * @return array
      */
-    private function parseSection(array $section)
+    private function parseSection(array $section): array
     {
         $config = [];
 
         foreach ($section as $key => $value) {
-            $this->parseKey($key, $value, $config);
+            $this->parseKey((string) $key, $value, $config);
         }
 
         return $config;
@@ -139,12 +141,12 @@ class IniFileLoader extends FileLoader
      * Process a key.
      *
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      * @param array  $config
      *
      * @throws \Propel\Common\Config\Exception\IniParseException
      */
-    private function parseKey($key, $value, array &$config)
+    private function parseKey(string $key, $value, array &$config): void
     {
         if (strpos($key, $this->nestSeparator) !== false) {
             $pieces = explode($this->nestSeparator, $key, 2);

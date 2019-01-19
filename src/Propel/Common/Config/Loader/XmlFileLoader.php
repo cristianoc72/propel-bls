@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config\Loader;
 
 use Propel\Common\Config\XmlToArrayConverter;
@@ -32,7 +34,7 @@ class XmlFileLoader extends FileLoader
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid xml file
      * @throws \Propel\Common\Config\Exception\XmlParseException        if something went wrong while parsing xml file
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $content = XmlToArrayConverter::convert($this->getPath($file));
         $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
@@ -48,7 +50,7 @@ class XmlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return $this->checkSupports('xml', $resource);
     }

@@ -95,7 +95,7 @@ EOF;
         $this->getFilesystem()->dumpFile('doctrine.yaml', $yamlConf);
 
         $manager = new TestableConfigurationManager();
-        $this->assertEquals('2.0.0-dev', $manager->getConfigProperty('general.version'));
+        $this->assertNull($manager->getConfigProperty('general.version'));
     }
 
     public function testBackupConfigFilesAreIgnored()
@@ -322,7 +322,7 @@ buildtime:
 EOF;
         $this->getFilesystem()->dumpFile('propel.yaml', $yamlConf);
 
-        $manager = new TestableConfigurationManager(null, $extraConf);
+        $manager = new TestableConfigurationManager('propel', $extraConf);
         $actual = $manager->get();
 
         $this->assertEquals($actual['runtime'], ['foo' => 'bar', 'bar' => 'baz']);
@@ -571,47 +571,6 @@ EOF;
         $this->assertEquals('mysource', $manager->getConfigProperty('runtime.defaultConnection'));
         $this->assertEquals('yoursource', $manager->getConfigProperty('runtime.connections.1'));
         $this->assertEquals('root', $manager->getConfigProperty('database.connections.mysource.user'));
-    }
-
-    /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid configuration property name
-     */
-    public function testGetConfigPropertyBadNameThrowsException()
-    {
-        $yamlConf = <<<EOF
-propel:
-  database:
-      connections:
-          mysource:
-              adapter: mysql
-              classname: Propel\Runtime\Connection\DebugPDO
-              dsn: mysql:host=localhost;dbname=mydb
-              user: root
-              password:
-              attributes:
-          yoursource:
-              adapter: mysql
-              classname: Propel\Runtime\Connection\DebugPDO
-              dsn: mysql:host=localhost;dbname=yourdb
-              user: root
-              password:
-              attributes:
-  runtime:
-      defaultConnection: mysource
-      connections:
-          - mysource
-          - yoursource
-  generator:
-      defaultConnection: mysource
-      connections:
-          - mysource
-          - yoursource
-EOF;
-        $this->getFilesystem()->dumpFile('propel.yaml', $yamlConf);
-
-        $manager = new ConfigurationManager();
-        $value = $manager->getConfigProperty(10);
     }
 
     public function testGetConfigPropertyBadName()

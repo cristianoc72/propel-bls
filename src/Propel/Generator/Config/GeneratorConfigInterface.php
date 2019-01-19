@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Generator\Config;
 
 use Propel\Common\Pluralizer\PluralizerInterface;
@@ -28,14 +30,14 @@ interface GeneratorConfigInterface
      * @param  string           $type
      * @return DataModelBuilder
      */
-    public function getConfiguredBuilder(Table $table, $type);
+    public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder;
 
     /**
      * Returns a configured Pluralizer class.
      *
      * @return PluralizerInterface
      */
-    public function getConfiguredPluralizer();
+    public function getConfiguredPluralizer(): PluralizerInterface;
 
 
     /**
@@ -48,7 +50,7 @@ interface GeneratorConfigInterface
      * @throws \Propel\Generator\Exception\ClassNotFoundException if the platform class doesn't exists
      * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of PlatformInterface
      */
-    public function getConfiguredPlatform(ConnectionInterface $con = null, $database = null);
+    public function getConfiguredPlatform(ConnectionInterface $con = null, string $database = null): ?PlatformInterface;
 
     /**
      * Creates and configures a new SchemaParser class for a specified platform.
@@ -61,14 +63,14 @@ interface GeneratorConfigInterface
      * @throws \Propel\Generator\Exception\ClassNotFoundException if the class doesn't exist
      * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of SchemaParserInterface
      */
-    public function getConfiguredSchemaParser(ConnectionInterface $con = null, $database = null);
+    public function getConfiguredSchemaParser(ConnectionInterface $con = null, string $database = null): ?SchemaParserInterface;
 
     /**
      * Returns the behavior locator.
      *
      * @return BehaviorLocator
      */
-    public function getBehaviorLocator();
+    public function getBehaviorLocator(): BehaviorLocator;
 
     /**
      * Return a specific configuration property.
@@ -82,5 +84,5 @@ interface GeneratorConfigInterface
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException
      * @return mixed The configuration property
      */
-    public function getConfigProperty($name);
+    public function getConfigProperty(string $name);
 }

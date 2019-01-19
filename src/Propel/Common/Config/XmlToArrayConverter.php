@@ -8,6 +8,8 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config;
 
 use Propel\Common\Config\Exception\InvalidArgumentException;
@@ -22,18 +24,14 @@ class XmlToArrayConverter
     /**
      * Create a PHP array from the XML file
      *
-     * @param String $xmlToParse The XML file or a string containing xml to parse
+     * @param string $xmlToParse The XML file or a string containing xml to parse
      *
      * @return array
      *
      * @throws \Propel\Common\Config\Exception\XmlParseException if parse errors occur
      */
-    public static function convert($xmlToParse)
+    public static function convert(string $xmlToParse)
     {
-        if (!is_string($xmlToParse)) {
-            throw new InvalidArgumentException("XmlToArrayConverter::convert method expects an xml file to parse, or a string containing valid xml");
-        }
-
         $isFile = file_exists($xmlToParse);
 
         //Empty xml file returns empty array
@@ -83,7 +81,7 @@ class XmlToArrayConverter
      * @param  \SimpleXMLElement $xml SimpleXML object.
      * @return array             Array representation of SimpleXML object.
      */
-    protected static function simpleXmlToArray($xml)
+    protected static function simpleXmlToArray(SimpleXMLElement $xml)
     {
         $ar = [];
         foreach ($xml->children() as $k => $v) {
@@ -137,7 +135,7 @@ class XmlToArrayConverter
      * @param  \SimpleXMLElement $value The simplexml value object.
      * @return mixed             string or boolean value
      */
-    private static function getConvertedXmlValue($value)
+    private static function getConvertedXmlValue(SimpleXMLElement $value)
     {
         $value = (string) $value; // convert from simplexml to string
 
@@ -151,7 +149,7 @@ class XmlToArrayConverter
         }
 
         // handle booleans specially
-        $lwr = strtolower($value);
+        $lwr = strtolower((string) $value);
         if ($lwr === "false") {
             return false;
         }

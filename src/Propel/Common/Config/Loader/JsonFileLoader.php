@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,6 +6,8 @@
  *
  * @license MIT License
  */
+
+declare(strict_types=1);
 
 namespace Propel\Common\Config\Loader;
 
@@ -31,7 +32,7 @@ class JsonFileLoader extends FileLoader
      * @throws \Propel\Common\Config\Exception\JsonParseException   if invalid json file
      * @throws \Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, $type = null): array
     {
         $json = file_get_contents($this->getPath($file));
 
@@ -59,7 +60,7 @@ class JsonFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return $this->checkSupports('json', $resource);
     }

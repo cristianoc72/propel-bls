@@ -8,11 +8,14 @@
  * @license MIT License
  */
 
+declare(strict_types=1);
+
 namespace Propel\Common\Config;
 
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\InvalidConfigurationException;
 use Propel\Common\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -41,7 +44,7 @@ class ConfigurationManager
      * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
      *                          It's useful when passing configuration parameters from command line.
      */
-    public function __construct($filename = null, $extraConf = [])
+    public function __construct(string $filename = self::CONFIG_FILE_NAME, array $extraConf = [])
     {
         $this->load($filename, $extraConf);
         $this->process();
@@ -52,7 +55,7 @@ class ConfigurationManager
      *
      * @return array
      */
-    public function get()
+    public function get(): array
     {
         return $this->config;
     }
@@ -64,7 +67,7 @@ class ConfigurationManager
      * @param  string $section the section to be returned
      * @return array
      */
-    public function getSection($section)
+    public function getSection(string $section): array
     {
         if (!array_key_exists($section, $this->config)) {
             return null;
@@ -85,12 +88,8 @@ class ConfigurationManager
      * @throws \Propel\Common\Config\Exception\InvalidArgumentException
      * @return mixed                                                    The configuration property
      */
-    public function getConfigProperty($name)
+    public function getConfigProperty(string $name)
     {
-        if (!is_string($name)) {
-            throw new InvalidArgumentException("Invalid configuration property name '$name'.");
-        }
-
         $keys = explode('.', $name);
         $output = $this->get();
         foreach ($keys as $key) {
@@ -110,7 +109,7 @@ class ConfigurationManager
      * @param  string     $section `runtime` or `generator` section
      * @return array|null
      */
-    public function getConnectionParametersArray($section = 'runtime')
+    public function getConnectionParametersArray(string $section = 'runtime'): ?array
     {
         if (!in_array($section, ['runtime', 'generator'])) {
             return null;
@@ -134,12 +133,14 @@ class ConfigurationManager
      *
      * @param string $fileName  Configuration file name or directory in which resides the configuration file.
      * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
+     *
+     * @throws FileLoaderLoadException
      */
-    protected function load($fileName, $extraConf)
+    protected function load(string $fileName, ?array $extraConf): void
     {
         $dirs = $this->getDirs($fileName);
 
-        if ((null === $fileName) || (is_dir($fileName))) {
+        if ((is_dir($fileName))) {
             $fileName = self::CONFIG_FILE_NAME;
         }
 
@@ -181,7 +182,7 @@ class ConfigurationManager
      *                         the constructor to pass a built-in array of configuration, without load it from file. I.e.
      *                         Propel\Generator\Config\QuickGeneratorConfig class.
      */
-    protected function process($extraConf = null)
+    protected function process(?array $extraConf = null)
     {
         if (null === $extraConf && count($this->config) <= 0) {
             return null;
@@ -209,7 +210,7 @@ class ConfigurationManager
      *
      * @return array
      */
-    private function getFiles($dirs, $fileName, $dist = false)
+    private function getFiles(array $dirs, string $fileName, bool $dist = false): array
     {
         $finder = new Finder();
         $fileName .= '.{php,inc,ini,properties,yaml,yml,xml,json}';
@@ -236,7 +237,7 @@ class ConfigurationManager
      * @return array|mixed
      * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
      */
-    private function loadFile($fileName)
+    private function loadFile(string $fileName)
     {
         if (!file_exists($fileName)) {
             return [];
@@ -253,7 +254,7 @@ class ConfigurationManager
      * @param  string $fileName
      * @return array
      */
-    private function getDirs($fileName)
+    private function getDirs(string $fileName): array
     {
         if (is_file($fileName)) {
             return [];

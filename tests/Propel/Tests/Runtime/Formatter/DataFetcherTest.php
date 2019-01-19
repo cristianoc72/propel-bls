@@ -121,8 +121,8 @@ class DataFetcherTest extends BookstoreEmptyTestBase
         $this->assertEquals(2, $dataFetcher2->count());
         $this->assertEquals('Peter', $dataFetcher2->fetchColumn());
         $this->assertEquals('Sayer', $dataFetcher2->fetchColumn('col2'));
-        $this->assertNull(null, $dataFetcher2->fetchColumn()); //no rows left, returns NULL
-        $this->assertNull(null, $dataFetcher2->fetchColumn()); //be sure further calls returns NULL as well
+        $this->assertNull($dataFetcher2->fetchColumn()); //no rows left, returns NULL
+        $this->assertNull($dataFetcher2->fetchColumn()); //be sure further calls returns NULL as well
 
         $dataFetcher2->close();
         $this->assertNull(null, $dataFetcher2->fetchColumn());

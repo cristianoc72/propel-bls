@@ -145,11 +145,11 @@ class NameFactoryTest extends BaseTestCase
      *
      * @param      algo The class name of the <code>NameGeneratorInterface</code> to
      * create an argument list for.
-     * @param      inputs The (possibly partial) list inputs from which to
+     * @param  array inputs The (possibly partial) list inputs from which to
      * generate the final list.
-     * @return the list of arguments to pass to the <code>NameGeneratorInterface</code>
+     * @return array the list of arguments to pass to the <code>NameGeneratorInterface</code>
      */
-    private function makeInputs($algo, $inputs)
+    private function makeInputs($algo, array $inputs): array
     {
         if (NameFactory::CONSTRAINT_GENERATOR == $algo) {
             array_unshift($inputs, $this->database);

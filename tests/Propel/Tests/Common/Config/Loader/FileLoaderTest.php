@@ -10,11 +10,14 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use Propel\Common\Config\Exception\RuntimeException;
 use Propel\Common\Config\Loader\FileLoader as BaseFileLoader;
+use Propel\Common\Config\Loader\FileLoader;
 use Propel\Tests\TestCase;
 
 class FileLoaderTest extends TestCase
 {
+    /** @var TestableFileLoader */
     private $loader;
 
     public function setUp()
@@ -272,10 +275,12 @@ class FileLoaderTest extends TestCase
         putenv('home');
     }
 
-    public function testResourceNameIsNotStringReturnsFalse()
+    /**
+     * @expectedException \TypeError
+     */
+    public function testResourceNameIsNotStringThrowsException()
     {
         $this->assertFalse($this->loader->checkSupports('ini', null));
-        $this->assertFalse($this->loader->checkSupports('yaml', ['foo',  'bar']));
     }
 
     public function testExtensionIsNotStringOrArrayReturnsFalse()
@@ -315,7 +320,10 @@ class FileLoaderTest extends TestCase
         $this->loader->resolveParams($config);
     }
 
-    public function testCallResolveParamTwiceReturnNull()
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testCallResolveParamTwiceThrowsException()
     {
         $config = [
             'foo' => 'bar',
@@ -323,7 +331,7 @@ class FileLoaderTest extends TestCase
         ];
 
         $this->assertEquals(['foo' => 'bar', 'baz' => 'bar'], $this->loader->resolveParams($config));
-        $this->assertNull($this->loader->resolveParams($config));
+        $this->loader->resolveParams($config);
     }
 }
 
@@ -339,7 +347,7 @@ class TestableFileLoader extends BaseFileLoader
 
     }
 
-    public function checkSupports($ext, $resource)
+    public function checkSupports($ext, string $resource): bool
     {
         return parent::checkSupports($ext, $resource);
     }
