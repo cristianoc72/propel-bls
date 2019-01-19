@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Propel\Common\Config\Loader;
 
+use phootwork\json\Json;
+use phootwork\json\JsonException;
 use Propel\Common\Config\Exception\JsonParseException;
 
 /**
@@ -29,25 +31,17 @@ class JsonFileLoader extends FileLoader
      * @return array
      *
      * @throws \InvalidArgumentException                            if configuration file not found
-     * @throws \Propel\Common\Config\Exception\JsonParseException   if invalid json file
      * @throws \Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
+     * @throws JsonException
      */
     public function load($file, $type = null): array
     {
         $json = file_get_contents($this->getPath($file));
-
         $content = [];
-
         if ('' !== $json) {
-            $content = json_decode($json, true);
-            $error = json_last_error();
-
-            if (JSON_ERROR_NONE !== $error) {
-                throw new JsonParseException($error);
-            }
+            $content = Json::decode($json);
+            $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
         }
-
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
 
         return $content;
     }

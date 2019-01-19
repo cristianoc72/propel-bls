@@ -10,6 +10,7 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use phootwork\json\JsonException;
 use Propel\Common\Config\Loader\JsonFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\Common\Config\ConfigTestCase;
@@ -56,7 +57,7 @@ EOF;
     }
 
     /**
-     * @expectedException        Propel\Common\Config\Exception\JsonParseException
+     * @expectedException phootwork\json\JsonException
      */
     public function testJsonFileHasInvalidContent()
     {
