@@ -10,17 +10,21 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\IniFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\vfsTrait;
 
-class IniFileLoaderTest extends ConfigTestCase
+class IniFileLoaderTest extends TestCase
 {
+    use vfsTrait;
+
     protected $loader;
 
     protected function setUp()
     {
-        $this->loader = new IniFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new IniFileLoader(new FileLocator($this->getRoot()->url()));
     }
 
     public function testSupports()
@@ -40,7 +44,7 @@ class IniFileLoaderTest extends ConfigTestCase
 foo = bar
 bar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $this->newFile('parameters.ini', $content);
 
         $test = $this->loader->load('parameters.ini');
         $this->assertEquals('bar', $test['foo']);
@@ -67,15 +71,13 @@ EOF;
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.ini', $content);
-
+        $this->newFile('nonvalid.ini', $content);
         @$this->loader->load('nonvalid.ini');
     }
 
     public function testIniFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.ini', $content);
+        $this->newFile('empty.ini');
 
         $actual = $this->loader->load('empty.ini');
 
@@ -92,7 +94,7 @@ Donald[]     = Dewey
 Donald[]     = Louie
 Mickey[love] = Minnie
 EOF;
-        $this->dumpTempFile('section.ini', $content);
+        $this->newFile('section.ini', $content);
         $actual = $this->loader->load('section.ini');
 
         $this->assertEquals('Pluto', $actual['Cartoons']['Dog']);
@@ -110,7 +112,7 @@ foo.bar.babaz = foobabar
 bla.foo       = blafoo
 bla.bar       = blabar
 EOF;
-        $this->dumpTempFile('nested.ini', $content);
+        $this->newFile('nested.ini', $content);
         $actual = $this->loader->load('nested.ini');
 
         $this->assertEquals('foobar', $actual['foo']['bar']['baz']);
@@ -128,7 +130,7 @@ bla.foo.baz[] = foobaz1
 bla.foo.baz[] = foobaz2
 
 EOF;
-        $this->dumpTempFile('mixnested.ini', $content);
+        $this->newFile('mixnested.ini', $content);
         $actual = $this->loader->load('mixnested.ini');
 
         $this->assertEquals('foobar', $actual['bla']['foo']['bar']);
@@ -147,7 +149,7 @@ EOF;
 .foo = bar
 bar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $this->newFile('parameters.ini', $content);
 
         $test = $this->loader->load('parameters.ini');
     }
@@ -162,7 +164,7 @@ EOF;
 foo. = bar
 bar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $this->newFile('parameters.ini', $content);
 
         $test = $this->loader->load('parameters.ini');
     }
@@ -177,7 +179,7 @@ EOF;
 foo = bar
 foo.babar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $this->newFile('parameters.ini', $content);
 
         $test = $this->loader->load('parameters.ini');
     }
@@ -188,7 +190,7 @@ EOF;
 foo = bar
 0.babar = baz
 EOF;
-        $this->dumpTempFile('parameters.ini', $content);
+        $this->newFile('parameters.ini', $content);
 
         $this->assertEquals(['0' => ['foo' => 'bar', 'babar' => 'baz']], $this->loader->load('parameters.ini'));
     }
@@ -196,7 +198,6 @@ EOF;
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
      * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.ini.
-     * @requires OS ^(?!Win.*)
      */
     public function testIniFileNotReadableThrowsException()
     {
@@ -204,14 +205,10 @@ EOF;
 foo = bar
 bar = baz
 EOF;
-
-        $this->dumpTempFile('notreadable.ini', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.ini', 0200);
+        $this->newFile('notreadable.ini', $content)->chmod(200);
 
         $actual = $this->loader->load('notreadable.ini');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }
-

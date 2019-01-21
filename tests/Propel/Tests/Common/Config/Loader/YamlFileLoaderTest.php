@@ -10,18 +10,22 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\YamlFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\vfsTrait;
 use Symfony\Component\Yaml\Exception\ParseException;
 
-class YamlFileLoaderTest extends ConfigTestCase
+class YamlFileLoaderTest extends TestCase
 {
+    use vfsTrait;
+    
     protected $loader;
 
     protected function setUp()
     {
-        $this->loader = new YamlFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new YamlFileLoader(new FileLocator($this->getRoot()->url()));
     }
 
     public function testSupports()
@@ -41,7 +45,7 @@ class YamlFileLoaderTest extends ConfigTestCase
 foo: bar
 bar: baz
 EOF;
-        $this->dumpTempFile('parameters.yaml', $content);
+        $this->newFile('parameters.yaml', $content);
 
         $test = $this->loader->load('parameters.yaml');
         $this->assertEquals('bar', $test['foo']);
@@ -68,15 +72,14 @@ not yaml content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.yaml', $content);
+        $this->newFile('nonvalid.yaml', $content);
         $this->loader->load('nonvalid.yaml');
     }
 
 
     public function testYamlFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.yaml', $content);
+        $this->newFile('empty.yaml', '');
 
         $actual = $this->loader->load('empty.yaml');
 
@@ -86,7 +89,6 @@ EOF;
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
      * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.yaml.
-     * @requires OS ^(?!Win.*)
      */
     public function testYamlFileNotReadableThrowsException()
     {
@@ -94,13 +96,10 @@ EOF;
 foo: bar
 bar: baz
 EOF;
-
-        $this->dumpTempFile('notreadable.yaml', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.yaml', 0200);
+        $this->newFile('notreadable.yaml', $content)->chmod(200);
 
         $actual = $this->loader->load('notreadable.yaml');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

@@ -10,18 +10,21 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
-use phootwork\json\JsonException;
+use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\Loader\JsonFileLoader;
 use Propel\Common\Config\FileLocator;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\vfsTrait;
 
-class JsonFileLoaderTest extends ConfigTestCase
+class JsonFileLoaderTest extends TestCase
 {
+    use vfsTrait;
+
     protected $loader;
 
     protected function setUp()
     {
-        $this->loader = new JsonFileLoader(new FileLocator(sys_get_temp_dir()));
+        $this->loader = new JsonFileLoader(new FileLocator($this->getRoot()->url()));
     }
 
     public function testSupports()
@@ -40,7 +43,7 @@ class JsonFileLoaderTest extends ConfigTestCase
   "bar": "baz"
 }
 EOF;
-        $this->dumpTempFile('parameters.json', $content);
+        $this->newFile('parameters.json', $content);
 
         $actual = $this->loader->load('parameters.json');
         $this->assertEquals('bar', $actual['foo']);
@@ -66,15 +69,14 @@ not json content
 only plain
 text
 EOF;
-        $this->dumpTempFile('nonvalid.json', $content);
+        $this->newFile('nonvalid.json', $content);
 
         $this->loader->load('nonvalid.json');
     }
 
     public function testJsonFileIsEmpty()
     {
-        $content = '';
-        $this->dumpTempFile('empty.json', $content);
+        $this->newFile('empty.json');
 
         $actual = $this->loader->load('empty.json');
 
@@ -84,7 +86,6 @@ EOF;
     /**
      * @expectedException Propel\Common\Config\Exception\InputOutputException
      * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.json.
-     * @requires OS ^(?!Win.*)
      */
     public function testJsonFileNotReadableThrowsException()
     {
@@ -94,13 +95,10 @@ EOF;
   "bar": "baz"
 }
 EOF;
-
-        $this->dumpTempFile('notreadable.json', $content);
-        $this->getFilesystem()->chmod(sys_get_temp_dir() . '/notreadable.json', 0200);
+        $this->newFile('notreadable.json', $content)->chmod(200);
 
         $actual = $this->loader->load('notreadable.json');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

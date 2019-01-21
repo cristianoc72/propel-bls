@@ -30,7 +30,8 @@
     },
     "require-dev": {
         "monolog/monolog": "^1.23",
-        "phpunit/phpunit": "^7.3"
+        "phpunit/phpunit": "^7.3",
+        "mikey179/vfsStream": "^1.6"
     },
     "suggest": {
         "monolog/monolog": "The recommended logging library to use with Propel."
