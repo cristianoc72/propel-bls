@@ -10,7 +10,7 @@
 
 namespace Propel\Generator\Builder;
 
-use Propel\Common\Pluralizer\PluralizerInterface;
+use cristianoc72\Pluralizer\PluralizerInterface;
 use Propel\Generator\Builder\Om\MultiExtendObjectBuilder;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Builder\Om\QueryBuilder;

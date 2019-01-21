@@ -10,8 +10,8 @@
 
 namespace Propel\Runtime\Collection;
 
-use Propel\Common\Pluralizer\PluralizerInterface;
-use Propel\Common\Pluralizer\StandardEnglishPluralizer;
+use cristianoc72\Pluralizer\PluralizerInterface;
+use cristianoc72\Pluralizer\EnglishPluralizer;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\RuntimeException;
 use Propel\Runtime\Propel;
@@ -596,7 +596,7 @@ class Collection implements \ArrayAccess, \IteratorAggregate, \Countable, \Seria
      */
     protected function createPluralizer()
     {
-        return new StandardEnglishPluralizer();
+        return new EnglishPluralizer();
     }
 
     protected function getPluralModelName()

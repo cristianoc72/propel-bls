@@ -358,7 +358,7 @@ class PropelConfiguration implements ConfigurationInterface
                                 ->booleanNode('addHooks')->defaultTrue()->end()
                                 ->scalarNode('classPrefix')->defaultNull()->end()
                                 ->booleanNode('useLeftJoinsInDoJoinMethods')->defaultTrue()->end()
-                                ->scalarNode('pluralizerClass')->defaultValue('\Propel\Common\Pluralizer\StandardEnglishPluralizer')->end()
+                                ->scalarNode('pluralizerClass')->defaultValue('\cristianoc72\Pluralizer\EnglishPluralizer')->end()
                                 ->scalarNode('entityNotFoundExceptionClass')->defaultValue('\Propel\Runtime\Exception\EntityNotFoundException')->end()
                                 ->arrayNode('builders')
                                     ->addDefaultsIfNotSet()

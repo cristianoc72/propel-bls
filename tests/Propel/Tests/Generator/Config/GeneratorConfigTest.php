@@ -11,15 +11,18 @@
 namespace Propel\Tests\Generator\Config;
 
 use Propel\Generator\Config\GeneratorConfig;
-use Propel\Tests\Common\Config\ConfigTestCase;
+use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
 /**
  * @author William Durand <william.durand1@gmail.com>
  * @author Cristiano Cinotti
  * @package	propel.generator.config
  */
-class GeneratorConfigTest extends ConfigTestCase
+class GeneratorConfigTest extends TestCase
 {
+    use VfsTrait;
+
     protected $generatorConfig;
 
     public function setConfig($config)
@@ -73,9 +76,9 @@ class GeneratorConfigTest extends ConfigTestCase
         )
 );
 ";
-        $this->dumpTempFile('propel.php.dist', $php);
+        $file = $this->newFile('propel.php.dist', $php);
 
-        $this->generatorConfig = new GeneratorConfig(sys_get_temp_dir() . '/propel.php.dist');
+        $this->generatorConfig = new GeneratorConfig($file->url());
     }
 
     public function testGetConfiguredPlatformDeafult()
@@ -198,13 +201,7 @@ class GeneratorConfigTest extends ConfigTestCase
     public function testGetConfiguredPluralizer()
     {
         $actual = $this->generatorConfig->getConfiguredPluralizer();
-        $this->assertInstanceOf('\\Propel\\Common\\Pluralizer\\StandardEnglishPluralizer', $actual);
-
-        $config['generator']['objectModel']['pluralizerClass'] = '\\Propel\\Common\\Pluralizer\\SimpleEnglishPluralizer';
-        $this->setConfig($config);
-
-        $actual = $this->generatorConfig->getConfiguredPluralizer();
-        $this->assertInstanceOf('\\Propel\\Common\\Pluralizer\\SimpleEnglishPluralizer', $actual);
+        $this->assertInstanceOf('\\cristianoc72\\Pluralizer\\EnglishPluralizer', $actual);
     }
 
     /**

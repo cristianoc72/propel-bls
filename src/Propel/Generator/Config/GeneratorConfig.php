@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace Propel\Generator\Config;
 
 use Propel\Common\Config\ConfigurationManager;
-use Propel\Common\Pluralizer\PluralizerInterface;
+use cristianoc72\Pluralizer\PluralizerInterface;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\ClassNotFoundException;
@@ -176,7 +176,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     {
         $classname = $this->get()['generator']['objectModel']['pluralizerClass'];
 
-        return $this->getInstance($classname, null, '\\Propel\\Common\\Pluralizer\\PluralizerInterface');
+        return $this->getInstance($classname, null, '\\cristianoc72\\Pluralizer\\PluralizerInterface');
     }
 
     /**

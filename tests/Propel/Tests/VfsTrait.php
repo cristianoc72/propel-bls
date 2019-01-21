@@ -13,14 +13,13 @@ namespace Propel\Tests;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
-use Propel\Tests\TestCase;
 
 /**
  * Useful methods to manipulate virtual filesystem, via vfsStream library
  *
  * @author Cristiano Cinotti
  */
-trait vfsTrait
+trait VfsTrait
 {
     /** @var vfsStreamDirectory */
     private $root;

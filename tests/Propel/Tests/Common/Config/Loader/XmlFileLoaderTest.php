@@ -14,11 +14,11 @@ use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\FileLocator;
 use Propel\Common\Config\Loader\XmlFileLoader;
 use Propel\Tests\TestCase;
-use Propel\Tests\vfsTrait;
+use Propel\Tests\VfsTrait;
 
 class XmlFileLoaderTest extends TestCase
 {
-    use vfsTrait;
+    use VfsTrait;
     
     protected $loader;
 

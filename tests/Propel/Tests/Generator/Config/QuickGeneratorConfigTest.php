@@ -44,7 +44,7 @@ class QuickGeneratorConfigTest extends TestCase
     {
         $actual = $this->generatorConfig->getConfiguredPluralizer();
 
-        $this->assertInstanceOf('\\Propel\\Common\\Pluralizer\\StandardEnglishPluralizer', $actual);
+        $this->assertInstanceOf('\\cristianoc72\\Pluralizer\\EnglishPluralizer', $actual);
     }
 
     public function testGetConfiguredPlatform()

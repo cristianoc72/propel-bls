@@ -13,11 +13,11 @@ namespace Propel\Tests\Common\Config;
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\ConfigurationManager;
 use Propel\Tests\TestCase;
-use Propel\Tests\vfsTrait;
+use Propel\Tests\VfsTrait;
 
 class ConfigurationManagerTest extends TestCase
 {
-    use vfsTrait;
+    use VfsTrait;
     use DataProviderTrait;
 
     public function testLoadConfigFileInCurrentDirectory()
@@ -506,7 +506,7 @@ EOF;
         $this->assertTrue($actual['generator']['namespaceAutoPackage']);
         $this->assertEquals($actual['generator']['dateTime']['dateTimeClass'], 'DateTime');
         $this->assertFalse($actual['generator']['schema']['autoPackage']);
-        $this->assertEquals($actual['generator']['objectModel']['pluralizerClass'], '\Propel\Common\Pluralizer\StandardEnglishPluralizer');
+        $this->assertEquals($actual['generator']['objectModel']['pluralizerClass'], '\cristianoc72\Pluralizer\EnglishPluralizer');
         $this->assertEquals($actual['generator']['objectModel']['builders']['objectstub'], '\Propel\Generator\Builder\Om\ExtensionObjectBuilder');
     }
 

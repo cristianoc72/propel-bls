@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Config;
 
-use Propel\Common\Pluralizer\PluralizerInterface;
+use cristianoc72\Pluralizer\PluralizerInterface;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Platform\PlatformInterface;

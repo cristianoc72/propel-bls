@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Propel\Generator\Config;
 
 use Propel\Common\Config\ConfigurationManager;
-use Propel\Common\Pluralizer\PluralizerInterface;
-use Propel\Common\Pluralizer\StandardEnglishPluralizer;
+use cristianoc72\Pluralizer\PluralizerInterface;
+use cristianoc72\Pluralizer\EnglishPluralizer;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\Table;
@@ -94,7 +94,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
      */
     public function getConfiguredPluralizer(): PluralizerInterface
     {
-        return new StandardEnglishPluralizer();
+        return new EnglishPluralizer();
     }
 
     /**

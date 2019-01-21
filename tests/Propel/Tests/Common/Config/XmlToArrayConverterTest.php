@@ -13,11 +13,11 @@ namespace Propel\Tests\Common\Config;
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\XmlToArrayConverter;
 use Propel\Tests\TestCase;
-use Propel\Tests\vfsTrait;
+use Propel\Tests\VfsTrait;
 
 class XmlToArrayConverterTest extends TestCase
 {
-    use vfsTrait;
+    use VfsTrait;
     use DataProviderTrait;
 
     /**
