@@ -20,6 +20,7 @@ use Propel\Tests\Bookstore\Book;
 use Propel\Tests\Bookstore\Map\BookTableMap;
 use Propel\Tests\Bookstore\Country;
 use Propel\Runtime\Propel;
+
 /**
  * Test class for ObjectCollection.
  *

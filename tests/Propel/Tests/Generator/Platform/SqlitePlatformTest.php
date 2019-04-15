@@ -373,5 +373,4 @@ DROP INDEX [babar];
 ";
         $this->assertEquals($expected, $this->getPlatform()->getCommentBlockDDL('foo bar'));
     }
-
 }

@@ -29,7 +29,6 @@ use Propel\Tests\Bookstore\Behavior\Map\Table6TableMap;
  */
 class PropelQueryTest extends BookstoreTestBase
 {
-
     protected function setUp()
     {
         parent::setUp();
@@ -70,7 +69,6 @@ class PropelQueryTest extends BookstoreTestBase
             ->findOne();
         $this->assertTrue($book instanceof Book);
         $this->assertEquals('Don Juan', $book->getTitle());
-
     }
 
     /**
@@ -112,7 +110,8 @@ class PropelQueryTest extends BookstoreTestBase
 
         $booksIn = BookQuery::create()
             ->filterById(
-               ['min' => $booksAll[2]->getId()])
+                ['min' => $booksAll[2]->getId()]
+            )
             ->find();
 
         $this->assertTrue($booksIn[1] == $booksAll[3]);
@@ -122,7 +121,8 @@ class PropelQueryTest extends BookstoreTestBase
 
         $booksIn = BookQuery::create()
           ->filterById(
-            ['max' => $booksAll[1]->getId()] )
+              ['max' => $booksAll[1]->getId()]
+          )
           ->find();
 
         $this->assertTrue($booksIn[1] == $booksAll[1]);
@@ -134,14 +134,14 @@ class PropelQueryTest extends BookstoreTestBase
 
         $minMax = BookQuery::create()
           ->filterById(
-            ['min' => $booksAll[1]->getId(),
+              ['min' => $booksAll[1]->getId(),
                 'max' => $booksAll[2]->getId()]
             )
           ->find();
 
         $In = BookQuery::create()
           ->filterById(
-            [$booksAll[1]->getId(),
+              [$booksAll[1]->getId(),
                 $booksAll[2]->getId()]
             )
           ->find();

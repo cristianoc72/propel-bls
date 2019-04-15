@@ -444,7 +444,6 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
      */
     protected function addInitialize(&$script)
     {
-
         $table = $this->getTable();
         $platform = $this->getPlatform();
 
@@ -493,7 +492,7 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
         }
 
         // Add columns to map
-            $script .= "
+        $script .= "
         // columns";
         foreach ($table->getColumns() as $col) {
             $columnName = $col->getName();
@@ -538,7 +537,6 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
         $script .= "
     } // initialize()
 ";
-
     }
 
     /**
@@ -571,7 +569,7 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
             $script .= "
         \$this->addRelation('$relationName', '" . addslashes($this->getNewStubObjectBuilder($fkey->getTable())->getFullyQualifiedClassName()) . "', RelationMap::ONE_TO_" . ($fkey->isLocalPrimaryKey() ? "ONE" : "MANY") .", $joinCondition, $onDelete, $onUpdate";
             if ($fkey->isLocalPrimaryKey()) {
-                 $script .= ", null";
+                $script .= ", null";
             } else {
                 $script .= ", '" . $this->getRefFKPhpNameAffix($fkey, true) . "'";
             }
@@ -861,7 +859,6 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
 
         return \$pks;";
         } else {
-
             $pk = "''";
             foreach ($table->getColumns() as $col) {
                 if (!$col->isLazyLoad()) {
@@ -1400,5 +1397,4 @@ class ".$this->getUnqualifiedClassName()." extends TableMap
     }
 ";
     }
-
 }

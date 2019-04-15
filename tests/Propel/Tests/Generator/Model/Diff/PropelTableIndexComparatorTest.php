@@ -199,5 +199,4 @@ class PropelTableIndexComparatorTest extends TestCase
         $this->assertEquals(1, count($tableDiff->getModifiedIndices()));
         $this->assertEquals(['Foo_Index' => [$i1, $i2]], $tableDiff->getModifiedIndices());
     }
-
 }

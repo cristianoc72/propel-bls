@@ -28,15 +28,15 @@ class SqlBuildCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED,  'MySQL engine (MyISAM, InnoDB, ...)')
-            ->addOption('schema-dir',   null, InputOption::VALUE_REQUIRED,  'The directory where the schema files are placed')
-            ->addOption('output-dir',   null, InputOption::VALUE_REQUIRED,  'The output directory')
-            ->addOption('validate',     null, InputOption::VALUE_NONE,      '')
-            ->addOption('overwrite',    null, InputOption::VALUE_NONE,      '')
-            ->addOption('connection',   null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
-            ->addOption('schema-name',  null, InputOption::VALUE_REQUIRED,  'The schema name for RDBMS supporting them', '')
+            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED, 'MySQL engine (MyISAM, InnoDB, ...)')
+            ->addOption('schema-dir', null, InputOption::VALUE_REQUIRED, 'The directory where the schema files are placed')
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
+            ->addOption('validate', null, InputOption::VALUE_NONE, '')
+            ->addOption('overwrite', null, InputOption::VALUE_NONE, '')
+            ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
+            ->addOption('schema-name', null, InputOption::VALUE_REQUIRED, 'The schema name for RDBMS supporting them', '')
             //->addOption('encoding',     null, InputOption::VALUE_REQUIRED,  'The encoding to use for the database')
-            ->addOption('table-prefix', null, InputOption::VALUE_REQUIRED,  'Add a prefix to all the table names in the database')
+            ->addOption('table-prefix', null, InputOption::VALUE_REQUIRED, 'Add a prefix to all the table names in the database')
             ->addOption('composer-dir', null, InputOption::VALUE_REQUIRED, 'Directory in which your composer.json resides', null)
             ->setName('sql:build')
             ->setAliases(['build-sql'])
@@ -60,13 +60,13 @@ class SqlBuildCommand extends AbstractCommand
                     case 'output-dir':
                         $configOptions['propel']['paths']['sqlDir'] = $option;
                         break;
-                    case 'schema-name';
+                    case 'schema-name':
                         $configOptions['propel']['generator']['schema']['basename'] = $option;
                         break;
                     case 'table-prefix':
                         $configOptions['propel']['generator']['tablePrefix'] = $option;
                         break;
-                    case 'mysql-engine';
+                    case 'mysql-engine':
                         $configOptions['propel']['database']['adapters']['mysql']['tableType'] = $option;
                         break;
                     case 'composer-dir':

@@ -23,7 +23,6 @@ use Propel\Runtime\Adapter\Pdo\SqliteAdapter;
  */
 class BasicCriterionTest extends BaseTestCase
 {
-
     public function testAppendPsToCreatesAnEqualConditionByDefault()
     {
         $cton = new BasicCriterion(new Criteria(), 'A.COL', 'foo');
@@ -129,7 +128,5 @@ class BasicCriterionTest extends BaseTestCase
         $params = [];
         $ps = '';
         $cton->appendPsTo($ps, $params);
-
     }
-
 }

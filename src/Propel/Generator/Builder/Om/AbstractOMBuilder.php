@@ -776,7 +776,7 @@ abstract class AbstractOMBuilder extends DataModelBuilder
         foreach ($crossFKs->getCrossForeignKeys() as $fk) {
             if (is_array($crossFKToIgnore) && in_array($fk, $crossFKToIgnore)) {
                 continue;
-            } else if ($fk === $crossFKToIgnore) {
+            } elseif ($fk === $crossFKToIgnore) {
                 continue;
             }
 
@@ -806,7 +806,6 @@ abstract class AbstractOMBuilder extends DataModelBuilder
             $phpDoc[] = "
      * @param $phpType $name";
         }
-
     }
 
 

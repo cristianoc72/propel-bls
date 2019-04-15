@@ -536,7 +536,7 @@ class ForeignKey extends MappingModel
             $foreign = $ref2->getName();
             $this->foreignColumns[] = $foreign;
             $this->localValues[] = null;
-        } else if ($ref1 instanceof Column) {
+        } elseif ($ref1 instanceof Column) {
             $this->foreignColumns[] = null;
             $this->localValues[] = $ref2;
         }
@@ -823,7 +823,7 @@ class ForeignKey extends MappingModel
         $result = [];
 
         foreach ($mapping as $map) {
-            list ($left, $right) = $map;
+            list($left, $right) = $map;
             $item = [];
             $item[0] = $left instanceof Column ? ':' . $left->getName() : $left;
             $item[1] = $right instanceof Column ? ':' . $right->getName() : $right;

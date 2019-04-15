@@ -29,8 +29,8 @@ class ModelBuildCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED,  'MySQL engine (MyISAM, InnoDB, ...)')
-            ->addOption('schema-dir', null, InputOption::VALUE_REQUIRED,  'The directory where the schema files are placed')
+            ->addOption('mysql-engine', null, InputOption::VALUE_REQUIRED, 'MySQL engine (MyISAM, InnoDB, ...)')
+            ->addOption('schema-dir', null, InputOption::VALUE_REQUIRED, 'The directory where the schema files are placed')
             ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
             ->addOption('object-class', null, InputOption::VALUE_REQUIRED, 'The object class generator name')
             ->addOption('object-stub-class', null, InputOption::VALUE_REQUIRED, 'The object stub class generator name')

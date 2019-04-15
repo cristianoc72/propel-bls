@@ -380,7 +380,7 @@ class Table extends ScopedMappingModel implements IdMethod
             // MySQL needs indices on any columns that serve as foreign keys.
             // These are not auto-created prior to 4.1.2.
 
-            $name = substr_replace($foreignKey->getName(), 'fi_',  strrpos($foreignKey->getName(), 'fk_'), 3);
+            $name = substr_replace($foreignKey->getName(), 'fi_', strrpos($foreignKey->getName(), 'fk_'), 3);
             if ($this->hasIndex($name)) {
                 // if we already have an index with this name, then it looks like the columns of this index have just
                 // been changed, so remove it and inject it again. This is the case if a referenced table is handled
@@ -523,7 +523,6 @@ class Table extends ScopedMappingModel implements IdMethod
     public function addColumn($col)
     {
         if ($col instanceof Column) {
-
             if (isset($this->columnsByName[$col->getName()])) {
                 throw new EngineException(sprintf('Column "%s" declared twice in table "%s"', $col->getName(), $this->getName()));
             }
@@ -642,7 +641,7 @@ class Table extends ScopedMappingModel implements IdMethod
             return $fk;
         }
 
-        $fk = new ForeignKey(isset($foreignKey['name'])? $foreignKey['name'] :null );
+        $fk = new ForeignKey(isset($foreignKey['name'])? $foreignKey['name'] :null);
         $fk->setTable($this);
         $fk->loadMapping($foreignKey);
 
@@ -730,7 +729,7 @@ class Table extends ScopedMappingModel implements IdMethod
 
             if (null !== $foreignTable) {
                 $referrers = $foreignTable->getReferrers();
-                if (null === $referrers || !in_array($foreignKey, $referrers, true) ) {
+                if (null === $referrers || !in_array($foreignKey, $referrers, true)) {
                     $foreignTable->addReferrer($foreignKey);
                 }
             } elseif ($throwErrors) {
@@ -977,7 +976,7 @@ class Table extends ScopedMappingModel implements IdMethod
 
         $idx = new Index();
         $idx->loadMapping($index);
-        foreach((array)@$index['columns'] as $column) {
+        foreach ((array)@$index['columns'] as $column) {
             $idx->addColumn($column);
         }
 
@@ -2043,5 +2042,4 @@ class Table extends ScopedMappingModel implements IdMethod
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

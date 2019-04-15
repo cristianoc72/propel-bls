@@ -78,7 +78,6 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
      */
     public function test1()
     {
-
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();
@@ -218,7 +217,6 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
         $this->assertEquals(0, \RelationpkUserGroupQuery::create()->count(), 'We have zero connections.');
         $this->assertEquals(1, \RelationpkUserQuery::create()->count(), 'We have one user.');
         $this->assertEquals(1, \RelationpkGroupQuery::create()->count(), 'We have one group.');
-
     }
 
     /*
@@ -377,8 +375,8 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
     /**
      * 7. remove, set
      */
-    public function test7(){
-
+    public function test7()
+    {
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();
@@ -421,8 +419,8 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
     /**
      * 8. remove, get
      */
-    public function test8(){
-
+    public function test8()
+    {
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();
@@ -456,8 +454,8 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
     /**
      * 9. set, add
      */
-    public function test9(){
-
+    public function test9()
+    {
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();
@@ -486,8 +484,8 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
     /**
      * 10. set, remove
      */
-    public function test10(){
-
+    public function test10()
+    {
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();
@@ -518,8 +516,8 @@ class GeneratedObjectM2MRelationThreePKs2Test extends PlatformDatabaseBuildTimeB
     /**
      * 11-12. set, set - set, get
      */
-    public function test11_12(){
-
+    public function test11_12()
+    {
         \RelationpkUserQuery::create()->deleteAll();
         \RelationpkGroupQuery::create()->deleteAll();
         \RelationpkUserGroupQuery::create()->deleteAll();

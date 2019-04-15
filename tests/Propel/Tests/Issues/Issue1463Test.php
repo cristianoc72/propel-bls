@@ -7,7 +7,6 @@ use Propel\Generator\Util\QuickBuilder;
 use Propel\Runtime\Propel;
 use Propel\Tests\TestCase;
 
-
 /**
  * Regression tests for a SQL injection vulnerability with `limit()`.
  *
@@ -15,7 +14,6 @@ use Propel\Tests\TestCase;
  */
 class Issue1463Test extends TestCase
 {
-
     public function setUp()
     {
         parent::setUp();
@@ -55,61 +53,61 @@ END;
 
     public function dataLimit()
     {
-        return array(
+        return [
 
             /*
                 Valid limits
              */
 
-            'Zero' => array(
+            'Zero' => [
                 'limit'       => 0,
                 'expectedSql' => 'SELECT  FROM  LIMIT 0'
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'limit'       => 38427,
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427'
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'limit'       => '38427',
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427'
-            ),
+            ],
 
-            'Large integer' => array(
+            'Large integer' => [
                 'limit'       => 9223372036854775807,
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807'
-            ),
-            'Large integer as a string' => array(
+            ],
+            'Large integer as a string' => [
                 'limit'       => '9223372036854775807',
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807'
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'limit'       => 123.9,
                 'expectedSql' => 'SELECT  FROM  LIMIT 123'
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'limit'       => '123.9',
                 'expectedSql' => 'SELECT  FROM  LIMIT 123'
-            ),
+            ],
 
             /*
                 Invalid limits
              */
 
-            'Negative value' => array(
+            'Negative value' => [
                 'limit'       => -1,
                 'expectedSql' => 'SELECT  FROM '
-            ),
-            'Non-numeric string' => array(
+            ],
+            'Non-numeric string' => [
                 'limit'       => 'foo',
                 'expectedSql' => 'SELECT  FROM  LIMIT 0'
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'limit'       => '3;DROP TABLE abc',
                 'expectedSql' => 'SELECT  FROM  LIMIT 3'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -129,61 +127,61 @@ END;
 
     public function dataOffset()
     {
-        return array(
+        return [
 
             /*
                 Valid offsets
              */
 
-            'Zero' => array(
+            'Zero' => [
                 'offset'      => 0,
                 'expectedSql' => 'SELECT  FROM '
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'offset'      => 38427,
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427, 18446744073709551615'
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'offset'      => '38427',
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427, 18446744073709551615'
-            ),
+            ],
 
-            'Large integer' => array(
+            'Large integer' => [
                 'offset'      => 9223372036854775807,
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807, 18446744073709551615'
-            ),
-            'Large integer as a string' => array(
+            ],
+            'Large integer as a string' => [
                 'offset'      => '9223372036854775807',
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807, 18446744073709551615'
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'offset'      => 123.9,
                 'expectedSql' => 'SELECT  FROM  LIMIT 123, 18446744073709551615'
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'offset'      => '123.9',
                 'expectedSql' => 'SELECT  FROM  LIMIT 123, 18446744073709551615'
-            ),
+            ],
 
             /*
                 Invalid offsets
              */
 
-            'Negative value' => array(
+            'Negative value' => [
                 'offset'      => -1,
                 'expectedSql' => 'SELECT  FROM '
-            ),
-            'Non-numeric string' => array(
+            ],
+            'Non-numeric string' => [
                 'offset'      => 'foo',
                 'expectedSql' => 'SELECT  FROM '
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'offset'      => '3;DROP TABLE abc',
                 'expectedSql' => 'SELECT  FROM  LIMIT 3, 18446744073709551615'
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -203,61 +201,60 @@ END;
 
     public function dataOffsetAndLimit()
     {
-        return array(
+        return [
 
             /*
                 Valid offsets
              */
 
-            'Zero' => array(
+            'Zero' => [
                 'offset'      => 0,
                 'expectedSql' => 'SELECT  FROM  LIMIT 999'
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'offset'      => 38427,
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427, 999'
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'offset'      => '38427',
                 'expectedSql' => 'SELECT  FROM  LIMIT 38427, 999'
-            ),
+            ],
 
-            'Large integer' => array(
+            'Large integer' => [
                 'offset'      => 9223372036854775807,
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807, 999'
-            ),
-            'Large integer as a string' => array(
+            ],
+            'Large integer as a string' => [
                 'offset'      => '9223372036854775807',
                 'expectedSql' => 'SELECT  FROM  LIMIT 9223372036854775807, 999'
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'offset'      => 123.9,
                 'expectedSql' => 'SELECT  FROM  LIMIT 123, 999'
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'offset'      => '123.9',
                 'expectedSql' => 'SELECT  FROM  LIMIT 123, 999'
-            ),
+            ],
 
             /*
                 Invalid offsets
              */
 
-            'Negative value' => array(
+            'Negative value' => [
                 'offset'      => -1,
                 'expectedSql' => 'SELECT  FROM  LIMIT 999'
-            ),
-            'Non-numeric string' => array(
+            ],
+            'Non-numeric string' => [
                 'offset'      => 'foo',
                 'expectedSql' => 'SELECT  FROM  LIMIT 999'
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'offset'      => '3;DROP TABLE abc',
                 'expectedSql' => 'SELECT  FROM  LIMIT 3, 999'
-            ),
-        );
+            ],
+        ];
     }
-
 }

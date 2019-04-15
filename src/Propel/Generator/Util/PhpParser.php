@@ -40,7 +40,7 @@ class PhpParser
      *
      * @var string[]
      */
-    private $knownMethodCache = array();
+    private $knownMethodCache = [];
 
     /**
      * Parser constructor

@@ -32,7 +32,7 @@ class SortableBehaviorObjectBuilderModifierTest extends TestCase
 
     public function testPreInsert()
     {
-         SortableTable11TableMap::doDeleteAll();
+        SortableTable11TableMap::doDeleteAll();
         $t1 = new Table11();
         $t1->save();
         $this->assertEquals($t1->getRank(), 1, 'Sortable inserts new line in first position if no row present');
@@ -269,11 +269,11 @@ class SortableBehaviorObjectBuilderModifierTest extends TestCase
         $res = $t2->removeFromList();
         $this->assertTrue($res instanceof Table11, 'removeFromList() returns the current object');
         $this->assertNull($res->getRank(), 'removeFromList() resets the object\'s rank');
-         SortableTable11TableMap::clearInstancePool();
+        SortableTable11TableMap::clearInstancePool();
         $expected = [1 => 'row1', 2 => 'row2', 3 => 'row3', 4 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArray(), 'removeFromList() does not change the list until the object is saved');
         $t2->save();
-         SortableTable11TableMap::clearInstancePool();
+        SortableTable11TableMap::clearInstancePool();
         $expected = [null => 'row2', 1 => 'row1', 2 => 'row3', 3 => 'row4'];
         $this->assertEquals($expected, $this->getFixturesArray(), 'removeFromList() changes the list once the object is saved');
     }

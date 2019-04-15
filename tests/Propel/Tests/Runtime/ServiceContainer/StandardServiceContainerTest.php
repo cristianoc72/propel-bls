@@ -438,7 +438,6 @@ class StandardServiceContainerTest extends BaseTestCase
         $handler = $logger->popHandler();
         $this->assertInstanceOf('\Monolog\Handler\StreamHandler', $handler);
     }
-
 }
 
 class TestableServiceContainer extends StandardServiceContainer

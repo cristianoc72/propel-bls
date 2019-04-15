@@ -285,7 +285,7 @@ class ModelCriteria extends BaseModelCriteria
         }
 
         if (!is_array($columnName)) {
-            $columnName = array($columnName);
+            $columnName = [$columnName];
         }
 
         foreach ($columnName as $column) {
@@ -1705,7 +1705,6 @@ class ModelCriteria extends BaseModelCriteria
             }
             $objects->save($con);
             $affectedRows = count($objects);
-
         } else {
 
             // update rows in a single query
@@ -1956,7 +1955,8 @@ class ModelCriteria extends BaseModelCriteria
      *
      * @return null|ModelJoin
      */
-    public function getModelJoinByTableName($tableName) {
+    public function getModelJoinByTableName($tableName)
+    {
         foreach ($this->joins as $join) {
             if ($join instanceof ModelJoin && $join->getTableMap()->getName() == $tableName) {
                 return $join;
@@ -2135,7 +2135,6 @@ class ModelCriteria extends BaseModelCriteria
         $dbMap = Propel::getServiceContainer()->getDatabaseMap($this->getDbName());
 
         foreach ($this->getMap() as $criterion) {
-
             $table = null;
             foreach ($criterion->getAttachedCriterion() as $attachedCriterion) {
                 $tableName = $attachedCriterion->getTable();

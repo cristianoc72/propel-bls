@@ -157,10 +157,13 @@ class ObjectBehaviorTest extends BookstoreTestBase
     public function testObjectFilter()
     {
         $t = new Table3();
-        $this->assertTrue(class_exists('Propel\Tests\Bookstore\Behavior\Base\testObjectFilter'),
+        $this->assertTrue(
+            class_exists('Propel\Tests\Bookstore\Behavior\Base\testObjectFilter'),
             'objectFilter hook allows complete manipulation of the generated script'
         );
-        $this->assertEquals('Propel\Generator\Builder\Om\ObjectBuilder', \Propel\Tests\Bookstore\Behavior\Base\testObjectFilter::FOO,
+        $this->assertEquals(
+            'Propel\Generator\Builder\Om\ObjectBuilder',
+            \Propel\Tests\Bookstore\Behavior\Base\testObjectFilter::FOO,
             'objectFilter hook is called with the object builder as parameter'
         );
     }

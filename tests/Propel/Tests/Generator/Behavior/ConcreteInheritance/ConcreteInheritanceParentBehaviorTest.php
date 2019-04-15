@@ -58,5 +58,4 @@ class ConcreteInheritanceParentBehaviorTest extends BookstoreTestBase
         $content = $article->getConcreteContent();
         $this->assertEquals($article, $content->getChildObject());
     }
-
 }

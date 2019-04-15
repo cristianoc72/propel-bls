@@ -213,10 +213,12 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
             $size = count($matches[1]);
             for ($i = $size-1; $i >= 0; $i--) {
                 $pos = $matches[1][$i];
-                if (isset($this->boundValues[$pos]))
+                if (isset($this->boundValues[$pos])) {
                     $sql = str_replace($pos, $this->boundValues[$pos], $sql);
-                if (isset($input_parameters[$pos]))
+                }
+                if (isset($input_parameters[$pos])) {
                     $sql = str_replace($pos, $input_parameters[$pos], $sql);
+                }
             }
         }
 
@@ -328,5 +330,4 @@ class StatementWrapper extends \PDOStatement implements \IteratorAggregate
     {
         return call_user_func_array([$this->statement, $method], $args);
     }
-
 }

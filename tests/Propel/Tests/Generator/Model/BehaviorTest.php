@@ -124,9 +124,9 @@ EOF;
         );
     }
 
-  /**
-   * @expectedException \Propel\Generator\Exception\BehaviorNotFoundException
-   */
+    /**
+     * @expectedException \Propel\Generator\Exception\BehaviorNotFoundException
+     */
     public function testUnknownBehavior()
     {
         $schemaReader = new SchemaReader();

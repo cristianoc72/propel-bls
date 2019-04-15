@@ -30,11 +30,11 @@ class MigrationMigrateCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('output-dir',       null, InputOption::VALUE_REQUIRED,  'The output directory')
-            ->addOption('migration-table',  null, InputOption::VALUE_REQUIRED,  'Migration table name')
-            ->addOption('connection',       null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
-            ->addOption('fake',             null, InputOption::VALUE_NONE,  'Does not touch the actual schema, but marks all migration as executed.')
-            ->addOption('force',            null, InputOption::VALUE_NONE,  'Continues with the migration even when errors occur.')
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
+            ->addOption('migration-table', null, InputOption::VALUE_REQUIRED, 'Migration table name')
+            ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use', [])
+            ->addOption('fake', null, InputOption::VALUE_NONE, 'Does not touch the actual schema, but marks all migration as executed.')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Continues with the migration even when errors occur.')
             ->setName('migration:migrate')
             ->setAliases(['migrate'])
             ->setDescription('Execute all pending migrations')
@@ -90,7 +90,6 @@ class MigrationMigrateCommand extends AbstractCommand
         }
 
         foreach ($timestamps as $timestamp) {
-
             if ($input->getOption('fake')) {
                 $output->writeln(
                     sprintf('Faking migration %s up', $manager->getMigrationClassName($timestamp))

@@ -91,7 +91,6 @@ class NameFactoryTest extends BaseTestCase
                             self::makeString(5) . "_FK_2"],
                         ["MyUser", "MYUSER", "MY_USER"]
                     ];
-
     }
 
     /**

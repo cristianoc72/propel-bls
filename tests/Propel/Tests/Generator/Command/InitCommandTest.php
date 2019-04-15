@@ -103,7 +103,6 @@ class InitCommandTest extends TestCaseFixtures
             }
 
             return $element;
-
         }, $dsnArray);
 
         $inputs[] = array_shift($dsnArray);

@@ -20,7 +20,6 @@ use Propel\Runtime\Collection\ObjectCollection;
  */
 class VersionableBehaviorObjectBuilderModifierTest extends TestCase
 {
-
     public static function setUpBeforeClass()
     {
         $schema = <<<EOF
@@ -150,10 +149,10 @@ EOF;
 EOF;
         QuickBuilder::buildSchema($schema4);
 
-    /**
-     *  Schema to test relation 1:1 versionable
-     */
-    $schema5 = <<<XML
+        /**
+         *  Schema to test relation 1:1 versionable
+         */
+        $schema5 = <<<XML
 <database name="versionable_behavior_test_one_to_one_database">
     <table name="versionable_behavior_test_one_to_one">
         <column name="id" type="integer" primaryKey="true" autoIncrement="true"/>
@@ -229,7 +228,6 @@ EOF;
         $this->assertTrue(method_exists('VersionableBehaviorTest7', 'setVersionCreatedAt'));
         $this->assertTrue(method_exists('VersionableBehaviorTest7', 'setVersionCreatedBy'));
         $this->assertTrue(method_exists('VersionableBehaviorTest7', 'setMyComment'));
-
     }
 
     public function providerForNewActiveRecordTests()
@@ -351,7 +349,6 @@ EOF;
         \VersionableBehaviorTest1Query::enableVersioning();
         \VersionableBehaviorTestCustomFieldQuery::enableVersioning();
         \VersionableBehaviorTestOneToOneQuery::enableVersioning();
-
     }
 
     public function testNewVersionCreatesRecordInVersionTable()
@@ -1049,6 +1046,5 @@ EOF;
 
         $this->assertEquals('One To....', $x->getBar());
         $this->assertEquals('One', $x->getVersionableBehaviorTestOneToOneKey()->getBar());//$y
-
     }
 }

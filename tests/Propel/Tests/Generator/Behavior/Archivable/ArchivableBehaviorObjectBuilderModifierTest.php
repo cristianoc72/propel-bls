@@ -390,5 +390,4 @@ EOF;
         // time without seconds
         $this->assertEquals(date('Y-m-d H:i'), $ret->getArchivedAt('Y-m-d H:i'));
     }
-
 }

@@ -433,5 +433,4 @@ CREATE TABLE i18n_behavior_test_custom_pk_0_i18n
 EOF;
         $this->assertContains($expected, $builder->getSQL());
     }
-
 }

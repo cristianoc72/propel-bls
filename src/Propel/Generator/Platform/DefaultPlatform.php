@@ -353,7 +353,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
 );
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $tableDescription,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines)
@@ -493,7 +494,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
 ALTER TABLE %s DROP CONSTRAINT %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             $this->quoteIdentifier($this->getPrimaryKeyName($table))
         );
@@ -515,7 +517,8 @@ ALTER TABLE %s DROP CONSTRAINT %s;
 ALTER TABLE %s ADD %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             $this->getPrimaryKeyDDL($table)
         );
@@ -549,7 +552,8 @@ ALTER TABLE %s ADD %s;
 CREATE %sINDEX %s ON %s (%s);
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getTable()->getName()),
@@ -569,7 +573,8 @@ CREATE %sINDEX %s ON %s (%s);
 DROP INDEX %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($index->getFQName())
         );
     }
@@ -582,7 +587,8 @@ DROP INDEX %s;
      */
     public function getIndexDDL(Index $index)
     {
-        return sprintf('%sINDEX %s (%s)',
+        return sprintf(
+            '%sINDEX %s (%s)',
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->getColumnListDDL($index->getColumnObjects())
@@ -631,7 +637,8 @@ DROP INDEX %s;
 ALTER TABLE %s ADD %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getTable()->getName()),
             $this->getForeignKeyDDL($fk)
         );
@@ -652,7 +659,8 @@ ALTER TABLE %s ADD %s;
 ALTER TABLE %s DROP CONSTRAINT %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getTable()->getName()),
             $this->quoteIdentifier($fk->getName())
         );
@@ -670,7 +678,8 @@ ALTER TABLE %s DROP CONSTRAINT %s;
         $pattern = "CONSTRAINT %s
     FOREIGN KEY (%s)
     REFERENCES %s (%s)";
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getName()),
             $this->getColumnListDDL($fk->getLocalColumnObjects()),
             $this->quoteIdentifier($fk->getForeignTableName()),
@@ -754,7 +763,8 @@ ALTER TABLE %s DROP CONSTRAINT %s;
 ALTER TABLE %s RENAME TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromTableName),
             $this->quoteIdentifier($toTableName)
         );
@@ -819,7 +829,9 @@ ALTER TABLE %s RENAME TO %s;
             $columnChanges = [];
 
             foreach ($changes as $change) {
-                if (!trim($change)) continue;
+                if (!trim($change)) {
+                    continue;
+                }
                 $isCompatibleCall = preg_match(
                     sprintf('/ALTER TABLE %s (?!RENAME)/', $this->quoteIdentifier($toTable->getName())),
                     $change
@@ -836,10 +848,13 @@ ALTER TABLE %s RENAME TO %s;
             }
 
             if (0 < count($columnChanges)) {
-                $ret .= sprintf("
+                $ret .= sprintf(
+                    "
 ALTER TABLE %s%s;
 ",
-                    $this->quoteIdentifier($toTable->getName()), implode(',', $columnChanges));
+                    $this->quoteIdentifier($toTable->getName()),
+                    implode(',', $columnChanges)
+                );
             }
         }
 
@@ -974,7 +989,8 @@ ALTER TABLE %s%s;
 ALTER TABLE %s DROP COLUMN %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($column->getTable()->getName()),
             $this->quoteIdentifier($column->getName())
         );
@@ -991,7 +1007,8 @@ ALTER TABLE %s DROP COLUMN %s;
 ALTER TABLE %s RENAME COLUMN %s TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromColumn->getTable()->getName()),
             $this->quoteIdentifier($fromColumn->getName()),
             $this->quoteIdentifier($toColumn->getName())
@@ -1010,7 +1027,8 @@ ALTER TABLE %s RENAME COLUMN %s TO %s;
 ALTER TABLE %s MODIFY %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($toColumn->getTable()->getName()),
             $this->getColumnDDL($toColumn)
         );
@@ -1044,7 +1062,8 @@ ALTER TABLE %s MODIFY
 );
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines)
         );
@@ -1061,7 +1080,8 @@ ALTER TABLE %s MODIFY
 ALTER TABLE %s ADD %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($column->getTable()->getName()),
             $this->getColumnDDL($column)
         );
@@ -1094,7 +1114,8 @@ ALTER TABLE %s ADD
 );
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines)
         );

@@ -813,7 +813,7 @@ class TableMap
 
             if ($criteria->containsKey($fqName)) {
                 $value = $criteria->getValue($fqName);
-            } else if ($criteria->containsKey($name)) {
+            } elseif ($criteria->containsKey($name)) {
                 $value = $criteria->getValue($name);
             } else {
                 return null;
@@ -824,5 +824,4 @@ class TableMap
 
         return $pk;
     }
-
 }

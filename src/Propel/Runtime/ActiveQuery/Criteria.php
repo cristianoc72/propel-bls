@@ -928,8 +928,12 @@ class Criteria
         list($rightTableName, $rightTableAlias) = $this->getTableNameAndAlias($rightTableAlias);
 
         $join->addExplicitCondition(
-            $leftTableName, $leftColumnName, $leftTableAlias,
-            $rightTableName, $rightColumnName, $rightTableAlias,
+            $leftTableName,
+            $leftColumnName,
+            $leftTableAlias,
+            $rightTableName,
+            $rightColumnName,
+            $rightTableAlias,
             Join::EQUAL
         );
 
@@ -1502,7 +1506,6 @@ class Criteria
     {
         $sb = 'Criteria:';
         try {
-
             $params = [];
             $sb .= "\nSQL (may not be complete): ".$this->createSelectSql($params);
 
@@ -1512,7 +1515,6 @@ class Criteria
                 $paramstr[] = $param['table'] . '.' . $param['column'] . ' => ' . var_export($param['value'], true);
             }
             $sb .= implode(', ', $paramstr);
-
         } catch (\Exception $exc) {
             $sb .= '(Error: ' . $exc->getMessage() . ')';
         }
@@ -1550,7 +1552,7 @@ class Criteria
             // Important: nested criterion objects are checked
 
             $criteria = $crit; // alias
-            if  ($this->offset            === $criteria->getOffset()
+            if ($this->offset            === $criteria->getOffset()
                 && $this->limit           === $criteria->getLimit()
                 && $this->ignoreCase      === $criteria->isIgnoreCase()
                 && $this->singleRecord    === $criteria->isSingleRecord()
@@ -1561,8 +1563,7 @@ class Criteria
                 && $this->orderByColumns  === $criteria->getOrderByColumns()
                 && $this->groupByColumns  === $criteria->getGroupByColumns()
                 && $this->aliases         === $criteria->getAliases()
-               ) // what about having ??
-            {
+               ) { // what about having ??
                 foreach ($criteria->keys() as $key) {
                     if ($this->containsKey($key)) {
                         $a = $this->getCriterion($key);
@@ -1931,7 +1932,6 @@ class Criteria
         }
 
         if (!empty($orderBy)) {
-
             foreach ($orderBy as $orderByColumn) {
 
                 // Add function expression as-is.
@@ -2282,7 +2282,6 @@ class Criteria
             $stmt = $con->prepare($sql);
             $db->bindValues($stmt, $params, $dbMap, $db);
             $stmt->execute();
-
         } catch (\Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
@@ -2372,7 +2371,6 @@ class Criteria
         $affectedRows = 0; // initialize this in case the next loop has no iterations.
 
         foreach ($tablesColumns as $tableName => $columns) {
-
             $whereClause = [];
             $params = [];
             $stmt = null;
@@ -2453,7 +2451,6 @@ class Criteria
                 $affectedRows = $stmt->rowCount();
 
                 $stmt = null; // close
-
             } catch (\Exception $e) {
                 if ($stmt) {
                     $stmt = null; // close
@@ -2461,7 +2458,6 @@ class Criteria
                 Propel::log($e->getMessage(), Propel::LOG_ERR);
                 throw new PropelException(sprintf('Unable to execute UPDATE statement [%s]', $sql), 0, $e);
             }
-
         } // foreach table in the criteria
 
         return $affectedRows;
@@ -2587,7 +2583,6 @@ class Criteria
         $affectedRows = 0; // initialize this in case the next loop has no iterations.
 
         foreach ($tables as $tableName => $columns) {
-
             $whereClause = [];
             $params = [];
             $stmt = null;
@@ -2611,7 +2606,6 @@ class Criteria
                 Propel::log($e->getMessage(), Propel::LOG_ERR);
                 throw new PropelException(sprintf('Unable to execute DELETE statement [%s]', $sql), 0, $e);
             }
-
         } // for each table
 
         return $affectedRows;
@@ -2772,5 +2766,4 @@ class Criteria
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

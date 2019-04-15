@@ -9,6 +9,7 @@
  */
 
 namespace Propel\Tests\Generator\Model;
+
 use Propel\Generator\Model\Index;
 use Propel\Tests\TestCase;
 

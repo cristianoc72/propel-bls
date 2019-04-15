@@ -181,11 +181,11 @@ class ColumnComparatorTest extends TestCase
         $expectedChangedProperties = [
             'type' => ['INTEGER', 'DOUBLE'],
             'sqlType' => ['INTEGER', 'DOUBLE'],
-            'scale' => [NULL, 2],
-            'size' => [NULL, 3],
+            'scale' => [null, 2],
+            'size' => [null, 3],
             'notNull' => [false, true],
-            'defaultValueType' => [NULL, ColumnDefaultValue::TYPE_VALUE],
-            'defaultValueValue' => [NULL, 123]
+            'defaultValueType' => [null, ColumnDefaultValue::TYPE_VALUE],
+            'defaultValueValue' => [null, 123]
         ];
         $this->assertEquals($expectedChangedProperties, ColumnComparator::compareColumns($c1, $c2));
     }

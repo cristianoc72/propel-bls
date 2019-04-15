@@ -163,5 +163,4 @@ class DefaultPlatformTest extends TestCase
     {
         $this->assertEquals($default, $this->getPlatform()->getColumnDefaultValueDDL($column));
     }
-
 }

@@ -62,5 +62,4 @@ class RawModelCriterion extends AbstractModelCriterion
         ];
         $sb .= str_replace('?', ':p' . count($params), $this->clause);
     }
-
 }

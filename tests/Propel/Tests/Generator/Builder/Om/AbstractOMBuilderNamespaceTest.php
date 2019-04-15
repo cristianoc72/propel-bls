@@ -163,16 +163,13 @@ class TestableOMBuilder2 extends AbstractOMBuilder
 
     protected function addClassOpen(&$script)
     {
-
     }
 
     protected function addClassBody(&$script)
     {
-
     }
 
     protected function addClassClose(&$script)
     {
-
     }
 }

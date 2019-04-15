@@ -60,7 +60,6 @@ class OraclePlatform extends DefaultPlatform
         $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, 'NVARCHAR2', '2000'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, 'NUMBER', '3', '0'));
         $this->setSchemaDomainMapping(new Domain(PropelTypes::SET, 'NUMBER'));
-
     }
 
     public function getMaxColumnNameLength()
@@ -135,7 +134,8 @@ ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS';
     %s
 )%s;
 ";
-        $ret = sprintf($pattern,
+        $ret = sprintf(
+            $pattern,
             $tableDescription,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines),
@@ -163,7 +163,8 @@ CREATE SEQUENCE %s
     INCREMENT BY 1 START WITH 1 NOMAXVALUE NOCYCLE NOCACHE ORDER;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getSequenceName($table))
             );
         }
@@ -197,7 +198,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($table)) . ";
         if ($table->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)%s';
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getPrimaryKeyName($table)),
                 $this->getColumnListDDL($table->getPrimaryKey()),
                 $this->generateBlockStorage($table, true)
@@ -207,7 +209,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($table)) . ";
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('CONSTRAINT %s UNIQUE (%s)',
+        return sprintf(
+            'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
             $this->getColumnListDDL($unique->getColumnObjects())
         );
@@ -220,7 +223,8 @@ DROP SEQUENCE " . $this->quoteIdentifier($this->getSequenceName($table)) . ";
         }
         $pattern = "CONSTRAINT %s
     FOREIGN KEY (%s) REFERENCES %s (%s)";
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getName()),
             $this->getColumnListDDL($fk->getLocalColumnObjects()),
             $this->quoteIdentifier($fk->getForeignTableName()),
@@ -343,7 +347,8 @@ USING INDEX
 CREATE %sINDEX %s ON %s (%s)%s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $index->isUnique() ? 'UNIQUE ' : '',
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getTable()->getName()),
@@ -387,7 +392,8 @@ CREATE %sINDEX %s ON %s (%s)%s;
         $snippet = "
 \$dataFetcher = %s->query('SELECT %s.nextval FROM dual');
 %s = %s\$dataFetcher->fetchColumn();";
-        $script = sprintf($snippet,
+        $script = sprintf(
+            $snippet,
             $connectionVariableName,
             $sequenceName,
             $columnValueMutator,

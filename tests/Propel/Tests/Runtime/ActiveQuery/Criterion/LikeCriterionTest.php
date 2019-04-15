@@ -132,5 +132,4 @@ class LikeCriterionTest extends BaseTestCase
         ];
         $this->assertEquals($expected, $params);
     }
-
 }

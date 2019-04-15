@@ -23,7 +23,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
  */
 class GeneratedQueryObjectColumnTypeTest extends TestCase
 {
-    protected $c1, $c2;
+    protected $c1;
+    protected $c2;
 
     public function setUp()
     {

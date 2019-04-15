@@ -30,7 +30,6 @@ class NestedSetBehaviorTest extends TestCase
         $this->assertTrue(method_exists('NestedSetTable9', 'getLevel'), 'nested_set maps the level getter with the tree_level column');
         $this->assertFalse(method_exists('NestedSetTable9', 'getTreeScope'), 'nested_set does not add a tree_scope column by default');
         $this->assertFalse(method_exists('NestedSetTable9', 'getScopeValue'), 'nested_set does not map the scope_value getter with the tree_scope column by default');
-
     }
 
     public function testParameters()

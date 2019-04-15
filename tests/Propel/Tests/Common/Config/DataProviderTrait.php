@@ -313,7 +313,8 @@ EOF
         ];
     }
 
-    public function providerForXmlToArrayConverterXmlInclusions() {
+    public function providerForXmlToArrayConverterXmlInclusions()
+    {
         return [
             [
                 <<<XML

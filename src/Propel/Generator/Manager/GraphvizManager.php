@@ -57,7 +57,7 @@ class GraphvizManager extends AbstractManager
                     $dotSyntax .= ':cols -> node'.$fk->getForeignTableName();
                     $label = [];
                     foreach ($fk->getMapping() as $map) {
-                        list ($localColumn, $foreignValueOrColumn) = $map;
+                        list($localColumn, $foreignValueOrColumn) = $map;
                         $labelString = $localColumn->getName().'=';
                         if ($foreignValueOrColumn instanceof Column) {
                             $labelString .= $foreignValueOrColumn->getName();

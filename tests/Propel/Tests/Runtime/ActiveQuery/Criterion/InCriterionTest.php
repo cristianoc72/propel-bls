@@ -23,7 +23,6 @@ use Propel\Runtime\ActiveQuery\Criterion\InCriterion;
  */
 class InCriterionTest extends BaseTestCase
 {
-
     public function testAppendPsToCreatesAnInConditionByDefault()
     {
         $cton = new InCriterion(new Criteria(), 'A.COL', ['foo']);
@@ -169,9 +168,9 @@ class InCriterionTest extends BaseTestCase
         $this->assertEquals($expected, $params);
     }
 
-   /**
-     * @dataProvider providerForEmptyValues
-     */
+    /**
+      * @dataProvider providerForEmptyValues
+      */
     public function testAppendPsToWithNotInAndEmptyValueCreatesAnAlwaysTrueCondition($emptyValue)
     {
         $cton = new InCriterion(new Criteria(), 'A.COL', $emptyValue, Criteria::NOT_IN);
@@ -200,5 +199,4 @@ class InCriterionTest extends BaseTestCase
         ];
         $this->assertEquals($expected, $params);
     }
-
 }

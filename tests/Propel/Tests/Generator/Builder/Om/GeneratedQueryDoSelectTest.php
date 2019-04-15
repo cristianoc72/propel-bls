@@ -115,7 +115,6 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $results2 = BookQuery::create(null, $lc2)->joinWith('Author')->find();
 
         $this->assertEquals($limitcount, count($results2), "Expected $limitcount results from BookQuery::doSelectJoinAuthor()");
-
     }
 
     /**
@@ -123,7 +122,6 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
      */
     public function testDoSelectJoin()
     {
-
         BookTableMap::clearInstancePool();
 
         $c = new Criteria();
@@ -198,7 +196,6 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         $empId = $b->getId();
 
         $this->assertSame($b, BookstoreEmployeeQuery::create()->findPk($empId), "Expected newly saved object to be same instance as pooled.");
-
     }
 
     /**
@@ -243,12 +240,11 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         // 2) test a forced reload from database
         BookstoreEmployeeTableMap::clearInstancePool();
 
-        list($o1,$o2,$o3) = BookstoreEmployeeQuery::create()->doSelect($c);
+        list($o1, $o2, $o3) = BookstoreEmployeeQuery::create()->doSelect($c);
 
         $this->assertTrue($o1 instanceof BookstoreManager, "Expected BookstoreManager object, got " . get_class($o1));
         $this->assertTrue($o2 instanceof BookstoreEmployee, "Expected BookstoreEmployee object, got " . get_class($o2));
         $this->assertTrue($o3 instanceof BookstoreCashier, "Expected BookstoreCashier object, got " . get_class($o3));
-
     }
 
     /**
@@ -399,13 +395,13 @@ class GeneratedQueryDoSelectTest extends BookstoreEmptyTestBase
         */
 
         $c = new Criteria();
-        $c->addJoin([BookstoreContestEntryTableMap::BOOKSTORE_ID, BookstoreContestEntryTableMap::CONTEST_ID], [BookstoreContestTableMap::BOOKSTORE_ID, BookstoreContestTableMap::CONTEST_ID] );
+        $c->addJoin([BookstoreContestEntryTableMap::BOOKSTORE_ID, BookstoreContestEntryTableMap::CONTEST_ID], [BookstoreContestTableMap::BOOKSTORE_ID, BookstoreContestTableMap::CONTEST_ID]);
 
         $results = BookstoreContestEntryQuery::create(null, $c)->find();
-        $this->assertEquals(2, count($results) );
+        $this->assertEquals(2, count($results));
         foreach ($results as $result) {
-            $this->assertEquals($bs1Id, $result->getBookstoreId() );
-            $this->assertEquals($ct1Id, $result->getContestId() );
+            $this->assertEquals($bs1Id, $result->getBookstoreId());
+            $this->assertEquals($ct1Id, $result->getContestId());
         }
     }
 }

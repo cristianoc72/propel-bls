@@ -60,5 +60,4 @@ class BasicModelCriterionTest extends BaseTestCase
         $this->assertEquals('A.COL IS NULL', $ps);
         $this->assertEquals([], $params);
     }
-
 }

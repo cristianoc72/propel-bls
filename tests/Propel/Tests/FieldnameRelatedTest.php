@@ -40,7 +40,7 @@ class FieldnameRelatedTest extends TestCaseFixtures
     /**
      * Tests if fieldname type constants are defined
      */
-    public function testFieldNameTypeConstants ()
+    public function testFieldNameTypeConstants()
     {
         $result = defined('\Propel\Runtime\Map\TableMap::TYPE_PHPNAME');
         $this->assertTrue($result);
@@ -49,7 +49,7 @@ class FieldnameRelatedTest extends TestCaseFixtures
     /**
      * Tests the Base[Object]TableMap::getFieldNames() method
      */
-    public function testGetFieldNames ()
+    public function testGetFieldNames()
     {
         $types = [
             TableMap::TYPE_PHPNAME,
@@ -115,7 +115,7 @@ class FieldnameRelatedTest extends TestCaseFixtures
     /**
      * Tests the Base[Object]TableMap::translateFieldName() method
      */
-    public function testTranslateFieldName ()
+    public function testTranslateFieldName()
     {
         $types = [
             TableMap::TYPE_PHPNAME,
@@ -144,7 +144,7 @@ class FieldnameRelatedTest extends TestCaseFixtures
     /**
      * Tests the BaseTableMap::getFieldNames() method
      */
-    public function testGetFieldNamesStatic ()
+    public function testGetFieldNamesStatic()
     {
         $types = [
             TableMap::TYPE_PHPNAME,
@@ -210,7 +210,7 @@ class FieldnameRelatedTest extends TestCaseFixtures
     /**
      * Tests the BaseTableMap::translateFieldName() method
      */
-    public function testTranslateFieldNameStatic ()
+    public function testTranslateFieldNameStatic()
     {
         $types = [
             TableMap::TYPE_PHPNAME,

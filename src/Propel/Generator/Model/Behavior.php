@@ -295,7 +295,6 @@ class Behavior extends MappingModel
      */
     public function modifyTable()
     {
-
     }
 
     /**
@@ -335,7 +334,8 @@ class Behavior extends MappingModel
             // try with '.php' at the end
             $filePath = $filePath . '.php';
             if (!file_exists($filePath)) {
-                throw new \InvalidArgumentException(sprintf('Template "%s" not found in "%s" directory',
+                throw new \InvalidArgumentException(sprintf(
+                    'Template "%s" not found in "%s" directory',
                     $filename,
                     $this->getDirname() . $templateDir
                 ));

@@ -256,7 +256,8 @@ class QuickBuilder
                 $stmt->execute();
             } catch (\Exception $e) {
                 //echo $sql; //uncomment for better debugging
-                throw new BuildException(sprintf("Can not execute SQL: \n%s\nFrom database: \n%s\n\nTo database: \n%s\n\nDiff:\n%s",
+                throw new BuildException(sprintf(
+                    "Can not execute SQL: \n%s\nFrom database: \n%s\n\nTo database: \n%s\n\nDiff:\n%s",
                     $statement,
                     $this->database,
                     $database,
@@ -292,7 +293,9 @@ class QuickBuilder
     {
         $tables = [];
         foreach ($this->getDatabase()->getTables() as $table) {
-            if (count($tables) > 3) break;
+            if (count($tables) > 3) {
+                break;
+            }
             $tables[] = $table->getName();
         }
         $name = implode('_', $tables);
@@ -331,12 +334,12 @@ class QuickBuilder
             if ($separate) {
                 foreach ($classes as $class) {
                     $code = $this->getClassesForTable($table, [$class]);
-                        $tempFile = $dir
+                    $tempFile = $dir
                             . str_replace('\\', '-', $table->getPhpName())
                             . "-$class"
                             . '.php';
-                        file_put_contents($tempFile, "<?php\n" . $code);
-                        $includes[] = $tempFile;
+                    file_put_contents($tempFile, "<?php\n" . $code);
+                    $includes[] = $tempFile;
                 }
             } else {
                 $code = $this->getClassesForTable($table, $classes);
@@ -486,8 +489,7 @@ class QuickBuilder
     protected function forceNamespace($code)
     {
         if (0 === preg_match('/\nnamespace/', $code)) {
-
-            $use = array_filter(explode(PHP_EOL, $code), function($string) {
+            $use = array_filter(explode(PHP_EOL, $code), function ($string) {
                 return substr($string, 0, 5) === 'use \\';
             });
 
@@ -513,5 +515,4 @@ class QuickBuilder
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

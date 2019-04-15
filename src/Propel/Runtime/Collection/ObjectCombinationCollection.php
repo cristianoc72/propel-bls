@@ -120,5 +120,4 @@ class ObjectCombinationCollection extends ObjectCollection
     {
         return false !== call_user_func_array([$this, 'search'], func_get_args());
     }
-
 }

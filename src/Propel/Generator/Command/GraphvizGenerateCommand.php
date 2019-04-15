@@ -30,8 +30,8 @@ class GraphvizGenerateCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('output-dir',   null, InputOption::VALUE_REQUIRED,  'The output directory', self::DEFAULT_OUTPUT_DIRECTORY)
-            ->addOption('schema-dir',   null, InputOption::VALUE_REQUIRED,  'The directory where the schema files are placed')
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory', self::DEFAULT_OUTPUT_DIRECTORY)
+            ->addOption('schema-dir', null, InputOption::VALUE_REQUIRED, 'The directory where the schema files are placed')
             ->setName('graphviz:generate')
             ->setAliases(['graphviz'])
             ->setDescription('Generate Graphviz files (.dot)')
@@ -44,7 +44,7 @@ class GraphvizGenerateCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $configOptions = [];
-        if ($this->hasInputOption('schema-dir', $input)){
+        if ($this->hasInputOption('schema-dir', $input)) {
             $configOptions['propel']['paths']['schemaDir'] = $input->getOption('schema-dir');
         }
         $generatorConfig = $this->getGeneratorConfig($configOptions, $input);

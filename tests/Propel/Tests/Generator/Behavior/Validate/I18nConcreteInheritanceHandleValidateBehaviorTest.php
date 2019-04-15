@@ -28,12 +28,11 @@ class I18nConcreteInheritanceHandleValidateBehaviorTest extends BookstoreTestBas
     public function assertPreConditions()
     {
         //if SF >= 2.5 use new validator classes
-        if(class_exists('Symfony\\Component\\Validator\\Validator\\RecursiveValidator')) {
+        if (class_exists('Symfony\\Component\\Validator\\Validator\\RecursiveValidator')) {
             $this->metadataFactory = new \Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory(new StaticMethodLoader());
         } else {
             $this->metadataFactory = new \Symfony\Component\Validator\Mapping\ClassMetadataFactory(new StaticMethodLoader());
         }
-
     }
 
     public function testI18nBehaviorHandlesValidateBehavior()
@@ -86,10 +85,10 @@ class I18nConcreteInheritanceHandleValidateBehaviorTest extends BookstoreTestBas
         // I'm not sure if this is needed. We should not care about validator internals
         $this->assertCount(2, $fictionMetadatas);
 
-        $expectedValidatorGroups = array(
+        $expectedValidatorGroups = [
             'ValidateTriggerFiction',
             'ValidateTriggerBook',
-        );
+        ];
 
         // iterate over metadatas and constarints.
         // If constraint match with expected constraint -> remove it form expectations list
@@ -117,11 +116,11 @@ class I18nConcreteInheritanceHandleValidateBehaviorTest extends BookstoreTestBas
         $comicMetadatas['isbn'] = $comicMetadata->getPropertyMetadata('isbn');
         $comicMetadatas['bar']  = $comicMetadata->getPropertyMetadata('bar');
 
-        $expectedComicValidators = array(
+        $expectedComicValidators = [
             'ValidateTriggerComic',
             'ValidateTriggerComic',
             'ValidateTriggerBook',
-        );
+        ];
 
         foreach ($comicMetadatas['isbn'] as $metadata) {
             /* @var $metadata \Symfony\Component\Validator\Mapping\PropertyMetadata */
@@ -136,10 +135,10 @@ class I18nConcreteInheritanceHandleValidateBehaviorTest extends BookstoreTestBas
 
         $comicMetadataBar = $comicMetadatas['bar'];
 
-        $expectedComicBarValidatorTypes = array(
+        $expectedComicBarValidatorTypes = [
             0 => 'Symfony\Component\Validator\Constraints\NotNull',
             1 => 'Symfony\Component\Validator\Constraints\Type',
-        );
+        ];
         foreach ($comicMetadataBar as $metadata) {
             $constraints = $metadata->getConstraints();
             foreach ($constraints as $constraint) {

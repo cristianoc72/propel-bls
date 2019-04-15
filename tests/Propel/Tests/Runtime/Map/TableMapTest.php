@@ -85,8 +85,9 @@ class TableMapTest extends TestCase
         try {
             $this->tmap->getColumn('FOO');
             $this->fail('getColumn throws an exception when called on an inexistent column');
-        } catch (ColumnNotFoundException $e) {}
-            $this->assertEquals($column, $this->tmap->getColumn('foo.bar'), 'getColumn accepts a denormalized column name');
+        } catch (ColumnNotFoundException $e) {
+        }
+        $this->assertEquals($column, $this->tmap->getColumn('foo.bar'), 'getColumn accepts a denormalized column name');
         try {
             $this->tmap->getColumn('foo.bar', false);
             $this->fail('getColumn accepts a $normalize parameter to skip name normalization');
@@ -239,7 +240,9 @@ class TableMapTest extends TestCase
     }
 }
 
-class TestCollection extends \Propel\Runtime\Collection\ObjectCollection {}
+class TestCollection extends \Propel\Runtime\Collection\ObjectCollection
+{
+}
 
 class TestableTableMap extends TableMap
 {

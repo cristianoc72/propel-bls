@@ -263,8 +263,7 @@ SQL;
         $builder->setSchema($schema);
         $builder->buildClasses();
 
-        foreach ($expectClasses as $expectClass)
-        {
+        foreach ($expectClasses as $expectClass) {
             $this->assertTrue(class_exists($expectClass), sprintf('expect class "%s" is not exists', $expectClass));
         }
     }

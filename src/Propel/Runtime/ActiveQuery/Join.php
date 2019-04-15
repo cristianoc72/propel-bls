@@ -114,7 +114,7 @@ class Join
     public function addCondition($left, $right, $operator = self::EQUAL)
     {
         if (strrpos($left, '.')) {
-            list($this->leftTableName,  $this->left[]) = explode('.', $left);
+            list($this->leftTableName, $this->left[]) = explode('.', $left);
         } else {
             $this->left[] = $left;
         }
@@ -614,7 +614,7 @@ class Join
                     $this->leftValues[$i],
                     self::EQUAL
                 );
-            } else if ($this->rightValues[$i]) {
+            } elseif ($this->rightValues[$i]) {
                 $criterion = $c->getNewCriterion(
                     $this->getRightColumn($i),
                     $this->rightValues[$i],
@@ -660,8 +660,8 @@ class Join
             for ($i = 0; $i < $this->count; $i++) {
                 if ($this->leftValues[$i]) {
                     $conditions[] = $this->getLeftColumn($i) . $this->getOperator($i) . var_export($this->leftValues[$i], true);
-                } else if ($this->rightValues[$i]) {
-                        $conditions[] = $this->getRightColumn($i) . $this->getOperator($i) . var_export($this->rightValues[$i], true);
+                } elseif ($this->rightValues[$i]) {
+                    $conditions[] = $this->getRightColumn($i) . $this->getOperator($i) . var_export($this->rightValues[$i], true);
                 } else {
                     $conditions[] = $this->getLeftColumn($i) . $this->getOperator($i) . $this->getRightColumn($i);
                 }
@@ -678,7 +678,8 @@ class Join
             $rightTableName = $this->getAdapter()->quoteIdentifierTable($rightTableName);
         }
 
-        return sprintf('%s %s ON %s',
+        return sprintf(
+            '%s %s ON %s',
             $this->getJoinType(),
             $rightTableName,
             $joinCondition
@@ -737,5 +738,4 @@ class Join
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

@@ -57,7 +57,6 @@ class SortableBehaviorQueryBuilderModifier
 
     public function queryMethods($builder)
     {
-
         $this->setBuilder($builder);
         $this->builder->declareClasses(
             '\Propel\Runtime\Propel',
@@ -127,7 +126,6 @@ static public function sortableApplyScopeCriteria(Criteria \$criteria, \$scope, 
         $script .= "
 }
 ";
-
     }
 
     protected function addInList(&$script)

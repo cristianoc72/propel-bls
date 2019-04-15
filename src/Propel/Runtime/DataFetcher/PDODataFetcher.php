@@ -39,7 +39,8 @@ class PDODataFetcher extends AbstractDataFetcher
      * Sets a new fetch style (FETCH_NUM, FETCH_ASSOC or FETCH_BOTH). Returns previous fetch style.
      * @var integer
      */
-    public function setStyle($style) {
+    public function setStyle($style)
+    {
         $old_style = $this->style;
         $this->style = $style;
         return $old_style;
@@ -49,7 +50,8 @@ class PDODataFetcher extends AbstractDataFetcher
      * Returns current fetch style (FETCH_NUM, FETCH_ASSOC or FETCH_BOTH).
      * @var integer
      */
-    public function getStyle() {
+    public function getStyle()
+    {
         return $this->style;
     }
 
@@ -108,8 +110,9 @@ class PDODataFetcher extends AbstractDataFetcher
      */
     public function rewind()
     {
-        if ($this->dataObject)
+        if ($this->dataObject) {
             $this->current = $this->dataObject->fetch($this->style);
+        }
     }
 
     /**
@@ -169,7 +172,8 @@ class PDODataFetcher extends AbstractDataFetcher
      */
     public function bindColumn($column, &$param, $type = null, $maxlen = null, $driverdata = null)
     {
-        if ($this->dataObject)
+        if ($this->dataObject) {
             $this->dataObject->bindColumn($column, $param, $type, $maxlen, $driverdata);
+        }
     }
 }

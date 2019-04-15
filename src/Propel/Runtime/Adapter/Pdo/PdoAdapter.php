@@ -417,7 +417,7 @@ abstract class PdoAdapter
 
         if ($aliasAll) {
             $this->turnSelectColumnsToAliases($criteria);
-            // no select columns after that, they are all aliases
+        // no select columns after that, they are all aliases
         } else {
             foreach ($criteria->getSelectColumns() as $columnName) {
 
@@ -601,5 +601,4 @@ abstract class PdoAdapter
 
         return $stmt->bindValue($parameter, $value, $cMap->getPdoType());
     }
-
 }

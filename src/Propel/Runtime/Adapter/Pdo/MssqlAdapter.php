@@ -153,9 +153,9 @@ class MssqlAdapter extends PdoAdapter implements SqlAdapterInterface
         for ($i = $selectTextLen; $i < $len; $i++) {
             if ('(' === $sql[$i]) {
                 $parenthesisMatch++;
-            } else if (')' === $sql[$i]) {
+            } elseif (')' === $sql[$i]) {
                 $parenthesisMatch--;
-            } else if (0 === $parenthesisMatch && $i === stripos($sql, ' from ', $i)) {
+            } elseif (0 === $parenthesisMatch && $i === stripos($sql, ' from ', $i)) {
                 // If we hit a 'from' clause outside of matching parenthesis, split the
                 // query string into `SELECT $selectStatement FROM $fromStatement`
                 $selectStatement = trim(substr($sql, $selectTextLen, $i - $selectTextLen));

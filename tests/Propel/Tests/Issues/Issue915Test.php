@@ -5,8 +5,6 @@ namespace Propel\Tests\Issues;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Tests\Helpers\Bookstore\BookstoreTestBase;
 
-
-
 /**
  * This test proves the bug described in https://github.com/propelorm/Propel2/issues/915.
  * @group database
@@ -38,5 +36,4 @@ EOF;
         $unserializedBook = unserialize(serialize($o));
         $this->assertEquals('blue', $unserializedBook->getColor());
     }
-
 }

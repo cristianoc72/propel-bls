@@ -44,7 +44,7 @@ class ArrayFormatterTest extends BookstoreEmptyTestBase
             $books = $formatter->format($dataFetcher);
             $this->fail('ArrayFormatter::format() throws an exception when called with no valid criteria');
         } catch (PropelException $e) {
-            $this->assertTrue(true,'ArrayFormatter::format() throws an exception when called with no valid criteria');
+            $this->assertTrue(true, 'ArrayFormatter::format() throws an exception when called with no valid criteria');
         }
     }
 
@@ -105,7 +105,7 @@ class ArrayFormatterTest extends BookstoreEmptyTestBase
             $book = $formatter->formatOne($dataFetcher);
             $this->fail('ArrayFormatter::formatOne() throws an exception when called with no valid criteria');
         } catch (PropelException $e) {
-            $this->assertTrue(true,'ArrayFormatter::formatOne() throws an exception when called with no valid criteria');
+            $this->assertTrue(true, 'ArrayFormatter::formatOne() throws an exception when called with no valid criteria');
         }
     }
 
@@ -133,5 +133,4 @@ class ArrayFormatterTest extends BookstoreEmptyTestBase
 
         $this->assertNull($book, 'ArrayFormatter::formatOne() returns null when no result');
     }
-
 }

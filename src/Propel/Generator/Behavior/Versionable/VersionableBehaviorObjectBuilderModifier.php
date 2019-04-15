@@ -249,9 +249,7 @@ public function isVersioningNecessary(ConnectionInterface \$con = null)
         }
 
         foreach ($this->behavior->getVersionableReferrers() as $fk) {
-
             if ($fk->isLocalPrimaryKey()) {
-
                 $fkGetter = $this->builder->getRefFKPhpNameAffix($fk);
                 $script .= "
     if (\$this->single{$fkGetter}) {
@@ -268,7 +266,6 @@ public function isVersioningNecessary(ConnectionInterface \$con = null)
     }
 ";
             } else {
-
                 $fkGetter = $this->builder->getRefFKPhpNameAffix($fk, $plural = true);
                 $script .= "
     if (\$this->coll{$fkGetter}) {
@@ -357,7 +354,7 @@ public function addVersion(ConnectionInterface \$con = null)
                 ";
             }
         }
-            $script .= "
+        $script .= "
     \$version->save(\$con);
 
     return \$version;

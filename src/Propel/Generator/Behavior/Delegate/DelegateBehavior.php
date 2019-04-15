@@ -128,7 +128,7 @@ class DelegateBehavior extends Behavior
                 $ARFQCN = $builder->getNewStubObjectBuilder($delegateTable)->getFullyQualifiedClassName();
                 $relationName = $builder->getFKPhpNameAffix($fk);
             }
-                $script .= "
+            $script .= "
 if (is_callable(array('$ARFQCN', \$name))) {
     \$delegate = \$this->get$relationName();
     if (!\$delegate) {
@@ -266,7 +266,6 @@ protected \$delegatedFields = [
 
                     $script .= $this->renderTemplate('queryMethodsTemplate', compact('tablePhpName', 'phpName', 'childClassName', 'fieldName'));
                 }
-
             }
         }
 
@@ -301,6 +300,6 @@ public function filterBy(\$column, \$value, \$comparison = Criteria::EQUAL)
 ";
         }
 
-       return $script;
+        return $script;
     }
 }

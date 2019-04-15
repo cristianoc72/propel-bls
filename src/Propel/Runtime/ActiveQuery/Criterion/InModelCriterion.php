@@ -43,5 +43,4 @@ class InModelCriterion extends AbstractModelCriterion
         }
         unset($value, $valuesLength);
     }
-
 }

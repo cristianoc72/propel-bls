@@ -781,7 +781,7 @@ class NestedSetBehaviorObjectBuilderModifierWithScopeTest extends TestCase
 
         $expected = [];
         $this->assertEquals($expected, $this->dumpTreeWithScope(2), 'root of scope 2 to scope 1, therefore scope 2 is empty');
-}
+    }
 
     public function testDeleteDescendants()
     {
@@ -817,7 +817,7 @@ class NestedSetBehaviorObjectBuilderModifierWithScopeTest extends TestCase
 
     public function testConstants()
     {
-        $this->assertEquals(\NestedSetTable10::LEFT_COL,  'nested_set_table10.my_left_column');
+        $this->assertEquals(\NestedSetTable10::LEFT_COL, 'nested_set_table10.my_left_column');
         $this->assertEquals(\NestedSetTable10::RIGHT_COL, 'nested_set_table10.my_right_column');
         $this->assertEquals(\NestedSetTable10::LEVEL_COL, 'nested_set_table10.my_level_column');
         $this->assertEquals(\NestedSetTable10::SCOPE_COL, 'nested_set_table10.my_scope_column');

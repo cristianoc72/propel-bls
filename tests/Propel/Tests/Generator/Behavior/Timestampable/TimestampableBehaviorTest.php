@@ -155,7 +155,6 @@ class TimestampableBehaviorTest extends BookstoreTestBase
         $tsave = time();
         $t1->save();
         $this->assertLessThan($tsave, $t1->getUpdatedAt('U'), 'keepUpdateDateUnchanged() prevents the behavior from updating the update date');
-
     }
 
     protected function populateUpdatedAt()

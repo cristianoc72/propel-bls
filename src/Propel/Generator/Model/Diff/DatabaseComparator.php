@@ -285,4 +285,5 @@ class DatabaseComparator
         }
 
         return false;
-    }}
+    }
+}

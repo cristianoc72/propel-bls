@@ -104,21 +104,18 @@ class SortableBehavior extends Behavior
      */
     public function generateScopePhp()
     {
-
         $methodSignature = '';
         $paramsDoc       = '';
         $buildScope      = '';
         $buildScopeVars  = '';
 
         if ($this->hasMultipleScopes()) {
-
             $methodSignature = [];
             $buildScope      = [];
             $buildScopeVars  = [];
             $paramsDoc       = [];
 
             foreach ($this->getScopes() as $idx => $scope) {
-
                 $column = $this->table->getColumn($scope);
                 $param  = '$scope'.$column->getPhpName();
 
@@ -136,7 +133,6 @@ class SortableBehavior extends Behavior
             $paramsDoc       = implode("\n", $paramsDoc);
             $buildScope      = "\n".implode('', $buildScope)."\n";
             $buildScopeVars  = "\n".implode('', $buildScopeVars)."\n";
-
         } elseif ($this->useScope()) {
             $methodSignature = '$scope';
             $column = $this->table->getColumn($this->getParameter('scope_column'));

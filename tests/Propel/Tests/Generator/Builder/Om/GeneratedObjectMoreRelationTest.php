@@ -79,12 +79,10 @@ EOF;
         \MoreRelationTest\PageQuery::create()->doDeleteAll();
 
         for ($i=1;$i<=2;$i++) {
-
             $page = new \MoreRelationTest\Page();
 
             $page->setTitle('Page '.$i);
             for ($j=1;$j<=3;$j++) {
-
                 $content = new \MoreRelationTest\Content();
                 $content->setTitle('Content '.$j);
                 $content->setContent(str_repeat('Content', $j));
@@ -99,7 +97,6 @@ EOF;
                 $comment->setContentId($i*$j);
                 $comment->setComment(str_repeat('Comment-'.$j.', ', $j));
                 $content->addContentComment($comment);
-
             }
 
             $page->save();
@@ -168,7 +165,7 @@ EOF;
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId($id)->count();
         $this->assertEquals(1, $count, 'We assigned a collection of only one item.');
 
-        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(NULL)->count();
+        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(null)->count();
         $this->assertEquals(0, $count, 'There should be no unassigned comment.');
 
         $page->removeComment($comment);
@@ -178,7 +175,7 @@ EOF;
         $count = \MoreRelationTest\CommentQuery::create()->filterByPageId($id)->count();
         $this->assertEquals(0, $count);
 
-        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(NULL)->count();
+        $count = \MoreRelationTest\CommentQuery::create()->filterByPageId(null)->count();
         $this->assertEquals(0, $count);
     }
 
@@ -213,9 +210,8 @@ EOF;
         $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId($id)->count();
         $this->assertEquals(2, $count, 'We assigned a collection of two items.');
 
-        $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId(NULL)->count();
+        $count = \MoreRelationTest\ContentCommentQuery::create()->filterByContentId(null)->count();
         $this->assertEquals(1, $count, 'There should be one unassigned contentComment.');
-
     }
 
     /**

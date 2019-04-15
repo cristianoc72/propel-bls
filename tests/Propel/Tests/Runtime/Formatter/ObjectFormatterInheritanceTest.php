@@ -61,5 +61,4 @@ class ObjectFormatterInheritanceTest extends BookstoreEmptyTestBase
             $this->assertEquals($expectedClass[$emp->getName()], get_class($emp), 'format() creates objects of the correct class when using inheritance');
         }
     }
-
 }

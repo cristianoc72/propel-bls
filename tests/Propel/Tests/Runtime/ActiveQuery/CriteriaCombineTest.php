@@ -251,7 +251,7 @@ class CriteriaCombineTest extends BaseTestCase
 
     public function testCombineCriterionAndMultiple()
     {
-        $this->c->addCond('cond1',"INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
+        $this->c->addCond('cond1', "INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond2', "INVOICE.COST2", "2000", Criteria::LESS_EQUAL);
         $this->c->addCond('cond3', "INVOICE.COST3", "8000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond4', "INVOICE.COST4", "9000", Criteria::LESS_EQUAL);
@@ -316,7 +316,7 @@ class CriteriaCombineTest extends BaseTestCase
 
     public function testCombineCriterionOrMultiple()
     {
-        $this->c->addCond('cond1',"INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
+        $this->c->addCond('cond1', "INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond2', "INVOICE.COST2", "2000", Criteria::LESS_EQUAL);
         $this->c->addCond('cond3', "INVOICE.COST3", "8000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond4', "INVOICE.COST4", "9000", Criteria::LESS_EQUAL);
@@ -389,7 +389,6 @@ class CriteriaCombineTest extends BaseTestCase
 
     public function testClonedCriteriaNotAffected()
     {
-
         $this->c->addCond('cond1', "INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond2', "INVOICE.COST2", "2000", Criteria::LESS_EQUAL);
         $this->c->combine(['cond1', 'cond2'], Criteria::LOGICAL_AND, 'cond12');
@@ -428,12 +427,11 @@ class CriteriaCombineTest extends BaseTestCase
         $result3 = $clonedCriteria->createSelectSql($params3);
 
         $this->assertEquals($expect1, $result3);
-
     }
 
 
-    public function testClonedCriteriaNotAffected2() {
-
+    public function testClonedCriteriaNotAffected2()
+    {
         $this->c->addCond('cond1', "INVOICE.COST1", "1000", Criteria::GREATER_EQUAL);
         $this->c->addCond('cond2', "INVOICE.COST2", "2000", Criteria::LESS_EQUAL);
         $this->c->combine(['cond1', 'cond2'], Criteria::LOGICAL_AND, 'cond12');
@@ -484,6 +482,5 @@ class CriteriaCombineTest extends BaseTestCase
 
         $this->assertEquals($expect3, $result3);
         $this->assertEquals($expect_params3, $params3);
-
     }
 }

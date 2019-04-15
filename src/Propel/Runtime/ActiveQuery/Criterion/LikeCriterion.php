@@ -94,5 +94,4 @@ class LikeCriterion extends AbstractCriterion
             $sb .= ':p'.count($params);
         }
     }
-
 }

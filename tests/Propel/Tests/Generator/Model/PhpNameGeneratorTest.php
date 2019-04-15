@@ -63,7 +63,6 @@ class PhpNameGeneratorTest extends TestCase
         $generator = new TestablePhpNameGenerator();
         $this->assertEquals($output, $generator->underscoreMethod($input));
     }
-
 }
 
 class TestablePhpNameGenerator extends PhpNameGenerator

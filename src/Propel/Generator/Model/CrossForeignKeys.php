@@ -249,5 +249,4 @@ class CrossForeignKeys
     {
         return $this->table;
     }
-
 }

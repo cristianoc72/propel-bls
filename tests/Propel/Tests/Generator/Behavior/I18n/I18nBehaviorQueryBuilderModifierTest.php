@@ -24,7 +24,6 @@ use Propel\Tests\TestCase;
  */
 class I18nBehaviorQueryBuilderModifierTest extends TestCase
 {
-
     public function setUp()
     {
         if (!class_exists('\I18nBehaviorTest11')) {
@@ -273,5 +272,4 @@ EOF;
         $translation = $o->getTranslation('en_US', $con);
         $this->assertEquals($count, $con->getQueryCount());
     }
-
 }

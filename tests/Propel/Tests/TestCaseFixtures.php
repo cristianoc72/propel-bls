@@ -114,7 +114,8 @@ class TestCaseFixtures extends TestCase
 
 
         $builtInfo = __DIR__ . '/../../Fixtures/fixtures_built';
-        file_put_contents($builtInfo,
+        file_put_contents(
+            $builtInfo,
             "$dsn\n$mode\nFixtures has been created. Delete this file to let the test suite regenerate all fixtures."
         );
 
@@ -223,7 +224,7 @@ class TestCaseFixtures extends TestCase
             $db = 'mysql';
         }
 
-        $dsn = $db . ':host=' . (getenv('DB_HOSTNAME') ?: '127.0.0.1' ) . ';dbname=';
+        $dsn = $db . ':host=' . (getenv('DB_HOSTNAME') ?: '127.0.0.1') . ';dbname=';
         $dsn .= getenv('DB_NAME') ?: 'test';
 
         return $dsn;

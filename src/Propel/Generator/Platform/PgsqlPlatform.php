@@ -144,7 +144,8 @@ class PgsqlPlatform extends DefaultPlatform
 CREATE SEQUENCE %s;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
             );
         }
@@ -158,7 +159,8 @@ CREATE SEQUENCE %s;
 DROP SEQUENCE %s;
 ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
             );
         }
@@ -238,14 +240,15 @@ SET search_path TO public;
         return $ret;
     }
 
-    public function getForeignKeyDDL(ForeignKey $fk) {
+    public function getForeignKeyDDL(ForeignKey $fk)
+    {
         $script = parent::getForeignKeyDDL($fk);
 
         $pgVendorInfo = $fk->getVendorInfoForType('pgsql');
-        if($pgVendorInfo) {
-            if(filter_var($pgVendorInfo->getParameter('deferrable'), FILTER_VALIDATE_BOOLEAN)) {
+        if ($pgVendorInfo) {
+            if (filter_var($pgVendorInfo->getParameter('deferrable'), FILTER_VALIDATE_BOOLEAN)) {
                 $script .= ' DEFERRABLE';
-                if(filter_var($pgVendorInfo->getParameter("initiallyDeferred"), FILTER_VALIDATE_BOOLEAN)) {
+                if (filter_var($pgVendorInfo->getParameter("initiallyDeferred"), FILTER_VALIDATE_BOOLEAN)) {
                     $script .= ' INITIALLY DEFERRED';
                 }
             }
@@ -315,7 +318,8 @@ CREATE TABLE %s
     %s
 );
 ";
-        $ret .= sprintf($pattern,
+        $ret .= sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines)
         );
@@ -324,7 +328,8 @@ CREATE TABLE %s
             $pattern = "
 COMMENT ON TABLE %s IS %s;
 ";
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($table->getName()),
                 $this->quote($table->getDescription())
             );
@@ -352,7 +357,8 @@ COMMENT ON TABLE %s IS %s;
 COMMENT ON COLUMN %s.%s IS %s;
 ";
         if ($description = $column->getDescription()) {
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($column->getTable()->getName()),
                 $this->quoteIdentifier($column->getName()),
                 $this->quote($description)
@@ -419,7 +425,8 @@ DROP TABLE IF EXISTS %s CASCADE;
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('CONSTRAINT %s UNIQUE (%s)',
+        return sprintf(
+            'CONSTRAINT %s UNIQUE (%s)',
             $this->quoteIdentifier($unique->getName()),
             $this->getColumnListDDL($unique->getColumnObjects())
         );
@@ -435,7 +442,8 @@ DROP TABLE IF EXISTS %s CASCADE;
 ALTER TABLE %s RENAME TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromTableName),
             $this->quoteIdentifier($toTableName)
         );
@@ -507,14 +515,14 @@ ALTER TABLE %s ALTER COLUMN %s;
             $seqName = "{$tableName}_{$colPlainName}_seq";
 
             if ($toColumn->isAutoIncrement() && $table && $table->getIdMethodParameters() == null) {
-
                 $defaultValue = "nextval('$seqName'::regclass)";
                 $toColumn->setDefaultValue($defaultValue);
                 $changedProperties['defaultValueValue'] = [null, $defaultValue];
 
                 //add sequence
                 if (!$fromTable->getDatabase()->hasSequence($seqName)) {
-                    $this->createOrDropSequences .= sprintf("
+                    $this->createOrDropSequences .= sprintf(
+                        "
 CREATE SEQUENCE %s;
 ",
                         $seqName
@@ -529,7 +537,8 @@ CREATE SEQUENCE %s;
 
                 //remove sequence
                 if ($fromTable->getDatabase()->hasSequence($seqName)) {
-                    $this->createOrDropSequences .= sprintf("
+                    $this->createOrDropSequences .= sprintf(
+                        "
 DROP SEQUENCE %s CASCADE;
 ",
                         $seqName
@@ -540,7 +549,6 @@ DROP SEQUENCE %s CASCADE;
         }
 
         if (isset($changedProperties['size']) || isset($changedProperties['type']) || isset($changedProperties['sqlType']) || isset($changedProperties['scale'])) {
-
             $sqlType = $toColumn->getDomain()->getSqlType();
 
             if ($this->hasSize($sqlType) && $toColumn->isDefaultSqlType($this)) {
@@ -556,7 +564,8 @@ DROP SEQUENCE %s CASCADE;
             if ($using = $this->getUsingCast($fromColumn, $toColumn)) {
                 $sqlType .= $using;
             }
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($table->getName()),
                 $colName . ' TYPE ' . $sqlType
             );
@@ -682,7 +691,8 @@ DROP SEQUENCE %s CASCADE;
     ALTER TABLE %s DROP CONSTRAINT %s;
     ";
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($index->getTable()->getName()),
                 $this->quoteIdentifier($index->getName())
             );
@@ -704,7 +714,8 @@ DROP SEQUENCE %s CASCADE;
         $snippet = "
 \$dataFetcher = %s->query(\"SELECT nextval('%s')\");
 %s = %s\$dataFetcher->fetchColumn();";
-        $script = sprintf($snippet,
+        $script = sprintf(
+            $snippet,
             $connectionVariableName,
             $sequenceName,
             $columnValueMutator,
@@ -713,5 +724,4 @@ DROP SEQUENCE %s CASCADE;
 
         return preg_replace('/^/m', $tab, $script);
     }
-
 }

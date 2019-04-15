@@ -18,7 +18,7 @@ use Propel\Runtime\Map\ColumnMap;
  *
  * @author Francois
  */
-Abstract class AbstractModelCriterion extends AbstractCriterion
+abstract class AbstractModelCriterion extends AbstractCriterion
 {
     protected $clause = '';
 
@@ -66,7 +66,8 @@ Abstract class AbstractModelCriterion extends AbstractCriterion
         /** @var AbstractModelCriterion $crit */
         $crit = $obj;
 
-        $isEquiv = (((null === $this->table && null === $crit->getTable())
+        $isEquiv = ((
+            (null === $this->table && null === $crit->getTable())
             || (null !== $this->table && $crit->getTable() === $this->table)
                           )
             && $this->clause === $crit->getClause()

@@ -35,17 +35,17 @@ class MigrationDiffCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->addOption('schema-dir',         null, InputOption::VALUE_REQUIRED,  'The directory where the schema files are placed')
-            ->addOption('output-dir',         null, InputOption::VALUE_REQUIRED,  'The output directory where the migration files are located')
-            ->addOption('migration-table',    null, InputOption::VALUE_REQUIRED,  'Migration table name', null)
-            ->addOption('connection',         null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use. Example: \'bookstore=mysql:host=127.0.0.1;dbname=test;user=root;password=foobar\' where "bookstore" is your propel database name (used in your schema.xml)', [])
-            ->addOption('table-renaming',     null, InputOption::VALUE_NONE,      'Detect table renaming', null)
-            ->addOption('editor',             null, InputOption::VALUE_OPTIONAL,  'The text editor to use to open diff files', null)
-            ->addOption('skip-removed-table', null, InputOption::VALUE_NONE,      'Option to skip removed table from the migration')
-            ->addOption('skip-tables',        null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'List of excluded tables', [])
+            ->addOption('schema-dir', null, InputOption::VALUE_REQUIRED, 'The directory where the schema files are placed')
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory where the migration files are located')
+            ->addOption('migration-table', null, InputOption::VALUE_REQUIRED, 'Migration table name', null)
+            ->addOption('connection', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Connection to use. Example: \'bookstore=mysql:host=127.0.0.1;dbname=test;user=root;password=foobar\' where "bookstore" is your propel database name (used in your schema.xml)', [])
+            ->addOption('table-renaming', null, InputOption::VALUE_NONE, 'Detect table renaming', null)
+            ->addOption('editor', null, InputOption::VALUE_OPTIONAL, 'The text editor to use to open diff files', null)
+            ->addOption('skip-removed-table', null, InputOption::VALUE_NONE, 'Option to skip removed table from the migration')
+            ->addOption('skip-tables', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'List of excluded tables', [])
             ->addOption('disable-identifier-quoting', null, InputOption::VALUE_NONE, 'Disable identifier quoting in SQL queries for reversed database tables.')
-            ->addOption('comment',            "m",  InputOption::VALUE_OPTIONAL,  'A comment for the migration', '')
-            ->addOption('suffix',             null, InputOption::VALUE_OPTIONAL,  'A suffix for the migration class', '')
+            ->addOption('comment', "m", InputOption::VALUE_OPTIONAL, 'A comment for the migration', '')
+            ->addOption('suffix', null, InputOption::VALUE_OPTIONAL, 'A suffix for the migration class', '')
             ->setName('migration:diff')
             ->setAliases(['diff'])
             ->setDescription('Generate diff classes')
@@ -108,7 +108,6 @@ class MigrationDiffCommand extends AbstractCommand
         $reversedSchema = new Schema();
 
         foreach ($manager->getDatabases() as $appDatabase) {
-
             $name = $appDatabase->getName();
             if (!$params = @$connections[$name]) {
                 $output->writeln(sprintf('<info>No connection configured for database "%s"</info>', $name));
@@ -196,7 +195,8 @@ class MigrationDiffCommand extends AbstractCommand
             foreach ($databaseDiff->getPossibleRenamedTables() as $fromTableName => $toTableName) {
                 $output->writeln(sprintf(
                     '<info>Possible table renaming detected: "%s" to "%s". It will be deleted and recreated. Use --table-renaming to only rename it.</info>',
-                        $fromTableName, $toTableName
+                    $fromTableName,
+                    $toTableName
                 ));
             }
 
@@ -232,5 +232,4 @@ class MigrationDiffCommand extends AbstractCommand
             $output->writeln('Once the migration class is valid, call the "migrate" task to execute it.');
         }
     }
-
 }

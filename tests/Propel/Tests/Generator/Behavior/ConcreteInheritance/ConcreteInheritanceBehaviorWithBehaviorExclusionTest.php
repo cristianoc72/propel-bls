@@ -62,5 +62,4 @@ EOF;
         $this->assertFalse(array_key_exists('sluggable', $behaviors), '');
         $this->assertTrue(array_key_exists('timestampable', $behaviors), '');
     }
-
 }

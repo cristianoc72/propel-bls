@@ -237,5 +237,4 @@ class BaseModelCriteria extends Criteria implements \IteratorAggregate
         }
         throw new LogicException('The current formatter doesn\'t return an iterable result');
     }
-
 }

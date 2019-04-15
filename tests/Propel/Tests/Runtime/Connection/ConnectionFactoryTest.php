@@ -80,8 +80,11 @@ class ConnectionFactoryTest extends BaseTestCase
     {
         $con = ConnectionFactory::create(['dsn' => 'sqlite::memory:', 'attributes' => ['ATTR_CAE' => PDO::CASE_LOWER]], new SqliteAdapter());
     }
-
 }
 
-class MyConnectionForFactoryTest1 extends ConnectionWrapper {}
-class MyConnectionForFactoryTest2 extends ConnectionWrapper {}
+class MyConnectionForFactoryTest1 extends ConnectionWrapper
+{
+}
+class MyConnectionForFactoryTest2 extends ConnectionWrapper
+{
+}

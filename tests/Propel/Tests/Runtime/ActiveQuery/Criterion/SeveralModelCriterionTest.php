@@ -61,5 +61,4 @@ class SeveralModelCriterionTest extends BaseTestCase
         $ps = '';
         $cton->appendPsTo($ps, $params);
     }
-
 }

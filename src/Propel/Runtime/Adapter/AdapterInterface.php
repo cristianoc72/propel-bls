@@ -195,5 +195,4 @@ interface AdapterInterface
      * @return string
      */
     public function getGroupBy(Criteria $criteria);
-
 }

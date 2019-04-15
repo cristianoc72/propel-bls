@@ -79,5 +79,4 @@ class ForeignKeyComparator
         // compare skipSql
         return $fromFk->isSkipSql() !== $toFk->isSkipSql();
     }
-
 }

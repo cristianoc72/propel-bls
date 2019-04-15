@@ -90,5 +90,4 @@ class IndexComparatorTest extends TestCase
         $i2->addColumn($c3);
         $this->assertTrue(IndexComparator::computeDiff($i1, $i2));
     }
-
 }

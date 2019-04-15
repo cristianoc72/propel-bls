@@ -104,7 +104,6 @@ class ModelCriteriaTest extends BookstoreTestBase
         } catch (InvalidArgumentException $e) {
             $this->assertTrue(true, 'setFormatter() throws an exception when passed an object not extending AbstractFormatter');
         }
-
     }
 
     public static function conditionsForTestReplaceNames()
@@ -493,7 +492,6 @@ class ModelCriteriaTest extends BookstoreTestBase
             $params,
             'filterBy() accepts a simple column name, even if initialized with an alias'
         );
-
     }
 
     public function testGetParams()
@@ -517,7 +515,6 @@ class ModelCriteriaTest extends BookstoreTestBase
         ];
 
         $this->assertEquals($expectedParams, $params, 'test getting parameters with Specialized Criterion used for LIKE expressions');
-
     }
 
     public function testHaving()
@@ -751,7 +748,6 @@ class ModelCriteriaTest extends BookstoreTestBase
         $sql = 'SELECT  FROM  LIMIT 0';
         $params = [];
         $this->assertCriteriaTranslation($c, $sql, $params, 'limit() adds a LIMIT clause');
-
     }
 
     public function testOffset()
@@ -1820,7 +1816,6 @@ class ModelCriteriaTest extends BookstoreTestBase
     {
         $c = new ModelCriteria('bookstore', 'Propel\Tests\Bookstore\BookListRel');
         $bookListRel = $c->findPks([[1, 2]]);
-
     }
 
     public function testFindBy()
@@ -2273,7 +2268,6 @@ class ModelCriteriaTest extends BookstoreTestBase
             $expectedSQL = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book LEFT JOIN author ON (book.author_id=author.id) WHERE author.first_name = 'Leo' LIMIT 1");
             $this->assertEquals($expectedSQL, $con->getLastExecutedQuery(), 'leftJoinX() is turned into join($x, Criteria::LEFT_JOIN)');
         }
-
     }
 
     public function testMagicJoinWith()
@@ -2434,7 +2428,6 @@ class ModelCriteriaTest extends BookstoreTestBase
 
         if (!$this->runningOnMySQL()) {
             $expectedSQL = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book LEFT JOIN author ON (book.author_id=author.id) WHERE book.title = 'foo' AND author.first_name = 'john' LIMIT 5 OFFSET 10");
-
         } else {
             $expectedSQL = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book LEFT JOIN author ON (book.author_id=author.id) WHERE book.title = 'foo' AND author.first_name = 'john' LIMIT 10, 5");
         }
@@ -2466,7 +2459,6 @@ class ModelCriteriaTest extends BookstoreTestBase
 
         if (!$this->runningOnMySQL()) {
             $expectedSQL = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book LEFT JOIN author a ON (book.author_id=a.id) WHERE book.title = 'foo' AND a.first_name = 'john' LIMIT 5 OFFSET 10");
-
         } else {
             $expectedSQL = $this->getSql("SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id FROM book LEFT JOIN author a ON (book.author_id=a.id) WHERE book.title = 'foo' AND a.first_name = 'john' LIMIT 10, 5");
         }
@@ -2622,7 +2614,6 @@ class ModelCriteriaTest extends BookstoreTestBase
         $this->assertEquals(2, count($with), 'mergeWith() merge joins to an existing join');
         $this->assertEquals('modelName: Propel\Tests\Bookstore\Author, relationName: Author, relationMethod: setAuthor, leftPhpName: , rightPhpName: a', $with['a']->__toString(), 'mergeWith() merge joins to an empty join');
         $this->assertEquals('modelName: Propel\Tests\Bookstore\Publisher, relationName: Publisher, relationMethod: setPublisher, leftPhpName: , rightPhpName: p', $with['p']->__toString(), 'mergeWith() merge joins to an empty join');
-
     }
 
     public function testGetAliasedColName()

@@ -80,8 +80,12 @@ trait BehaviorableTrait
         $class = $locator->getBehavior($bdata['name']);
         $behavior = new $class();
         if (!($behavior instanceof Behavior)) {
-            throw new BuildException(sprintf('Behavior [%s: %s] not instance of %s',
-                    $bdata['name'], $class, '\Propel\Generator\Model\Behavior'));
+            throw new BuildException(sprintf(
+                'Behavior [%s: %s] not instance of %s',
+                $bdata['name'],
+                $class,
+                '\Propel\Generator\Model\Behavior'
+            ));
         }
         $behavior->loadMapping($bdata);
 

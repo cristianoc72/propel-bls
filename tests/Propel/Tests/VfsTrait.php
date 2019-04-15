@@ -71,7 +71,7 @@ trait VfsTrait
 
         $dirs = explode('/', $dirname);
         $parent = $this->getRoot();
-        foreach($dirs as $dir) {
+        foreach ($dirs as $dir) {
             $current = $parent->getChild($dir);
             if (null === $current) {
                 $current = vfsStream::newDirectory($dir)->at($parent);

@@ -73,5 +73,4 @@ class GeneratedRelationMapTest extends TestCaseFixtures
         $rfTable = $this->databaseMap->getTableByPhpName('Propel\Tests\Bookstore\ReaderFavorite');
         $this->assertTrue($rfTable->getRelation('BookOpinion')->isComposite());
     }
-
 }

@@ -79,11 +79,11 @@ class TestPrepareCommand extends AbstractCommand
     {
         $this
             ->setDefinition([
-                new InputOption('vendor',       null, InputOption::VALUE_REQUIRED, 'The database vendor', self::DEFAULT_VENDOR),
-                new InputOption('dsn',          null, InputOption::VALUE_REQUIRED, 'The data source name', self::DEFAULT_DSN),
-                new InputOption('user',          'u', InputOption::VALUE_REQUIRED, 'The database user', self::DEFAULT_DB_USER),
-                new InputOption('password',      'p', InputOption::VALUE_REQUIRED, 'The database password', self::DEFAULT_DB_PASSWD),
-                new InputOption('exclude-database',  null, InputOption::VALUE_NONE, 'Whether this should not touch database\'s schema'),
+                new InputOption('vendor', null, InputOption::VALUE_REQUIRED, 'The database vendor', self::DEFAULT_VENDOR),
+                new InputOption('dsn', null, InputOption::VALUE_REQUIRED, 'The data source name', self::DEFAULT_DSN),
+                new InputOption('user', 'u', InputOption::VALUE_REQUIRED, 'The database user', self::DEFAULT_DB_USER),
+                new InputOption('password', 'p', InputOption::VALUE_REQUIRED, 'The database password', self::DEFAULT_DB_PASSWD),
+                new InputOption('exclude-database', null, InputOption::VALUE_NONE, 'Whether this should not touch database\'s schema'),
             ])
             ->setName('test:prepare')
             ->setDescription('Prepare the Propel test suite by building fixtures')
@@ -121,9 +121,9 @@ class TestPrepareCommand extends AbstractCommand
         if (is_file('propel.yaml.dist')) {
             $content = file_get_contents('propel.yaml.dist');
 
-            $content = str_replace('##DATABASE_VENDOR##',   $input->getOption('vendor'), $content);
-            $content = str_replace('##DATABASE_URL##',      $input->getOption('dsn'), $content);
-            $content = str_replace('##DATABASE_USER##',     $input->getOption('user'), $content);
+            $content = str_replace('##DATABASE_VENDOR##', $input->getOption('vendor'), $content);
+            $content = str_replace('##DATABASE_URL##', $input->getOption('dsn'), $content);
+            $content = str_replace('##DATABASE_USER##', $input->getOption('user'), $content);
             $content = str_replace('##DATABASE_PASSWORD##', $input->getOption('password'), $content);
 
             file_put_contents('propel.yaml', $content);
@@ -176,13 +176,16 @@ class TestPrepareCommand extends AbstractCommand
                 if ('sqlite' === substr($input->getOption('dsn'), 0, 6)) {
                     $conParams[] = sprintf(
                         '%s=%s',
-                        $con, $input->getOption('dsn')
+                        $con,
+                        $input->getOption('dsn')
                     );
                 } else {
                     $conParams[] = sprintf(
                         '%s=%s;user=%s;password=%s',
-                        $con, $input->getOption('dsn'),
-                        $input->getOption('user'), $input->getOption('password')
+                        $con,
+                        $input->getOption('dsn'),
+                        $input->getOption('user'),
+                        $input->getOption('password')
                     );
                 }
             }

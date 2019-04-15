@@ -27,9 +27,9 @@ class ConfigConvertCommand extends AbstractCommand
     protected function configure()
     {
         $this
-            ->addOption('config-dir',   null, InputOption::VALUE_REQUIRED,  'The directory where the configuration file is placed.',   self::DEFAULT_CONFIG_DIRECTORY)
-            ->addOption('output-dir',  null, InputOption::VALUE_REQUIRED,  'The output directory')
-            ->addOption('output-file', null, InputOption::VALUE_REQUIRED,  'The output file',       self::DEFAULT_OUTPUT_FILE)
+            ->addOption('config-dir', null, InputOption::VALUE_REQUIRED, 'The directory where the configuration file is placed.', self::DEFAULT_CONFIG_DIRECTORY)
+            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'The output directory')
+            ->addOption('output-file', null, InputOption::VALUE_REQUIRED, 'The output file', self::DEFAULT_OUTPUT_FILE)
             ->setName('config:convert')
             ->setAliases(['convert-conf'])
             ->setDescription('Transform the configuration to PHP code leveraging the ServiceContainer')
@@ -68,7 +68,6 @@ class ConfigConvertCommand extends AbstractCommand
             $currentContent = file_get_contents($outputFilePath);
             if ($currentContent == $phpConf) {
                 $output->writeln(sprintf('No change required in the current configuration file <info>"%s"</info>.', $outputFilePath));
-
             } else {
                 file_put_contents($outputFilePath, $phpConf);
                 $output->writeln(sprintf('Successfully updated PHP configuration in file <info>"%s"</info>.', $outputFilePath));

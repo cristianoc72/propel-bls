@@ -23,7 +23,6 @@ use Propel\Generator\Model\Unique;
  */
 abstract class PlatformTestProvider extends PlatformTestBase
 {
-
     public function providerForTestGetAddTablesDDL()
     {
         $schema = <<<EOF
@@ -341,5 +340,4 @@ EOF;
             [$table1]
         ];
     }
-
 }

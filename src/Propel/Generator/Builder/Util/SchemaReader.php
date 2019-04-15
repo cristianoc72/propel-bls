@@ -144,9 +144,12 @@ class SchemaReader
         xml_set_object($parser, $this);
         xml_set_element_handler($parser, 'startElement', 'endElement');
         if (!xml_parse($parser, $xmlString)) {
-            throw new SchemaException(sprintf('XML error: %s at line %d',
+            throw new SchemaException(
+                sprintf(
+                'XML error: %s at line %d',
                 xml_error_string(xml_get_error_code($parser)),
-                xml_get_current_line_number($parser))
+                xml_get_current_line_number($parser)
+            )
             );
         }
         xml_parser_free($parser);
@@ -202,7 +205,7 @@ class SchemaReader
                     break;
 
                 case 'table':
-                    if (!isset($attributes['schema']) 
+                    if (!isset($attributes['schema'])
                         && $this->currDB->getSchema() && $this->currDB->getPlatform()->supportsSchemas()
                         && false === strpos($attributes['name'], $this->currDB->getPlatform()->getSchemaDelimiter())) {
                         $attributes['schema'] = $this->currDB->getSchema();
@@ -226,7 +229,6 @@ class SchemaReader
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-
         } elseif ('table' === $parentTag) {
             switch ($name) {
                 case 'column':
@@ -264,9 +266,7 @@ class SchemaReader
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-
         } elseif ('column' === $parentTag) {
-
             switch ($name) {
                 case 'inheritance':
                     $this->currColumn->addInheritance($attributes);
@@ -279,9 +279,7 @@ class SchemaReader
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-
         } elseif ('foreign-key' === $parentTag) {
-
             switch ($name) {
                 case 'reference':
                     $this->currFK->addReference($attributes);
@@ -294,9 +292,7 @@ class SchemaReader
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-
         } elseif ('index' === $parentTag) {
-
             switch ($name) {
                 case 'index-column':
                     $this->currIndex->addColumn($attributes);
@@ -309,9 +305,7 @@ class SchemaReader
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-
         } elseif ('unique' === $parentTag) {
-
             switch ($name) {
                 case 'unique-column':
                     $this->currUnique->addColumn($attributes);
@@ -325,7 +319,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ($parentTag == 'behavior') {
-
             switch ($name) {
                 case 'parameter':
                     $this->currBehavior->addParameter($attributes);
@@ -335,7 +328,6 @@ class SchemaReader
                     $this->_throwInvalidTagException($parser, $name);
             }
         } elseif ('vendor' === $parentTag) {
-
             switch ($name) {
                 case 'parameter':
                     $this->currVendorObject->setParameter($attributes['name'], $attributes['value']);
@@ -371,7 +363,7 @@ class SchemaReader
     {
         if ('index' === $name) {
             $this->currTable->addIndex($this->currIndex);
-        } else if ('unique' === $name) {
+        } elseif ('unique' === $name) {
             $this->currTable->addUnique($this->currUnique);
         }
 

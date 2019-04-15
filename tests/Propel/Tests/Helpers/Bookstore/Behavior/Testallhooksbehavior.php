@@ -14,7 +14,9 @@ use Propel\Generator\Model\Behavior;
 
 class TestAllHooksBehavior extends Behavior
 {
-    protected $tableModifier, $objectBuilderModifier, $queryBuilderModifier;
+    protected $tableModifier;
+    protected $objectBuilderModifier;
+    protected $queryBuilderModifier;
 
     public function getTableModifier()
     {
@@ -46,7 +48,8 @@ class TestAllHooksBehavior extends Behavior
 
 class TestAllHooksTableModifier
 {
-    protected $behavior, $table;
+    protected $behavior;
+    protected $table;
 
     public function __construct($behavior)
     {
@@ -128,7 +131,6 @@ class TestAllHooksObjectBuilderModifier
 
 class TestAllHooksQueryBuilderModifier
 {
-
     public function staticAttributes($builder)
     {
         return 'static public $customStaticAttribute = 1;public static $staticAttributeBuilder = "' . get_class($builder) . '";';

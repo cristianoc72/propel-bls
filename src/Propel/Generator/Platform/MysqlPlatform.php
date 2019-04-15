@@ -182,7 +182,6 @@ SET FOREIGN_KEY_CHECKS = 1;
     public function getPrimaryKeyDDL(Table $table)
     {
         if ($table->hasPrimaryKey()) {
-
             $keys = $table->getPrimaryKey();
 
             //MySQL throws an 'Incorrect table definition; there can be only one auto column and it must be defined as a key'
@@ -258,7 +257,8 @@ CREATE TABLE %s
 ) %s=%s%s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines),
             $this->getTableEngineKeyword(),
@@ -449,7 +449,8 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
 ALTER TABLE %s DROP PRIMARY KEY;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($table->getName())
         );
     }
@@ -466,7 +467,8 @@ ALTER TABLE %s DROP PRIMARY KEY;
 CREATE %sINDEX %s ON %s (%s);
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->getIndexType($index),
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getTable()->getName()),
@@ -486,7 +488,8 @@ CREATE %sINDEX %s ON %s (%s);
 DROP INDEX %s ON %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($index->getName()),
             $this->quoteIdentifier($index->getTable()->getName())
         );
@@ -498,7 +501,8 @@ DROP INDEX %s ON %s;
      */
     public function getIndexDDL(Index $index)
     {
-        return sprintf('%sINDEX %s (%s)',
+        return sprintf(
+            '%sINDEX %s (%s)',
             $this->getIndexType($index),
             $this->quoteIdentifier($index->getName()),
             $this->getIndexColumnListDDL($index)
@@ -520,7 +524,8 @@ DROP INDEX %s ON %s;
 
     public function getUniqueDDL(Unique $unique)
     {
-        return sprintf('UNIQUE INDEX %s (%s)',
+        return sprintf(
+            'UNIQUE INDEX %s (%s)',
             $this->quoteIdentifier($unique->getName()),
             $this->getIndexColumnListDDL($unique)
         );
@@ -553,7 +558,9 @@ DROP INDEX %s ON %s;
 
     public function getDropForeignKeyDDL(ForeignKey $fk)
     {
-        if (!$this->supportsForeignKeys($fk->getTable())) return '';
+        if (!$this->supportsForeignKeys($fk->getTable())) {
+            return '';
+        }
         if ($fk->isSkipSql() || $fk->isPolymorphic()) {
             return;
         }
@@ -561,7 +568,8 @@ DROP INDEX %s ON %s;
 ALTER TABLE %s DROP FOREIGN KEY %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getTable()->getName()),
             $this->quoteIdentifier($fk->getName())
         );
@@ -586,7 +594,6 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
      */
     public function getModifyDatabaseDDL(DatabaseDiff $databaseDiff)
     {
-
         $ret = '';
 
         foreach ($databaseDiff->getRemovedTables() as $table) {
@@ -622,7 +629,8 @@ ALTER TABLE %s DROP FOREIGN KEY %s;
 RENAME TABLE %s TO %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromTableName),
             $this->quoteIdentifier($toTableName)
         );
@@ -639,7 +647,8 @@ RENAME TABLE %s TO %s;
 ALTER TABLE %s DROP %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($column->getTable()->getName()),
             $this->quoteIdentifier($column->getName())
         );
@@ -674,7 +683,8 @@ ALTER TABLE %s DROP %s;
 ALTER TABLE %s CHANGE %s %s;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fromColumn->getTable()->getName()),
             $this->quoteIdentifier($fromColumn->getName()),
             $this->getColumnDDL($toColumn)
@@ -722,7 +732,8 @@ ALTER TABLE %s ADD %s %s;
             }
         }
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($column->getTable()->getName()),
             $this->getColumnDDL($column),
             $insertPositionDDL

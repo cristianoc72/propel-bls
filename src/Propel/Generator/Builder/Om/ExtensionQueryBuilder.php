@@ -101,7 +101,7 @@ class ".$this->getUnqualifiedClassName()." extends $baseClassName
      */
     public function hasBehaviorModifier($hookName, $modifier = null)
     {
-         return parent::hasBehaviorModifier($hookName, 'QueryBuilderModifier');
+        return parent::hasBehaviorModifier($hookName, 'QueryBuilderModifier');
     }
 
     /**
@@ -123,5 +123,4 @@ class ".$this->getUnqualifiedClassName()." extends $baseClassName
     {
         return $this->getBehaviorContentBase($contentName, 'QueryBuilderModifier');
     }
-
 }

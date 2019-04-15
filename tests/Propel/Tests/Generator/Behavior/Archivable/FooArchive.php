@@ -4,7 +4,9 @@ namespace Propel\Tests\Generator\Behavior\Archivable;
 
 class FooArchive
 {
-    public $id, $title, $age;
+    public $id;
+    public $title;
+    public $age;
 
     public function setId($value)
     {

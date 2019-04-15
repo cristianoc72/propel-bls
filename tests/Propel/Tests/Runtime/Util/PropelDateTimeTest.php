@@ -81,7 +81,6 @@ class PropelDateTimeTest extends TestCase
         $dt = new DateTime($now, new DateTimeZone('UTC'));
         $pdt = new PropelDateTime($now, new DateTimeZone('America/New_York'));
         $this->assertDatesNotEqual($dt, $pdt, "Expected DateTime != PropelDateTime: %s");
-
     }
 
     /**
@@ -242,7 +241,6 @@ class PropelDateTimeTest extends TestCase
 
         date_default_timezone_set($originalTimezone);
     }
-
 }
 
 class TestPropelDateTime extends PropelDateTime

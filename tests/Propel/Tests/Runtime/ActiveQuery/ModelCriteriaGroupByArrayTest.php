@@ -28,7 +28,7 @@ class ModelCriteriaGroupByArrayTest extends BookstoreEmptyTestBase
     {
         $authors = AuthorQuery::create()
             ->leftJoinBook()
-            ->select(array('FirstName', 'LastName'))
+            ->select(['FirstName', 'LastName'])
             ->withColumn('COUNT(Book.Id)', 'nbBooks')
             ->groupBy($groupBy)
             ->orderByLastName()
@@ -73,9 +73,9 @@ class ModelCriteriaGroupByArrayTest extends BookstoreEmptyTestBase
         
         $authors = AuthorQuery::create()
             ->leftJoinBook()
-            ->select(array('FirstName', 'LastName'))
+            ->select(['FirstName', 'LastName'])
             ->withColumn('COUNT(Book.Id)', 'nbBooks')
-            ->groupBy(array('FirstName', 'LastName'))
+            ->groupBy(['FirstName', 'LastName'])
             ->orderByLastName()
             ->find();
         
@@ -94,10 +94,10 @@ class ModelCriteriaGroupByArrayTest extends BookstoreEmptyTestBase
     
     public function dataForTestException()
     {
-        return array(
-            'empty string' => array(''),
-            'null' => array(null),
-            'array' => array(array())
-        );
+        return [
+            'empty string' => [''],
+            'null' => [null],
+            'array' => [[]]
+        ];
     }
 }

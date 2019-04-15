@@ -230,7 +230,6 @@ class ArrayCollectionTest extends BookstoreEmptyTestBase
         $col = new TestableArrayCollection();
         $col->getWorkerObject();
     }
-
 }
 
 class TestableArrayCollection extends ArrayCollection

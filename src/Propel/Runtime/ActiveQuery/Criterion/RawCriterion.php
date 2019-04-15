@@ -57,5 +57,4 @@ class RawCriterion extends AbstractCriterion
         $params[] = ['table' => null, 'type' => $this->type, 'value' => $this->value];
         $sb .= str_replace('?', ':p' . count($params), $this->column);
     }
-
 }

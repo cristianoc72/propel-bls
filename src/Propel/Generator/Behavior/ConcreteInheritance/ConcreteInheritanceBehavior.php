@@ -124,7 +124,6 @@ class ConcreteInheritanceBehavior extends Behavior
             $copiedBehavior->setTableModified(false);
             $this->getTable()->addBehavior($copiedBehavior);
         }
-
     }
 
     protected function getParentTable()

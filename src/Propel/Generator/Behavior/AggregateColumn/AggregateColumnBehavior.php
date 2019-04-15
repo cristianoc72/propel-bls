@@ -114,7 +114,8 @@ class AggregateColumnBehavior extends Behavior
                 .$tableName;
         }
 
-        $sql = sprintf('SELECT %s FROM %s WHERE %s',
+        $sql = sprintf(
+            'SELECT %s FROM %s WHERE %s',
             $this->getParameter('expression'),
             $builder->getTable()->quoteIdentifier($tableName),
             implode(' AND ', $conditions)

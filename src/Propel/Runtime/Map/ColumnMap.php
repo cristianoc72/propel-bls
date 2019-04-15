@@ -251,7 +251,7 @@ class ColumnMap
 
     /**
      * Whether this column is of type set.
-     * 
+     *
      * @return bool
      */
     public function isSetType()
@@ -512,7 +512,7 @@ class ColumnMap
     {
         if (false !== ($pos = strrpos($name, '.'))) {
             $name = substr($name, $pos + 1);
-	     $name = trim($name," \t\n\r\0\x0B`'()\"[]~!-{}%^&.");
+            $name = trim($name, " \t\n\r\0\x0B`'()\"[]~!-{}%^&.");
         }
 
         return strtoupper($name);

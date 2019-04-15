@@ -67,7 +67,6 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
 
         $this->assertEquals($origName, $a->getFirstName());
         $this->assertFalse($a->isModified());
-
     }
 
     /**
@@ -115,12 +114,12 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
             $book->setTitle("Will Fail");
             $book->save();
             $this->fail("Expect an exception to be thrown when attempting to save() a deleted object.");
-        } catch (PropelException $e) {}
+        } catch (PropelException $e) {
+        }
 
-            // 4) make sure that it doesn't exist in db
-            $book = BookQuery::create()->findPk($bookId);
+        // 4) make sure that it doesn't exist in db
+        $book = BookQuery::create()->findPk($bookId);
         $this->assertNull($book, "Expect NULL from retrieveByPK on deleted Book.");
-
     }
 
     /**
@@ -173,7 +172,6 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $this->assertInstanceOf('\Propel\Tests\Bookstore\Book', $r2->getBook(), "Expected getBook() to return a Book.");
         $this->assertInternalType('float', $r2->getBook()->getPrice(), "Expected Book->getPrice() to return a float.");
         $this->assertInstanceOf('\DateTime', $r2->getReviewDate(null), "Expected Book->getReviewDate() to return a DateTime.");
-
     }
 
     /**
@@ -360,5 +358,4 @@ class GeneratedObjectWithFixturesTest extends BookstoreEmptyTestBase
         $this->assertEquals('Anna Karenina', $arr['Books'][1]['Title']);
         $this->assertEquals('*RECURSION*', $arr['Books'][0]['Author']);
     }
-
 }

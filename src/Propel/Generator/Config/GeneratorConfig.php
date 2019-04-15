@@ -180,7 +180,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     }
 
     /**
-     * Return an array of all configured connection properties, from `generator` and `reverse` 
+     * Return an array of all configured connection properties, from `generator` and `reverse`
      * sections of the configuration.
      *
      * @return array

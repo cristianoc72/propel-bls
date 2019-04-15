@@ -240,7 +240,7 @@ class InitCommand extends AbstractCommand
             'config:convert',
         ];
 
-        foreach($followupCommands as $command) {
+        foreach ($followupCommands as $command) {
             if (0 !== $this->getApplication()->run(new ArrayInput([$command]))) {
                 exit(1);
             }
@@ -301,7 +301,7 @@ class InitCommand extends AbstractCommand
         }
         
         $input = new ArrayInput($arrInput);
-        $result = $this->getApplication()->run($input,$output);
+        $result = $this->getApplication()->run($input, $output);
 
         if (0 === $result) {
             $schema = file_get_contents($outputDir . '/schema.xml');

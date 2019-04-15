@@ -123,7 +123,6 @@ class MssqlSchemaParser extends AbstractSchemaParser
         $dataFetcher->setStyle(\PDO::FETCH_ASSOC);
 
         foreach ($dataFetcher as $row) {
-
             $name = $this->cleanDelimitedIdentifiers($row['COLUMN_NAME']);
             $type = $row['TYPE_NAME'];
             $size = $row['LENGTH'];
@@ -176,7 +175,6 @@ class MssqlSchemaParser extends AbstractSchemaParser
 
         $foreignKeys = []; // local store to avoid duplicates
         foreach ($dataFetcher as $row) {
-
             $name = $this->cleanDelimitedIdentifiers($row['CONSTRAINT_NAME']);
             $lcol = $this->cleanDelimitedIdentifiers($row['COLUMN_NAME']);
             $ftbl = $this->cleanDelimitedIdentifiers($row['FK_TABLE_NAME']);
@@ -197,7 +195,6 @@ class MssqlSchemaParser extends AbstractSchemaParser
             }
             $foreignKeys[$name]->addReference($localColumn, $foreignColumn);
         }
-
     }
 
     /**

@@ -118,7 +118,6 @@ class NestedSetBehaviorQueryBuilderModifierWithScopeTest extends TestCase
             ->orderByBranch()
             ->find();
         $this->assertEquals([$t1, $t2, $t3, $t4, $t5, $t6, $t7], iterator_to_array($objs), 'branchOf() filters by branch of the same scope');
-
     }
 
     public function testChildrenOf()
@@ -447,7 +446,7 @@ class NestedSetBehaviorQueryBuilderModifierWithScopeTest extends TestCase
             't6' => [7, 8, 3],
             't7' => [9, 10, 3],
         ];
-        $this->assertEquals($expected, $this->dumpTreeWithScope(1),'shiftRLValues can shift all nodes to the left');
+        $this->assertEquals($expected, $this->dumpTreeWithScope(1), 'shiftRLValues can shift all nodes to the left');
         $expected = [
             't8' => [1, 6, 0],
             't9' => [2, 3, 1],

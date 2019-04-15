@@ -50,7 +50,7 @@ class ValidateBehavior extends Behavior
         );
 
         //if SF >= 2.5 use new validator classes
-        if(class_exists('Symfony\\Component\\Validator\\Validator\\RecursiveValidator')) {
+        if (class_exists('Symfony\\Component\\Validator\\Validator\\RecursiveValidator')) {
             $this->builder->declareClasses(
                 'Symfony\\Component\\Validator\\Validator\\RecursiveValidator',
                 'Symfony\\Component\\Validator\\Context\\ExecutionContextFactory',
@@ -279,5 +279,4 @@ class ValidateBehavior extends Behavior
     {
         return $this->renderTemplate('objectGetValidationFailures');
     }
-
 }

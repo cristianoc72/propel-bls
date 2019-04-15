@@ -15,15 +15,15 @@ use Propel\Common\Util\SetColumnConverter;
 
 /**
  * Tests for SetColumnConverter class.
- * 
- * @author Moritz Schroeder <moritz.schroeder@molabs.de> 
+ *
+ * @author Moritz Schroeder <moritz.schroeder@molabs.de>
  */
 class SetColumnConverterTest extends TestCase
 {
     /**
      * @param array  $values
      * @param string $validInteger
-     * 
+     *
      * @dataProvider convertValuesProvider
      */
     public function testConvertToIntValidValues(array $values, $validInteger)

@@ -49,36 +49,36 @@ class ValidateBehaviorTest extends BookstoreTestBase
     public function testHasValidateMethod()
     {
         foreach ($this->classes as $class) {
-             $this->assertTrue(method_exists($class, 'validate'));
+            $this->assertTrue(method_exists($class, 'validate'));
         }
     }
 
     public function testHasLoadValidatorMetadataMethod()
     {
         foreach ($this->classes as $class) {
-             $this->assertTrue(method_exists($class, 'loadValidatorMetadata'));
+            $this->assertTrue(method_exists($class, 'loadValidatorMetadata'));
         }
     }
 
     public function testHasAlreadyInValidationAttribute()
     {
         foreach ($this->classes as $class) {
-             $this->assertClassHasAttribute('alreadyInValidation', $class);
+            $this->assertClassHasAttribute('alreadyInValidation', $class);
         }
     }
 
     public function testHasValidationFailuresAttribute()
     {
         foreach ($this->classes as $class) {
-             $this->assertClassHasAttribute('validationFailures', $class);
+            $this->assertClassHasAttribute('validationFailures', $class);
         }
     }
 
     public function testLoadValidatorMetadataMethodIsStatic()
     {
         foreach ($this->classes as $class) {
-             $method = new \ReflectionMethod($class, 'loadValidatorMetadata');
-             $this->assertTrue($method->isStatic());
+            $method = new \ReflectionMethod($class, 'loadValidatorMetadata');
+            $this->assertTrue($method->isStatic());
         }
     }
 
@@ -235,51 +235,51 @@ EOF;
 
     public function testSingleValidationFailure()
     {
-       $reader = new ValidateReader();
-       $reader->setId(14);
-       $reader->setFirstName('Felicity');
-       $reader->setLastName('Stamm');
-       $reader->setEmail('f.stamm@'); //failure
-       $reader->setBirthday('1989-07-24');
+        $reader = new ValidateReader();
+        $reader->setId(14);
+        $reader->setFirstName('Felicity');
+        $reader->setLastName('Stamm');
+        $reader->setEmail('f.stamm@'); //failure
+        $reader->setBirthday('1989-07-24');
 
-       $res = $reader->validate();
+        $res = $reader->validate();
 
-       $this->assertFalse($res, 'This validation expected to fail');
+        $this->assertFalse($res, 'This validation expected to fail');
 
-       $failures = $reader->getValidationFailures();
+        $failures = $reader->getValidationFailures();
 
-       $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $failures);
-       $this->assertEquals(1, count($failures), 'Only one constraint violation object');
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $failures);
+        $this->assertEquals(1, count($failures), 'Only one constraint violation object');
 
-       $failure = $failures[0];
-       $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolation', $failure);
-       $this->assertEquals('email', $failure->getPropertyPath(), 'email property expected to fail');
+        $failure = $failures[0];
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolation', $failure);
+        $this->assertEquals('email', $failure->getPropertyPath(), 'email property expected to fail');
     }
 
     public function testMultipleValidationFailures()
     {
-       $reader = new ValidateReader();
-       $reader->setId(18);
-       $reader->setFirstName('Bo'); //failure: less than 4 chars
+        $reader = new ValidateReader();
+        $reader->setId(18);
+        $reader->setFirstName('Bo'); //failure: less than 4 chars
        $reader->setLastName(null); //failure
        $reader->setEmail('zora.null@'); //failure
        $reader->setBirthday('1983-09-22');
 
-       $failedProperties = ['last_name', 'first_name', 'email'];
+        $failedProperties = ['last_name', 'first_name', 'email'];
 
-       $res = $reader->validate();
+        $res = $reader->validate();
 
-       $this->assertFalse($res, 'This validation expected to fail');
+        $this->assertFalse($res, 'This validation expected to fail');
 
-       $failures = $reader->getValidationFailures();
+        $failures = $reader->getValidationFailures();
 
-       $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $failures);
-       $this->assertEquals(3, count($failures), 'Three constraint violation objects expected');
+        $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolationList', $failures);
+        $this->assertEquals(3, count($failures), 'Three constraint violation objects expected');
 
-       foreach ($failures as $failure) {
-           $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolation', $failure);
-           $this->assertTrue(in_array($failure->getPropertyPath(), $failedProperties));
-       }
+        foreach ($failures as $failure) {
+            $this->assertInstanceOf('Symfony\Component\Validator\ConstraintViolation', $failure);
+            $this->assertTrue(in_array($failure->getPropertyPath(), $failedProperties));
+        }
     }
 
     public function testComplexValidationSingleFailure()
@@ -398,7 +398,7 @@ EOF;
         $book->setValidateAuthor($author);
         $book->setValidatePublisher($publisher);
         $book->setTitle(null); //failed
-        $book->setPrice(12,90);
+        $book->setPrice(12, 90);
 
         $reader1 = new ValidateReader();
         $reader1->setId(1);
@@ -434,5 +434,4 @@ EOF;
             $this->assertEquals($failedProperties[$failure->getPropertyPath()], $failObject->getName());
         }
     }
-
 }

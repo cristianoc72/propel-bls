@@ -293,7 +293,6 @@ class SluggableBehaviorTest extends BookstoreTestBase
         $t = new TableWithScope();
         $t->setTitle('Hello, World');
         $t->save();
-
     }
 
     public function testNoUniqueViolationWithScope()

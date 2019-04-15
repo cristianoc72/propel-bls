@@ -89,5 +89,4 @@ interface ".$this->getUnqualifiedClassName()."
 } // " . $this->getUnqualifiedClassName() . "
 ";
     }
-
 } // ExtensionObjectBuilder

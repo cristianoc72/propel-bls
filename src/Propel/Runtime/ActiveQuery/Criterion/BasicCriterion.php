@@ -75,7 +75,6 @@ class BasicCriterion extends AbstractCriterion
             if (Criteria::CURRENT_DATE === $this->value || Criteria::CURRENT_TIME === $this->value || Criteria::CURRENT_TIMESTAMP === $this->value) {
                 $sb .= $field . $this->comparison . $this->value;
             } else {
-
                 $params[] = ['table' => $this->realtable, 'column' => $this->column, 'value' => $this->value];
 
                 // default case, it is a normal col = value expression; value
@@ -85,7 +84,6 @@ class BasicCriterion extends AbstractCriterion
                 } else {
                     $sb .= $field . $this->comparison . ':p'.count($params);
                 }
-
             }
         } else {
 
@@ -101,5 +99,4 @@ class BasicCriterion extends AbstractCriterion
             }
         }
     }
-
 }

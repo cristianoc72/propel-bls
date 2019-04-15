@@ -94,5 +94,4 @@ EOF;
         $this->assertTrue($e->getTrueBar());
         $this->assertFalse($e->getFalseBar());
     }
-
 }

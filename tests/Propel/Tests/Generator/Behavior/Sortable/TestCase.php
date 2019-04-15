@@ -30,7 +30,6 @@ use Propel\Tests\TestCaseFixturesDatabase;
  */
 class TestCase extends TestCaseFixturesDatabase
 {
-
     protected function populateTable11()
     {
         SortableTable11TableMap::doDeleteAll();

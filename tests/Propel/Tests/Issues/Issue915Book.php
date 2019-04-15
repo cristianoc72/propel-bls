@@ -2,7 +2,6 @@
 
 namespace Propel\Tests\Issues;
 
-
 class Issue915Book extends \Base\Issue915Book
 {
     private $color;

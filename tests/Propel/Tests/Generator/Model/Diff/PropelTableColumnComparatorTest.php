@@ -272,5 +272,4 @@ class PropelTableColumnComparatorTest extends TestCase
         $this->assertEquals([], $tableDiff->getRemovedColumns());
         $this->assertEquals([], $tableDiff->getModifiedColumns());
     }
-
 }

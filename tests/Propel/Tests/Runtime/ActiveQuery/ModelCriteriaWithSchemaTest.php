@@ -24,7 +24,6 @@ use Propel\Tests\TestCaseFixturesDatabase;
  */
 class ModelCriteriaWithSchemaTest extends TestCaseFixturesDatabase
 {
-
     protected function assertCriteriaTranslation($criteria, $expectedSql, $expectedParams, $message = '')
     {
         $params = [];
@@ -52,7 +51,7 @@ class ModelCriteriaWithSchemaTest extends TestCaseFixturesDatabase
     public function testReplaceNamesWithSchemas($origClause, $columnPhpName = false, $modifiedClause)
     {
         $c = new TestableModelCriteriaWithSchema('bookstore-schemas', '\Propel\Tests\BookstoreSchemas\BookstoreContest');
-        $this->doTestReplaceNames($c, BookstoreContestTableMap::getTableMap(),  $origClause, $columnPhpName = false, $modifiedClause);
+        $this->doTestReplaceNames($c, BookstoreContestTableMap::getTableMap(), $origClause, $columnPhpName = false, $modifiedClause);
     }
 
     public function doTestReplaceNames($c, $tableMap, $origClause, $columnPhpName = false, $modifiedClause)
@@ -65,7 +64,6 @@ class ModelCriteriaWithSchemaTest extends TestCaseFixturesDatabase
         $modifiedClause = preg_replace('/^(\(?)contest\./', '$1contest' . $this->getPlatform()->getSchemaDelimiter(), $modifiedClause);
         $this->assertEquals($modifiedClause, $origClause);
     }
-
 }
 
 class TestableModelCriteriaWithSchema extends ModelCriteria
@@ -76,5 +74,4 @@ class TestableModelCriteriaWithSchema extends ModelCriteria
     {
         return parent::replaceNames($sql);
     }
-
 }

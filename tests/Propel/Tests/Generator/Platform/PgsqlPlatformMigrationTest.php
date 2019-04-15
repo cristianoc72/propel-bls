@@ -347,7 +347,7 @@ EOF;
         $this->assertSame($expected, $columnDiff);
     }
 
-public function testGetModifyColumnDDLWithVarcharWithoutSizeAndPlatform()
+    public function testGetModifyColumnDDLWithVarcharWithoutSizeAndPlatform()
     {
         $t1 = new Table('foo');
         $t1->setIdentifierQuoting(true);
@@ -405,5 +405,4 @@ EOF;
     {
         $this->assertFalse($databaseDiff);
     }
-
 }

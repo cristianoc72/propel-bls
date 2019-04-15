@@ -103,5 +103,4 @@ class OnDemandCollectionTest extends BookstoreEmptyTestBase
     {
         $this->books->fromArray([]);
     }
-
 }

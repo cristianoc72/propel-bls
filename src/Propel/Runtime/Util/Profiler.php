@@ -9,6 +9,7 @@
  */
 
 namespace Propel\Runtime\Util;
+
 use Propel\Common\Config\Exception\InvalidConfigurationException;
 
 /**
@@ -225,7 +226,6 @@ class Profiler
                     break;
             }
             $profile .= $config['name'] . $this->innerGlue . str_pad($value, $config['pad'], ' ', STR_PAD_LEFT) . $this->outerGlue;
-
         }
 
         return $profile;

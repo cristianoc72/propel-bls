@@ -243,5 +243,4 @@ EOF;
 EOF;
         $this->assertEquals($expected, (string) $coll);
     }
-
 }

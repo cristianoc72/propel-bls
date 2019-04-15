@@ -25,7 +25,6 @@ use Propel\Tests\TestCase;
  */
 class AbstractOMBuilderTest extends TestCase
 {
-
     public function testClear()
     {
         $b = new Book();
@@ -100,7 +99,6 @@ EOF;
             ['foo.bar/baz.map', 'foo.bar/baz/map'],
         ];
     }
-
 }
 
 class OMBuilderMock extends AbstractOMBuilder
@@ -127,16 +125,13 @@ class OMBuilderMock extends AbstractOMBuilder
 
     protected function addClassOpen(&$script)
     {
-
     }
 
     protected function addClassBody(&$script)
     {
-
     }
 
     protected function addClassClose(&$script)
     {
-
     }
 }

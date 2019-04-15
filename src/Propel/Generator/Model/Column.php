@@ -394,7 +394,9 @@ class Column extends MappingModel
      */
     public function getSingularName()
     {
-        if ($this->getAttribute('phpSingularName')) return $this->getAttribute('phpSingularName');
+        if ($this->getAttribute('phpSingularName')) {
+            return $this->getAttribute('phpSingularName');
+        }
         return rtrim($this->name, 's');
     }
 
@@ -434,8 +436,8 @@ class Column extends MappingModel
     }
 
     /**
-     * Returns the singular form of the name to use in PHP sources. 
-     * It will set & return a self-generated phpName from its name 
+     * Returns the singular form of the name to use in PHP sources.
+     * It will set & return a self-generated phpName from its name
      * if its not already set.
      *
      * @return string
@@ -467,7 +469,7 @@ class Column extends MappingModel
     }
 
     /**
-     * Sets the singular forn of the name to use in PHP 
+     * Sets the singular forn of the name to use in PHP
      * sources.
      *
      * It will generate a phpName from its name if no

@@ -128,7 +128,6 @@ class "  .$this->getUnqualifiedClassName() . " extends " . $baseClassName . "
      */
     protected function addClassBody(&$script)
     {
-
     }
 
     /**

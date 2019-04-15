@@ -235,7 +235,6 @@ class DatabaseTest extends ModelTestCase
         $this->assertTrue($database->hasTableByPhpName('Books'));
         $this->assertSame($table, $database->getTable('books'));
         $this->assertSame($table, $database->getTableByPhpName('Books'));
-
     }
 
     public function testAddArrayTable()

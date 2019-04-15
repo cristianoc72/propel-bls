@@ -43,7 +43,7 @@ class ModelCriteriaWithNamespaceTest extends NamespacesTestBase
     public function testReplaceNamesWithNamespaces($origClause, $columnPhpName = false, $modifiedClause)
     {
         $c = new TestableModelCriteriaWithNamespace('bookstore_namespaced', 'Foo\\Bar\\NamespacedBook');
-        $this->doTestReplaceNames($c, \Foo\Bar\Map\NamespacedBookTableMap::getTableMap(),  $origClause, $columnPhpName = false, $modifiedClause);
+        $this->doTestReplaceNames($c, \Foo\Bar\Map\NamespacedBookTableMap::getTableMap(), $origClause, $columnPhpName = false, $modifiedClause);
     }
 
     public function doTestReplaceNames($c, $tableMap, $origClause, $columnPhpName = false, $modifiedClause)
@@ -55,7 +55,6 @@ class ModelCriteriaWithNamespaceTest extends NamespacesTestBase
         }
         $this->assertEquals($modifiedClause, $origClause);
     }
-
 }
 
 class TestableModelCriteriaWithNamespace extends ModelCriteria

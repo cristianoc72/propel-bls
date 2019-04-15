@@ -126,7 +126,6 @@ class ColumnMapTest extends TestCaseFixtures
         $bookstoreTable = BookstoreEmployeeTableMap::getTableMap();
         $supervisorColumn = $bookstoreTable->getColumn('SUPERVISOR_ID');
         $this->assertEquals($supervisorColumn->getRelation(), $supervisorColumn->getRelation('Supervisor'), 'getRelation() returns the RelationMap object even whit ha specific refPhpName');
-
     }
 
     public function testNormalizeName()

@@ -143,5 +143,4 @@ EOF;
         $this->assertEquals(1, QuickBuildFoo2Query::create()->count());
         $this->assertEquals($foo, QuickBuildFoo2Query::create()->findOne());
     }
-
 }

@@ -61,7 +61,7 @@ EOF;
 
     public function testModifyTableAddsVersionColumnCustomName()
     {
-            $schema = <<<EOF
+        $schema = <<<EOF
 <database name="versionable_behavior_test_0">
     <table name="versionable_behavior_test_0">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -94,7 +94,7 @@ EOF;
 
     public function testModifyTableDoesNotAddVersionColumnIfExists()
     {
-            $schema = <<<EOF
+        $schema = <<<EOF
 <database name="versionable_behavior_test_0">
     <table name="versionable_behavior_test_0">
         <column name="id" primaryKey="true" type="INTEGER" autoIncrement="true" />
@@ -523,7 +523,8 @@ EOF;
         $this->assertEmpty($builder->getSQL());
     }
 
-    public function tablePrefixSchemaDataProvider() {
+    public function tablePrefixSchemaDataProvider()
+    {
         $schema = <<<XML
 <database name="versionable_behavior_test_0" tablePrefix="prefix_">
     <table name="versionable_behavior_test_0">
@@ -542,7 +543,6 @@ XML;
      */
     public function testModifyTableAddsVersionColumnWithPrefix($schema)
     {
-
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
         $expected = <<<SQL
@@ -565,8 +565,8 @@ SQL;
     /**
      * @dataProvider tablePrefixSchemaDataProvider
      */
-    public function testModifyTableAddsVersionTableWithPrefix($schema) {
-
+    public function testModifyTableAddsVersionTableWithPrefix($schema)
+    {
         $builder = new QuickBuilder();
         $builder->setSchema($schema);
         $expected = <<<SQL
@@ -589,5 +589,4 @@ CREATE TABLE prefix_versionable_behavior_test_0_version
 SQL;
         $this->assertContains($expected, $builder->getSQL());
     }
-
 }

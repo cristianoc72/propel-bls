@@ -46,7 +46,6 @@ define('_LOB_SAMPLE_FILE_PATH', __DIR__ . '/../../../../Fixtures/etc/lob');
  */
 class BookstoreDataPopulator
 {
-
     public static function populate($con = null)
     {
         if ($con === null) {
@@ -311,5 +310,4 @@ class BookstoreDataPopulator
             $tableMapClass::doDeleteAll($con);
         }
     }
-
 }

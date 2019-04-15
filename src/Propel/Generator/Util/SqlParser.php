@@ -255,7 +255,9 @@ class SqlParser
                 // get next characters if we have multiple characters in delimiter
                 $nextChars = '';
                 for ($i = 0; $i < $this->delimiterLength - 1; $i++) {
-                    if (!isset($this->sql[$this->pos + $i])) break;
+                    if (!isset($this->sql[$this->pos + $i])) {
+                        break;
+                    }
                     $nextChars .= $this->sql[$this->pos + $i];
                 }
                 // check for end of statement
@@ -271,5 +273,4 @@ class SqlParser
         }
         return trim($parsedString);
     }
-
 }

@@ -441,13 +441,12 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function addColumnAttributes(&$script)
     {
-
         $table = $this->getTable();
 
         foreach ($table->getColumns() as $col) {
             $this->addColumnAttributeComment($script, $col);
             $this->addColumnAttributeDeclaration($script, $col);
-            if ($col->isLazyLoad() ) {
+            if ($col->isLazyLoad()) {
                 $this->addColumnAttributeLoaderComment($script, $col);
                 $this->addColumnAttributeLoaderDeclaration($script, $col);
             }
@@ -1682,9 +1681,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         $table = $this->getTable();
 
         if ($column->isForeignKey()) {
-
             foreach ($column->getForeignKeys() as $fk) {
-
                 $tblFK =  $table->getDatabase()->getTable($fk->getForeignTableName());
                 $colFK = $tblFK->getColumn($fk->getMappedForeignColumn($column->getName()));
 
@@ -1703,13 +1700,10 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         } /* if col is foreign key */
 
         foreach ($column->getReferrers() as $refFK) {
-
             $tblFK = $this->getDatabase()->getTable($refFK->getForeignTableName());
 
-            if ( $tblFK->getName() != $table->getName() ) {
-
+            if ($tblFK->getName() != $table->getName()) {
                 foreach ($column->getForeignKeys() as $fk) {
-
                     $tblFK = $table->getDatabase()->getTable($fk->getForeignTableName());
                     $colFK = $tblFK->getColumn($fk->getMappedForeignColumn($column->getName()));
 
@@ -2722,7 +2716,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function addToArrayKeyLookUp($phpName, Table $table, $plural)
     {
-        if($phpName == "") {
+        if ($phpName == "") {
             $phpName = $table->getPhpName();
         }
 
@@ -3375,7 +3369,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function addGetPrimaryKey_MultiPK(&$script)
     {
-
         $script .= "
     /**
      * Returns the composite primary key for this object.
@@ -3444,7 +3437,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function addSetPrimaryKey_SinglePK(&$script)
     {
-
         $pkeys = $this->getTable()->getPrimaryKey();
         $col = $pkeys[0];
         $clo=$col->getLowercasedName();
@@ -3470,7 +3462,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function addSetPrimaryKey_MultiPK(&$script)
     {
-
         $script .="
     /**
      * Set the [composite] primary key.
@@ -3663,7 +3654,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         }
                 ";
             }
-
         } /* foreach local col */
 
         $script .= "
@@ -3688,7 +3678,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             \$v->add".$this->getRefFKPhpNameAffix($fk, false)."(\$this);
         }
 ";
-
         }
 
         $script .= "
@@ -3800,7 +3789,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         return \$this->$varName;
     }
 ";
-
     } // addFKAccessor
 
     /**
@@ -3820,7 +3808,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         $className = $this->getClassNameFromTable($tblFK);
 
         foreach ($tblFK->getForeignKeys() as $fk2) {
-
             $tblFK2 = $fk2->getForeignTable();
             $doJoinGet = !$tblFK2->isForReferenceOnly();
 
@@ -3832,7 +3819,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
 
             $relCol2 = $this->getFKPhpNameAffix($fk2, false);
 
-            if ( $this->getRelatedBySuffix($refFK) != "" &&
+            if ($this->getRelatedBySuffix($refFK) != "" &&
                 ($this->getRelatedBySuffix($refFK) == $this->getRelatedBySuffix($fk2))) {
                 $doJoinGet = false;
             }
@@ -3866,9 +3853,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     }
 ";
             } /* end if ($doJoinGet) */
-
         } /* end foreach ($tblFK->getForeignKeys() as $fk2) { */
-
     } // function
 
     /**
@@ -4448,7 +4433,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected \$coll" . $this->getFKPhpNameAffix($fk, true) . "Partial;
 ";
-
         }
     }
 
@@ -4581,7 +4565,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
                         ->delete(\$con);
 ";
         } else {
-
             $script .= "
                     foreach (\$this->{$scheduledForDeletionVarName} as \$entry) {
                         \$entryPk = [];
@@ -4655,7 +4638,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             }
 ";
         } else {
-
             foreach ($crossFKs->getCrossForeignKeys() as $fk) {
                 $relatedName            = $this->getFKPhpNameAffix($fk, true);
                 $lowerSingleRelatedName = lcfirst($this->getFKPhpNameAffix($fk, false));
@@ -4674,7 +4656,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
 
         $script .= "
 ";
-
     }
 
     protected function addRefFkScheduledForDeletion(&$script, ForeignKey $refFK)
@@ -4836,7 +4817,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     public function init$relCol()
     {";
-            if($collectionClass) {
+            if ($collectionClass) {
                 $script .= "
         \$this->$collName = new $collectionClass;";
             } else {
@@ -4856,7 +4837,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     }
 ";
         }
-
     }
 
     /**
@@ -4874,7 +4854,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
                 'collName' => 'combination' . ucfirst($this->getCrossFKsVarName($crossFKs)),
             ];
         } else {
-
             foreach ($crossFKs->getCrossForeignKeys() as $crossFK) {
                 $relCol = $this->getFKPhpNameAffix($crossFK, true);
                 $collName = $this->getCrossFKVarName($crossFK);
@@ -4919,7 +4898,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         $signature = $shortSignature = $normalizedShortSignature = $phpDoc = [];
         $this->extractCrossInformation($crossFKs, [$firstFK], $signature, $shortSignature, $normalizedShortSignature, $phpDoc);
 
-        $signature = array_map(function($item) {
+        $signature = array_map(function ($item) {
             return $item . ' = null';
         }, $signature);
         $signature = implode(', ', $signature);
@@ -4976,7 +4955,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         return \$criteria;
     }
 ";
-
     }
 
     /**
@@ -5090,7 +5068,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             $signature = $shortSignature = $normalizedShortSignature = $phpDoc = [];
             $this->extractCrossInformation($crossFKs, [$firstFK], $signature, $shortSignature, $normalizedShortSignature, $phpDoc);
 
-            $signature = array_map(function($item) {
+            $signature = array_map(function ($item) {
                 return $item . ' = null';
             }, $signature);
             $signature = implode(', ', $signature);
@@ -5327,7 +5305,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             $signature = $shortSignature = $normalizedShortSignature = $phpDoc = [];
             $this->extractCrossInformation($crossFKs, [$firstFK], $signature, $shortSignature, $normalizedShortSignature, $phpDoc);
 
-            $signature = array_map(function($item) {
+            $signature = array_map(function ($item) {
                 return $item . ' = null';
             }, $signature);
             $signature = implode(', ', $signature);
@@ -5351,7 +5329,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     }
 ";
         }
-
     }
 
 
@@ -5380,7 +5357,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             $tblFK = $refFK->getTable();
             $relatedObjectClassName = $this->getFKPhpNameAffix($crossFK, false);
             $crossObjectClassName = $this->getClassNameFromTable($crossFK->getForeignTable());
-            list ($signature, $shortSignature, $normalizedShortSignature, $phpDoc) = $this->getCrossFKAddMethodInformation($crossFKs, $crossFK);
+            list($signature, $shortSignature, $normalizedShortSignature, $phpDoc) = $this->getCrossFKAddMethodInformation($crossFKs, $crossFK);
 
             $script .= "
     /**
@@ -5416,7 +5393,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
      */
     protected function getCrossFKGetterSignature(CrossForeignKeys $crossFKs, $excludeSignatureItem)
     {
-        list (, $getSignature) = $this->getCrossFKAddMethodInformation($crossFKs);
+        list(, $getSignature) = $this->getCrossFKAddMethodInformation($crossFKs);
         $getSignature = explode(', ', $getSignature);
 
         if (false !== ($pos = array_search($excludeSignatureItem, $getSignature))) {
@@ -5441,7 +5418,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         $tblFK                       = $crossFKs->getIncomingForeignKey()->getTable();
         $foreignObjectName           = '$' . $tblFK->getCamelCaseName();
 
-        list ($signature, $shortSignature, $normalizedShortSignature, $phpDoc) = $this->getCrossFKAddMethodInformation($crossFKs);
+        list($signature, $shortSignature, $normalizedShortSignature, $phpDoc) = $this->getCrossFKAddMethodInformation($crossFKs);
 
         $script .= "
     /**
@@ -5497,9 +5474,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         } elseif (!\${$lowerRelatedObjectClassName}->get{$getterName}()->contains($getterRemoveObjectName)) {
             \${$lowerRelatedObjectClassName}->get{$getterName}()->push($getterRemoveObjectName);
         }\n";
-
             }
-
         } else {
             $relatedObjectClassName      = $this->getFKPhpNameAffix($crossFK, $plural = false);
             $lowerRelatedObjectClassName = lcfirst($relatedObjectClassName);
@@ -5513,7 +5488,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         } elseif (!\${$lowerRelatedObjectClassName}->get{$selfRelationNamePlural}($getterSignature)->contains(\$this)) {
             \${$lowerRelatedObjectClassName}->get{$selfRelationNamePlural}($getterSignature)->push(\$this);
         }\n";
-
         }
 
         $script .= "
@@ -5604,7 +5578,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
                 //remove the back reference if available
                 \${$lowerRelatedObjectClassName}->get$getterName()->removeObject($getterRemoveObjectName);
             }\n";
-
         }
 
         foreach ($crossFKs->getUnclassifiedPrimaryKeys() as $primaryKey) {
@@ -5679,7 +5652,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         }
 
         if (count($table->getForeignKeys())) {
-
             $script .= "
             // We call the save method on the following object(s) if they
             // were passed to this object by their corresponding set
@@ -5790,7 +5762,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         return \$affectedRows;
     } // doSave()
 ";
-
     }
 
     /**
@@ -5813,7 +5784,7 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     protected function doInsert(ConnectionInterface \$con)
     {";
         if ($this->getPlatform() instanceof MssqlPlatform) {
-            if ($table->hasAutoIncrementPrimaryKey() ) {
+            if ($table->hasAutoIncrementPrimaryKey()) {
                 $script .= "
         \$this->modifiedColumns[" . $this->getColumnConstant($table->getAutoIncrementPrimaryKey()).'] = true;';
             }
@@ -6289,12 +6260,10 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
     public function ensureConsistency()
     {";
         foreach ($table->getColumns() as $col) {
-
             $clo=$col->getLowercasedName();
 
             if ($col->isForeignKey()) {
                 foreach ($col->getForeignKeys() as $fk) {
-
                     $tblFK = $table->getDatabase()->getTable($fk->getForeignTableName());
                     $colFK = $tblFK->getColumn($fk->getMappedForeignColumn($col->getName()));
                     $varName = $this->getFKVarName($fk);
@@ -6309,7 +6278,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
         }";
                 } // foreach
             } /* if col is foreign key */
-
         } // foreach
 
         $script .= "
@@ -6405,7 +6373,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
                 //if ( $fk->getTable()->getName() != $table->getName() ) {
 
                 if ($fk->isLocalPrimaryKey()) {
-
                     $afx = $this->getRefFKPhpNameAffix($fk, false);
                     $script .= "
             \$relObj = \$this->get$afx();
@@ -6414,7 +6381,6 @@ abstract class ".$this->getUnqualifiedClassName().$parentClass." implements Acti
             }
 ";
                 } else {
-
                     $script .= "
             foreach (\$this->get".$this->getRefFKPhpNameAffix($fk, true)."() as \$relObj) {
                 if (\$relObj !== \$this) {  // ensure that we don't try to copy a reference to ourselves

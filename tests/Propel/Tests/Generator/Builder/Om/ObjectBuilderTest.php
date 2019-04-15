@@ -69,7 +69,6 @@ class ObjectBuilderTest extends TestCase
     {
         $this->assertEquals('TYPE_PHPNAME', $this->builder->getDefaultKeyType());
     }
-
 }
 
 class TestableObjectBuilder extends ObjectBuilder

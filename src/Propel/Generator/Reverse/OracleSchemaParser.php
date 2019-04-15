@@ -185,7 +185,6 @@ class OracleSchemaParser extends AbstractSchemaParser
             $column->setNotNull(!$isNullable);
             $table->addColumn($column);
         }
-
     }
 
     /**

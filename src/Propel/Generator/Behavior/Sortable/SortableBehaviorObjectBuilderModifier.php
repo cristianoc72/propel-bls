@@ -221,7 +221,6 @@ protected \$oldScope;
     {
         if ($this->behavior->useScope()) {
             if ($this->behavior->hasMultipleScopes()) {
-
                 foreach ($this->behavior->getScopes() as $idx => $scope) {
                     $name = strtolower($this->behavior->getTable()->getColumn($scope)->getName());
 
@@ -232,7 +231,6 @@ protected \$oldScope;
 ";
                     $script = str_replace($search, $replace, $script);
                 }
-
             } else {
                 $scope = current($this->behavior->getScopes());
                 $name = strtolower($this->behavior->getTable()->getColumn($scope)->getName());
@@ -285,7 +283,6 @@ public function setRank(\$v)
      */
     protected function addScopeAccessors(&$script)
     {
-
         $script .= "
 /**
  * Wrap the getter for scope value
@@ -306,19 +303,18 @@ public function getScopeValue(\$returnNulls = true)
                 $script .= "
     \$onlyNulls &= null === (\$result[] = \$this->{$this->behavior->getColumnGetter($scopeField)}());
 ";
-
             }
 
             $script .= "
 
     return \$onlyNulls && \$returnNulls ? null : \$result;
 ";
-        } else if ($this->behavior->getColumnForParameter('scope_column')->isEnumType()){
+        } elseif ($this->behavior->getColumnForParameter('scope_column')->isEnumType()) {
             $columnConstant = strtoupper(preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '_', $this->getColumnAttribute('scope_column')));
             $script .= "
     return array_search(\$this->{$this->getColumnGetter('scope_column')}(), {$this->tableMapClassName}::getValueSet({$this->tableMapClassName}::COL_{$columnConstant}));
             ";
-        } else if ($this->behavior->getColumnForParameter('scope_column')->isSetType()){
+        } elseif ($this->behavior->getColumnForParameter('scope_column')->isSetType()) {
             $columnConstant = strtoupper(preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '_', $this->getColumnAttribute('scope_column')));
             $script .= "
     try {
@@ -328,7 +324,6 @@ public function getScopeValue(\$returnNulls = true)
     }
             ";
         } else {
-
             $script .= "
 
     return \$this->{$this->getColumnGetter('scope_column')}();
@@ -349,19 +344,16 @@ public function setScopeValue(\$v)
 ";
 
         if ($this->behavior->hasMultipleScopes()) {
-
             foreach ($this->behavior->getScopes() as $idx => $scopeField) {
                 $script .= "
     \$this->{$this->behavior->getColumnSetter($scopeField)}(\$v === null ? null : \$v[$idx]);
 ";
             }
-
         } else {
             $script .= "
 
     return \$this->{$this->getColumnSetter('scope_column')}(\$v);
 ";
-
         }
         $script .= "
 }
@@ -432,7 +424,6 @@ public function getNext(ConnectionInterface \$con = null)
     \$query->filterByRank(\$this->{$this->getColumnGetter()}() + 1, $methodSignature);
 ";
         } else {
-
             $script .= "
     \$query->filterByRank(\$this->{$this->getColumnGetter()}() + 1);
 ";
@@ -477,7 +468,6 @@ public function getPrevious(ConnectionInterface \$con = null)
     \$query->filterByRank(\$this->{$this->getColumnGetter()}() - 1, $methodSignature);
 ";
         } else {
-
             $script .= "
     \$query->filterByRank(\$this->{$this->getColumnGetter()}() - 1);
 ";

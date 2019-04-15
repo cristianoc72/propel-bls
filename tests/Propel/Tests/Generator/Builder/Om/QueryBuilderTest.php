@@ -51,7 +51,6 @@ use \ReflectionMethod;
  */
 class QueryBuilderTest extends BookstoreTestBase
 {
-
     protected function setUp()
     {
         parent::setUp();
@@ -437,7 +436,6 @@ class QueryBuilderTest extends BookstoreTestBase
         $q1 = BookListRelQuery::create();
         $q1->add(null, '1<>1', Criteria::CUSTOM);
         $this->assertEquals($q1, $q, 'filterByPrimaryKeys() translates to an always failing test on empty arrays');
-
     }
 
     public function testFilterByIntegerPk()
@@ -609,7 +607,6 @@ class QueryBuilderTest extends BookstoreTestBase
         $q = ReviewQuery::create()->filterByRecommended('');
         $q1 = ReviewQuery::create()->add(ReviewTableMap::COL_RECOMMENDED, false, Criteria::EQUAL);
         $this->assertEquals($q1, $q, 'filterByBooleanColumn() translates to a = false when passed an empty string');
-
     }
 
     public function testFilterByFk()
@@ -687,7 +684,7 @@ class QueryBuilderTest extends BookstoreTestBase
         $this->assertEquals($q2, $q1, 'filterByFk() accepts a collection and results to an IN query');
     }
 
-        public function testFilterByRefFk()
+    public function testFilterByRefFk()
     {
         $this->assertTrue(method_exists('\Propel\Tests\Bookstore\BookQuery', 'filterByReview'), 'QueryBuilder adds filterByRefFk() methods');
         $this->assertTrue(method_exists('\Propel\Tests\Bookstore\BookQuery', 'filterByMedia'), 'QueryBuilder adds filterByRefFk() methods for all fkeys');

@@ -105,6 +105,5 @@ XML;
         $actual = $this->loader->load('notreadable.xml');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
-
     }
 }

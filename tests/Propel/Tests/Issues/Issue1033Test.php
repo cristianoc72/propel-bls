@@ -5,8 +5,6 @@ namespace Propel\Tests\Issues;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Tests\Helpers\Bookstore\BookstoreTestBase;
 
-
-
 /**
  * This test proves the bug described in https://github.com/propelorm/Propel2/issues/1033.
  * @group database
@@ -38,9 +36,8 @@ EOF;
             $noExceptionThrown = true;
         } catch (\Exception $e) {
             $noExceptionThrown = false;
-	}
+        }
 
-        $this->assertTrue($noExceptionThrown);        
+        $this->assertTrue($noExceptionThrown);
     }
-
 }

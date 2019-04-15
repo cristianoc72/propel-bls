@@ -144,5 +144,4 @@ class CollectionIteratorTest extends BookstoreTestBase
             $this->assertEquals(!(boolean) ($key % 2), $iterator->isEven(), 'isEven() returns true only when the key is even');
         }
     }
-
 }

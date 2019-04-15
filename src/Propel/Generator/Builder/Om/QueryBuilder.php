@@ -44,7 +44,7 @@ class QueryBuilder extends AbstractOMBuilder
     public function getNamespace()
     {
         if ($namespace = parent::getNamespace()) {
-                return $namespace . '\\Base';
+            return $namespace . '\\Base';
         }
 
         return 'Base';
@@ -264,7 +264,6 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
                     $this->addFilterBySetCol($script, $col);
                 }
             }
-
         }
         foreach ($this->getTable()->getForeignKeys() as $fk) {
             $this->addFilterByFK($script, $fk);
@@ -339,7 +338,7 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
         $table = $this->getTable();
         if ((!$this->getPlatform()->supportsNativeDeleteTrigger() || $this->getBuildProperty('generator.objectModel.emulateForeignKeyConstraints')) && count($table->getReferrers()) > 0) {
             foreach ($table->getReferrers() as $fk) {
-                if ( ForeignKey::CASCADE === $fk->getOnDelete()) {
+                if (ForeignKey::CASCADE === $fk->getOnDelete()) {
                     return true;
                 }
             }
@@ -867,7 +866,6 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
         $table = $this->getTable();
 
         if (!$table->hasPrimaryKey()) {
-
             $this->declareClass('Propel\\Runtime\\Exception\\LogicException');
             $script .= "
         throw new LogicException('The {$this->getObjectName()} object has no primary key');
@@ -1338,7 +1336,6 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
                 $script .= "
                 ->where(\"$leftValue = ?\", $rightValue, $bindingType)";
             }
-
         }
         $script .= ";";
         if (!$fk->isComposite()) {
@@ -1868,9 +1865,7 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
 
                     $script .= "
             \$affectedRows += \$query->delete(\$con);";
-
                 } // if cascade && fkey table name != curr table name
-
             } // if not for ref only
         } // foreach foreign keys
         $script .= "
@@ -2004,5 +1999,4 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
     }
 ";
     }
-
 }

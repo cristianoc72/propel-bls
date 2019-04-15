@@ -417,5 +417,4 @@ class PropelModelPager implements \IteratorAggregate, \Countable
             throw new BadMethodCallException('Call to undefined method: ' . $name);
         }
     }
-
 }

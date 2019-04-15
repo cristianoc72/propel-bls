@@ -232,5 +232,4 @@ class PropelTablePkColumnComparatorTest extends TestCase
         $this->assertEquals([], $tableDiff->getAddedPkColumns());
         $this->assertEquals([], $tableDiff->getRemovedPkColumns());
     }
-
 }

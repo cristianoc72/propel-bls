@@ -277,12 +277,14 @@ class CriteriaTest extends BookstoreTestBase
 
         $i =0;
         foreach ($adapters as $adapter) {
-
             Propel::getServiceContainer()->setAdapter(Propel::getServiceContainer()->getDefaultDatasource(), $adapter);
             $myCriteria = new Criteria();
 
             $myCriterion = $myCriteria->getNewCriterion(
-                "TABLE.COLUMN", "FoObAr", Criteria::LIKE);
+                "TABLE.COLUMN",
+                "FoObAr",
+                Criteria::LIKE
+            );
             $sb = "";
             $params=[];
             $myCriterion->appendPsTo($sb, $params);
@@ -340,7 +342,6 @@ class CriteriaTest extends BookstoreTestBase
 
         $this->assertEquals($expect, $result, "Boolean test failed.");
         $this->assertEquals($expect_params, $params);
-
     }
 
     public function testCurrentDate()
@@ -361,7 +362,6 @@ class CriteriaTest extends BookstoreTestBase
         }
 
         $this->assertEquals($expect, $result, "Current date test failed!");
-
     }
 
     public function testCountAster()
@@ -383,7 +383,6 @@ class CriteriaTest extends BookstoreTestBase
         }
 
         $this->assertEquals($expect, $result);
-
     }
 
     public function testInOperator()
@@ -441,7 +440,6 @@ class CriteriaTest extends BookstoreTestBase
             $this->fail("PropelException thrown in Criteria->createSelectSql(): ". $e->getMessage());
         }
         $this->assertEquals($expect, $result);
-
     }
 
     /**
@@ -497,7 +495,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals('TABLE_B.COL_2', $j->getRightColumn(1));
     }
 
-    public function testAddStraightJoin ()
+    public function testAddStraightJoin()
     {
         $c = new Criteria();
         $c->addSelectColumn("*");
@@ -514,7 +512,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddSeveralJoins ()
+    public function testAddSeveralJoins()
     {
         $c = new Criteria();
         $c->addSelectColumn("*");
@@ -533,7 +531,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddLeftJoin ()
+    public function testAddLeftJoin()
     {
         $c = new Criteria();
         $c->addSelectColumn("TABLE_A.*");
@@ -551,7 +549,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddSeveralLeftJoins ()
+    public function testAddSeveralLeftJoins()
     {
         // Fails.. Suspect answer in the chunk starting at BaseTableMap:605
         $c = new Criteria();
@@ -572,7 +570,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddRightJoin ()
+    public function testAddRightJoin()
     {
         $c = new Criteria();
         $c->addSelectColumn("*");
@@ -589,7 +587,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddSeveralRightJoins ()
+    public function testAddSeveralRightJoins()
     {
         // Fails.. Suspect answer in the chunk starting at BaseTableMap:605
         $c = new Criteria();
@@ -610,7 +608,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddInnerJoin ()
+    public function testAddInnerJoin()
     {
         $c = new Criteria();
         $c->addSelectColumn("*");
@@ -627,7 +625,7 @@ class CriteriaTest extends BookstoreTestBase
         $this->assertEquals($expect, $result);
     }
 
-    public function testAddSeveralInnerJoin ()
+    public function testAddSeveralInnerJoin()
     {
         $c = new Criteria();
         $c->addSelectColumn("*");
@@ -691,7 +689,8 @@ class CriteriaTest extends BookstoreTestBase
             addJoin(
                 ['TABLE_A.FOO_ID', 'TABLE_A.BAR'],
                 ['TABLE_B.id', 'TABLE_B.BAZ'],
-                Criteria::LEFT_JOIN)->
+                Criteria::LEFT_JOIN
+            )->
                 addSelectColumn("TABLE_A.id");
 
         $expect = $this->getSql('SELECT TABLE_A.id FROM TABLE_A LEFT JOIN TABLE_B ON (TABLE_A.FOO_ID=TABLE_B.id AND TABLE_A.BAR=TABLE_B.BAZ)');
@@ -754,10 +753,12 @@ class CriteriaTest extends BookstoreTestBase
         $c = new Criteria();
         $c->
             clearSelectColumns()->
-            addMultipleJoin([
+            addMultipleJoin(
+                [
                 ['TABLE_A.FOO_ID', 'TABLE_B.id'],
                 ['TABLE_A.BAR', 'TABLE_B.BAZ']],
-            Criteria::LEFT_JOIN)->
+                Criteria::LEFT_JOIN
+            )->
             addSelectColumn("TABLE_A.id");
 
         $expect = $this->getSql('SELECT TABLE_A.id FROM TABLE_A '
@@ -799,10 +800,12 @@ class CriteriaTest extends BookstoreTestBase
         $c = new Criteria();
         $c->
             clearSelectColumns()->
-            addMultipleJoin([
+            addMultipleJoin(
+                [
                 ['TABLE_A.FOO_ID', 'TABLE_B.id', Criteria::GREATER_EQUAL],
                 ['TABLE_A.BAR', 'TABLE_B.BAZ', Criteria::LESS_THAN]],
-            Criteria::LEFT_JOIN)->
+                Criteria::LEFT_JOIN
+            )->
             addSelectColumn("TABLE_A.id");
 
         $expect = $this->getSql('SELECT TABLE_A.id FROM TABLE_A '
@@ -849,7 +852,6 @@ class CriteriaTest extends BookstoreTestBase
 
         $c->addJoin("tbl.COL3", "tbl.COL4");
         $this->assertEquals(4, count($c->getJoins()), "Expected new col join to be added.");
-
     }
 
     /**
@@ -1084,61 +1086,61 @@ class CriteriaTest extends BookstoreTestBase
 
     public function dataLimit()
     {
-        return array(
-            'Negative value' => array(
+        return [
+            'Negative value' => [
                 'limit'    => -1,
                 'expected' => -1
-            ),
-            'Zero' => array(
+            ],
+            'Zero' => [
                 'limit'    => 0,
                 'expected' => 0
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'limit'    => 38427,
                 'expected' => 38427
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'limit'    => '38427',
                 'expected' => 38427
-            ),
+            ],
 
-            'Largest 32-bit integer' => array(
+            'Largest 32-bit integer' => [
                 'limit'    => 2147483647,
                 'expected' => 2147483647
-            ),
-            'Largest 32-bit integer as a string' => array(
+            ],
+            'Largest 32-bit integer as a string' => [
                 'limit'    => '2147483647',
                 'expected' => 2147483647
-            ),
+            ],
 
-            'Largest 64-bit integer' => array(
+            'Largest 64-bit integer' => [
                 'limit'    => 9223372036854775807,
                 'expected' => 9223372036854775807
-            ),
-            'Largest 64-bit integer as a string' => array(
+            ],
+            'Largest 64-bit integer as a string' => [
                 'limit'    => '9223372036854775807',
                 'expected' => 9223372036854775807
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'limit'    => 123.9,
                 'expected' => 123
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'limit'    => '123.9',
                 'expected' => 123
-            ),
+            ],
 
-            'Non-numeric string' => array(
+            'Non-numeric string' => [
                 'limit'    => 'foo',
                 'expected' => 0
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'limit'    => '3;DROP TABLE abc',
                 'expected' => 3
-            ),
-        );
+            ],
+        ];
     }
 
     public function testDefaultOffset()
@@ -1161,61 +1163,61 @@ class CriteriaTest extends BookstoreTestBase
 
     public function dataOffset()
     {
-        return array(
-            'Negative value' => array(
+        return [
+            'Negative value' => [
                 'offset'   => -1,
                 'expected' => -1
-            ),
-            'Zero' => array(
+            ],
+            'Zero' => [
                 'offset'   => 0,
                 'expected' => 0
-            ),
+            ],
 
-            'Small integer' => array(
+            'Small integer' => [
                 'offset'   => 38427,
                 'expected' => 38427
-            ),
-            'Small integer as a string' => array(
+            ],
+            'Small integer as a string' => [
                 'offset'   => '38427',
                 'expected' => 38427
-            ),
+            ],
 
-            'Largest 32-bit integer' => array(
+            'Largest 32-bit integer' => [
                 'offset'   => 2147483647,
                 'expected' => 2147483647
-            ),
-            'Largest 32-bit integer as a string' => array(
+            ],
+            'Largest 32-bit integer as a string' => [
                 'offset'   => '2147483647',
                 'expected' => 2147483647
-            ),
+            ],
 
-            'Largest 64-bit integer' => array(
+            'Largest 64-bit integer' => [
                 'offset'   => 9223372036854775807,
                 'expected' => 9223372036854775807
-            ),
-            'Largest 64-bit integer as a string' => array(
+            ],
+            'Largest 64-bit integer as a string' => [
                 'offset'   => '9223372036854775807',
                 'expected' => 9223372036854775807
-            ),
+            ],
 
-            'Decimal value' => array(
+            'Decimal value' => [
                 'offset'   => 123.9,
                 'expected' => 123
-            ),
-            'Decimal value as a string' => array(
+            ],
+            'Decimal value as a string' => [
                 'offset'   => '123.9',
                 'expected' => 123
-            ),
+            ],
 
-            'Non-numeric string' => array(
+            'Non-numeric string' => [
                 'offset'   => 'foo',
                 'expected' => 0
-            ),
-            'Injected SQL' => array(
+            ],
+            'Injected SQL' => [
                 'offset'   => '3;DROP TABLE abc',
                 'expected' => 3
-            ),
-        );
+            ],
+        ];
     }
 
     public function testCombineAndFilterBy()
@@ -1251,7 +1253,7 @@ class CriteriaTest extends BookstoreTestBase
 
         $result = $c->createSelectSql($params);
 
-        if ($this->runningOnPostgreSQL()){
+        if ($this->runningOnPostgreSQL()) {
             $sql = 'SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id, COUNT(review.id) AS Count FROM book LEFT JOIN review ON (book.id=review.book_id) GROUP BY book.id,book.title,book.isbn,book.price,book.publisher_id,book.author_id';
         } else {
             $sql = $this->getSql('SELECT book.id, book.title, book.isbn, book.price, book.publisher_id, book.author_id, COUNT(review.id) AS Count FROM book LEFT JOIN review ON (book.id=review.book_id) GROUP BY book.id');

@@ -84,5 +84,4 @@ class UniqueConstraintTest extends BookstoreTestBase
 
         $book->delete();
     }
-
 }

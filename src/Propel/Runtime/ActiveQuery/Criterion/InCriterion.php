@@ -54,5 +54,4 @@ class InCriterion extends AbstractCriterion
             $sb .= (Criteria::IN === $this->comparison) ? '1<>1' : '1=1';
         }
     }
-
 }

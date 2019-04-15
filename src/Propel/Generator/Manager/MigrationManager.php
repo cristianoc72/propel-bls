@@ -199,7 +199,8 @@ class MigrationManager extends AbstractManager
         $platform = $this->getPlatform($datasource);
         $conn = $this->getAdapterConnection($datasource);
         $conn->transaction(function () use ($conn, $platform, $timestamp) {
-            $sql = sprintf('DELETE FROM %s WHERE %s = ?',
+            $sql = sprintf(
+                'DELETE FROM %s WHERE %s = ?',
                 $this->getMigrationTable(),
                 $platform->doQuoting('version')
             );
@@ -213,7 +214,8 @@ class MigrationManager extends AbstractManager
     {
         $platform = $this->getPlatform($datasource);
         $conn = $this->getAdapterConnection($datasource);
-        $sql = sprintf('INSERT INTO %s (%s) VALUES (?)',
+        $sql = sprintf(
+            'INSERT INTO %s (%s) VALUES (?)',
             $this->getMigrationTable(),
             $platform->doQuoting('version')
         );
@@ -284,7 +286,8 @@ class MigrationManager extends AbstractManager
         return $className;
     }
 
-    public function findMigrationClassNameSuffix($timestamp) {
+    public function findMigrationClassNameSuffix($timestamp)
+    {
         $suffix = "";
         $path = $this->getWorkingDirectory();
         if (is_dir($path)) {
@@ -301,7 +304,8 @@ class MigrationManager extends AbstractManager
     public function getMigrationObject($timestamp)
     {
         $className = $this->getMigrationClassName($timestamp);
-        require_once sprintf('%s/%s.php',
+        require_once sprintf(
+            '%s/%s.php',
             $this->getWorkingDirectory(),
             $className
         );

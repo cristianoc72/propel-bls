@@ -148,8 +148,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
             $sql .= ' AND c.relname = ?';
             $params[] = $filterTable->getCommonName();
-
-        } else if (!$database->getSchema()) {
+        } elseif (!$database->getSchema()) {
             $stmt = $this->dbh->query('SELECT schema_name FROM information_schema.schemata');
             $searchPath = [];
 
@@ -164,7 +163,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
             $searchPath = implode(', ', $searchPath);
             $sql .= "
             AND n.nspname IN ($searchPath)";
-
         } elseif ($database->getSchema()) {
             $sql .= "
             AND n.nspname = ?";
@@ -201,7 +199,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                 $tableWraps[] = $wrap;
             }
         }
-
     }
 
     /**
@@ -221,7 +218,7 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         if ($schema = $table->getSchema()) {
             $searchPath = '?';
             $params = [$schema];
-        } else if (!$table->getDatabase()->getSchema()) {
+        } elseif (!$table->getDatabase()->getSchema()) {
             $stmt = $this->dbh->query('SHOW search_path');
             $searchPathString = $stmt->fetchColumn();
 
@@ -253,7 +250,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
         $stmt->execute($params);
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
             $size = $row['character_maximum_length'];
             if (!$size) {
                 $size = $row['numeric_precision'];
@@ -358,7 +354,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
 
         $foreignKeys = [];
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
             $name = $row['conname'];
             $localTable = $row['fktab'];
             $localColumns = explode(',', trim($row['fkcols'], '{}'));
@@ -484,7 +479,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
                 $indexes[$name]->addColumn([
                     "name" => $row2['attname']
                 ]);
-
             }
         }
 
@@ -502,7 +496,6 @@ class PgsqlSchemaParser extends AbstractSchemaParser
      */
     protected function addPrimaryKey(Table $table, $oid)
     {
-
         $stmt = $this->dbh->prepare("SELECT
             DISTINCT ON(cls.relname)
             cls.relname as idxname,

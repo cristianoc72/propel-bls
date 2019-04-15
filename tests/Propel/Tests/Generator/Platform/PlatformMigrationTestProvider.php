@@ -21,7 +21,6 @@ use Propel\Generator\Model\Diff\TableComparator;
  */
 abstract class PlatformMigrationTestProvider extends PlatformTestBase
 {
-
     public function providerForTestGetModifyDatabaseDDL()
     {
         $schema1 = <<<EOF
@@ -127,7 +126,7 @@ EOF;
         $t1 = $this->getDatabaseFromSchema($schema1)->getTable('foo');
         $t2 = $this->getDatabaseFromSchema($schema2)->getTable('foo');
 
-        return [[TableComparator::computeDiff($t1,$t2)]];
+        return [[TableComparator::computeDiff($t1, $t2)]];
     }
 
     public function providerForTestGetModifyTableColumnsDDL()
@@ -569,5 +568,4 @@ EOF;
 
         return [[$diff]];
     }
-
 }

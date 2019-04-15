@@ -148,7 +148,7 @@ class TableMapTest extends BookstoreTestBase
         $c->addSelectColumn(BookTableMap::COL_ID);
         $c->addSelectColumn(BookTableMap::COL_TITLE);
         $c->addSelectColumn(PublisherTableMap::COL_NAME);
-        $c->addAsColumn('PublisherName','(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
+        $c->addAsColumn('PublisherName', '(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
 
         $c->addJoin(BookTableMap::COL_PUBLISHER_ID, PublisherTableMap::COL_ID, Criteria::LEFT_JOIN);
 
@@ -173,7 +173,7 @@ class TableMapTest extends BookstoreTestBase
         $c->addSelectColumn(BookTableMap::COL_ID);
         $c->addSelectColumn(BookTableMap::COL_TITLE);
         $c->addSelectColumn(PublisherTableMap::COL_NAME);
-        $c->addAsColumn('PublisherName','(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
+        $c->addAsColumn('PublisherName', '(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
         $c->addJoin(BookTableMap::COL_PUBLISHER_ID, PublisherTableMap::COL_ID, Criteria::LEFT_JOIN);
         $c->setOffset(20);
         $c->setLimit(20);
@@ -196,7 +196,7 @@ class TableMapTest extends BookstoreTestBase
         $c->addSelectColumn(BookTableMap::COL_ID);
         $c->addSelectColumn(BookTableMap::COL_TITLE);
         $c->addSelectColumn(PublisherTableMap::COL_NAME);
-        $c->addAsColumn('PublisherName','(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
+        $c->addAsColumn('PublisherName', '(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
         $c->addJoin(BookTableMap::COL_PUBLISHER_ID, PublisherTableMap::COL_ID, Criteria::LEFT_JOIN);
         $c->addDescendingOrderByColumn('PublisherName');
         $c->setOffset(20);
@@ -220,7 +220,7 @@ class TableMapTest extends BookstoreTestBase
         $c->addSelectColumn(BookTableMap::COL_ID);
         $c->addSelectColumn(BookTableMap::COL_TITLE);
         $c->addSelectColumn(PublisherTableMap::COL_NAME);
-        $c->addAsColumn('PublisherName','(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
+        $c->addAsColumn('PublisherName', '(SELECT MAX(publisher.NAME) FROM publisher WHERE publisher.id = book.PUBLISHER_ID)');
         $c->addJoin(BookTableMap::COL_PUBLISHER_ID, PublisherTableMap::COL_ID, Criteria::LEFT_JOIN);
         $c->addDescendingOrderByColumn('PublisherName');
         $c->addAscendingOrderByColumn(BookTableMap::COL_TITLE);

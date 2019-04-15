@@ -53,5 +53,4 @@ class BinaryCriterion extends AbstractCriterion
             $sb .= $this->comparison === Criteria::BINARY_ALL ? '1<>1' : '1=1';
         }
     }
-
 }

@@ -28,7 +28,6 @@ use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
  */
 class ObjectCollection extends Collection
 {
-
     protected $index;
     protected $indexSplHash;
 
@@ -391,7 +390,7 @@ class ObjectCollection extends Collection
     {
         $this->index = [];
         $this->indexSplHash = [];
-        foreach ($this->data as $idx => $value){
+        foreach ($this->data as $idx => $value) {
             $hashCode = $this->getHashCode($value);
             $this->index[$hashCode] = $idx;
             $this->indexSplHash[spl_object_hash($value)] = $hashCode;

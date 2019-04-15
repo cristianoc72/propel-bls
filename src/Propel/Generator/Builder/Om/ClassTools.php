@@ -34,7 +34,6 @@ class ClassTools
         } else {
             return $qualifiedName;  // there is no '.' in the qualified name
         }
-
     }
 
     /**

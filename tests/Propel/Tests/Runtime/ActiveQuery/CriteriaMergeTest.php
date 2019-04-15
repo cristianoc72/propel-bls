@@ -436,5 +436,4 @@ class CriteriaMergeTest extends TestCaseFixtures
         $c2->setLimit(456);
         $this->assertEquals(123, $c1->getLimit(), 'further modifying a merged criteria does not affect the merger');
     }
-
 }

@@ -431,7 +431,7 @@ class NestedSetBehaviorObjectBuilderModifierTest extends TestCase
                |  \
                t6 t7
         */
-    $this->assertTrue($t2->getChildren() instanceof ObjectCollection, 'getChildren() returns a collection');
+        $this->assertTrue($t2->getChildren() instanceof ObjectCollection, 'getChildren() returns a collection');
         $this->assertEquals(0, count($t2->getChildren()), 'getChildren() returns an empty collection for leafs');
         $children = $t3->getChildren();
         $expected = [
@@ -477,7 +477,7 @@ class NestedSetBehaviorObjectBuilderModifierTest extends TestCase
             't4' => [5, 6, 2],
             't5' => [7, 12, 2],
         ];
-    $this->assertEquals($expected, $this->dumpNodes($children, true), 'getChildren() returns a collection of children');
+        $this->assertEquals($expected, $this->dumpNodes($children, true), 'getChildren() returns a collection of children');
     }
 
     public function testCountChildren()

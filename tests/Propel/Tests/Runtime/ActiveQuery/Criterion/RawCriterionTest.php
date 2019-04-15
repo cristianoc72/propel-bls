@@ -65,5 +65,4 @@ class RawCriterionTest extends BaseTestCase
         ];
         $this->assertEquals($expected, $params);
     }
-
 }

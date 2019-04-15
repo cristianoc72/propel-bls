@@ -96,10 +96,13 @@ class SqlitePlatform extends DefaultPlatform
         parent::setGeneratorConfig($generatorConfig);
 
         if (null !== ($foreignKeySupport = $generatorConfig->getConfigProperty('database.adapter.sqlite.foreignKey'))) {
-            $this->foreignKeySupport = filter_var($foreignKeySupport, FILTER_VALIDATE_BOOLEAN);;
+            $this->foreignKeySupport = filter_var($foreignKeySupport, FILTER_VALIDATE_BOOLEAN);
+            ;
         }
         if (null !== ($tableAlteringWorkaround = $generatorConfig->getConfigProperty('database.adapter.sqlite.tableAlteringWorkaround'))) {
-            $this->tableAlteringWorkaround = filter_var($tableAlteringWorkaround, FILTER_VALIDATE_BOOLEAN);;;
+            $this->tableAlteringWorkaround = filter_var($tableAlteringWorkaround, FILTER_VALIDATE_BOOLEAN);
+            ;
+            ;
         }
     }
 
@@ -117,7 +120,8 @@ ALTER TABLE %s ADD %s;
 ";
         foreach ($columns as $column) {
             $tableName = $column->getTable()->getName();
-            $ret .= sprintf($pattern,
+            $ret .= sprintf(
+                $pattern,
                 $this->quoteIdentifier($tableName),
                 $this->getColumnDDL($column)
             );
@@ -131,7 +135,8 @@ ALTER TABLE %s ADD %s;
      */
     public function getModifyTableDDL(TableDiff $tableDiff)
     {
-        $changedNotEditableThroughDirectDDL = $this->tableAlteringWorkaround && (false
+        $changedNotEditableThroughDirectDDL = $this->tableAlteringWorkaround && (
+            false
             || $tableDiff->hasModifiedFks()
             || $tableDiff->hasModifiedIndices()
             || $tableDiff->hasModifiedColumns()
@@ -147,10 +152,8 @@ ALTER TABLE %s ADD %s;
         );
 
         if ($this->tableAlteringWorkaround && !$changedNotEditableThroughDirectDDL && $tableDiff->hasAddedColumns()) {
-
             $addedCols = $tableDiff->getAddedColumns();
             foreach ($addedCols as $column) {
-
                 $sqlChangeNotSupported = false
 
                     //The column may not have a PRIMARY KEY or UNIQUE constraint.
@@ -160,7 +163,9 @@ ALTER TABLE %s ADD %s;
                     //The column may not have a default value of CURRENT_TIME, CURRENT_DATE, CURRENT_TIMESTAMP,
                     //or an expression in parentheses.
                     || false !== array_search(
-                        $column->getDefaultValue(), ['CURRENT_TIME', 'CURRENT_DATE', 'CURRENT_TIMESTAMP'])
+                        $column->getDefaultValue(),
+                        ['CURRENT_TIME', 'CURRENT_DATE', 'CURRENT_TIMESTAMP']
+                    )
                     || substr(trim($column->getDefaultValue()), 0, 1) == '('
 
                     //If a NOT NULL constraint is specified, then the column must have a default value other than NULL.
@@ -171,7 +176,6 @@ ALTER TABLE %s ADD %s;
                     $changedNotEditableThroughDirectDDL = true;
                     break;
                 }
-
             }
         }
 
@@ -214,7 +218,7 @@ DROP TABLE %s;
         }
 
         foreach ($tableDiff->getRenamedColumns() as $col) {
-            list ($from, $to) = $col;
+            list($from, $to) = $col;
             $fieldMap[$from->getName()] = $to->getName();
         }
 
@@ -224,13 +228,13 @@ DROP TABLE %s;
                     $fieldMap[$col->getName()] = $col->getName();
                 }
             }
-
         }
 
         $createTable = $this->getAddTableDDL($newTable);
         $createTable .= $this->getAddIndicesDDL($newTable);
 
-        $sql = sprintf($pattern,
+        $sql = sprintf(
+            $pattern,
             $this->quoteIdentifier($tempTableName), //CREATE TEMPORARY TABLE %s
             $originTableFields, //select %s
             $this->quoteIdentifier($originTableName), //from %s
@@ -489,7 +493,8 @@ PRAGMA foreign_keys = ON;
 );
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $tableDescription,
             $this->quoteIdentifier($table->getName()),
             implode($sep, $lines)
@@ -504,7 +509,8 @@ PRAGMA foreign_keys = ON;
 
         $pattern = "FOREIGN KEY (%s) REFERENCES %s (%s)";
 
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->getColumnListDDL($fk->getLocalColumnObjects()),
             $this->quoteIdentifier($fk->getForeignTableName()),
             $this->getColumnListDDL($fk->getForeignColumnObjects())
@@ -550,5 +556,4 @@ PRAGMA foreign_keys = ON;
     {
         return true;
     }
-
 }

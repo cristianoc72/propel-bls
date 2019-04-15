@@ -166,7 +166,6 @@ class ArrayFormatter extends AbstractFormatter
             // in order to get the $col variable increased anyway
             $secondaryObject = $this->getSingleObjectFromRow($row, $class, $col);
             if (!isset($this->alreadyHydratedObjects[$relAlias][$key])) {
-
                 if ($secondaryObject->isPrimaryKeyNull()) {
                     $this->alreadyHydratedObjects[$relAlias][$key] = [];
                 } else {

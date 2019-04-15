@@ -9,6 +9,7 @@
  */
 
 namespace Propel\Generator\Config;
+
 use Propel\Runtime\Propel;
 
 /**

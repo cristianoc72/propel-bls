@@ -106,5 +106,4 @@ EOF;
         $this->assertNull($obj->getBar());
         $this->assertEquals('bazValue', $obj->getBaz());
     }
-
 }

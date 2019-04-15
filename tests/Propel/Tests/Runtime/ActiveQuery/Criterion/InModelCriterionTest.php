@@ -136,9 +136,9 @@ class InModelCriterionTest extends BaseTestCase
         $this->assertEquals($expected, $params);
     }
 
-   /**
-     * @dataProvider providerForEmptyValues
-     */
+    /**
+      * @dataProvider providerForEmptyValues
+      */
     public function testAppendPsToWithNotInAndEmptyValueCreatesAnAlwaysTrueCondition($emptyValue)
     {
         $cton = new InModelCriterion(new Criteria(), 'A.COL NOT IN ?', 'A.COL', $emptyValue);
@@ -152,9 +152,9 @@ class InModelCriterionTest extends BaseTestCase
         $this->assertEquals($expected, $params);
     }
 
-   /**
-     * @dataProvider providerForEmptyValues
-     */
+    /**
+      * @dataProvider providerForEmptyValues
+      */
     public function testAppendPsToWithNotInAndEmptyValueIsCaseInsensitive($emptyValue)
     {
         $cton = new InModelCriterion(new Criteria(), 'A.COL not in ?', 'A.COL', $emptyValue);
@@ -183,5 +183,4 @@ class InModelCriterionTest extends BaseTestCase
         ];
         $this->assertEquals($expected, $params);
     }
-
 }

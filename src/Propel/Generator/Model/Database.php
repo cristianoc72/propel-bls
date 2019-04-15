@@ -28,7 +28,6 @@ use Propel\Generator\Platform\PlatformInterface;
  */
 class Database extends ScopedMappingModel
 {
-
     use BehaviorableTrait;
 
     /**
@@ -531,7 +530,7 @@ class Database extends ScopedMappingModel
     public function removeTable(Table $table)
     {
         if ($this->hasTable($table->getName(), true)) {
-            foreach($this->tables as $id => $tableExam) {
+            foreach ($this->tables as $id => $tableExam) {
                 if ($table->getName() === $tableExam->getName()) {
                     unset($this->tables[$id]);
                 }
@@ -842,20 +841,22 @@ class Database extends ScopedMappingModel
         foreach ($this->getTables() as $table) {
             $columns = [];
             foreach ($table->getColumns() as $column) {
-                $columns[] = sprintf("      %s %s %s %s %s %s %s",
+                $columns[] = sprintf(
+                    "      %s %s %s %s %s %s %s",
                     $column->getName(),
                     $column->getType(),
                     $column->getSize() ? '(' . $column->getSize() . ')' : '',
                     $column->isPrimaryKey() ? 'PK' : '',
                     $column->isNotNull() ? 'NOT NULL' : '',
                     $column->getDefaultValueString() ? "'".$column->getDefaultValueString()."'" : '',
-                    $column->isAutoIncrement() ? 'AUTO_INCREMENT' : '' 
+                    $column->isAutoIncrement() ? 'AUTO_INCREMENT' : ''
                 );
             }
 
             $fks = [];
             foreach ($table->getForeignKeys() as $fk) {
-                $fks[] = sprintf("      %s to %s.%s (%s => %s)",
+                $fks[] = sprintf(
+                    "      %s to %s.%s (%s => %s)",
                     $fk->getName(),
                     $fk->getForeignSchemaName(),
                     $fk->getForeignTableCommonName(),
@@ -870,7 +871,8 @@ class Database extends ScopedMappingModel
                 foreach ($index->getColumns() as $indexColumnName) {
                     $indexColumns[] = sprintf('%s (%s)', $indexColumnName, $index->getColumnSize($indexColumnName));
                 }
-                $indices[] = sprintf("      %s (%s)",
+                $indices[] = sprintf(
+                    "      %s (%s)",
                     $index->getName(),
                     join(', ', $indexColumns)
                 );
@@ -878,13 +880,15 @@ class Database extends ScopedMappingModel
 
             $unices = [];
             foreach ($table->getUnices() as $index) {
-                $unices[] = sprintf("      %s (%s)",
+                $unices[] = sprintf(
+                    "      %s (%s)",
                     $index->getName(),
                     join(', ', $index->getColumns())
                 );
             }
 
-            $tableDef = sprintf("  %s (%s):\n%s",
+            $tableDef = sprintf(
+                "  %s (%s):\n%s",
                 $table->getName(),
                 $table->getCommonName(),
                 implode("\n", $columns)
@@ -905,7 +909,8 @@ class Database extends ScopedMappingModel
             $tables[] = $tableDef;
         }
 
-        return sprintf("%s:\n%s",
+        return sprintf(
+            "%s:\n%s",
             $this->getName() . ($this->getSchema() ? '.'. $this->getSchema() : ''),
             implode("\n", $tables)
         );
@@ -979,5 +984,4 @@ class Database extends ScopedMappingModel
     {
         $this->identifierQuoting = $identifierQuoting;
     }
-
 }

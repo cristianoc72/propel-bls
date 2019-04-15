@@ -77,8 +77,8 @@ class MssqlPlatform extends DefaultPlatform
 
     /**
      * Returns the DDL SQL to add the tables of a database
-     * together with index and foreign keys. 
-     * Since MSSQL always checks it the tables in foreign key definitions exist, 
+     * together with index and foreign keys.
+     * Since MSSQL always checks it the tables in foreign key definitions exist,
      * the foreign key DDLs are moved after all tables are created
      *
      * @return string
@@ -150,7 +150,8 @@ END
         if ($table->hasPrimaryKey()) {
             $pattern = 'CONSTRAINT %s PRIMARY KEY (%s)';
 
-            return sprintf($pattern,
+            return sprintf(
+                $pattern,
                 $this->quoteIdentifier($this->getPrimaryKeyName($table)),
                 $this->getColumnListDDL($table->getPrimaryKey())
             );
@@ -169,7 +170,8 @@ END
 ;
 ";
 
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getTable()->getName()),
             $this->getForeignKeyDDL($fk)
         );
@@ -184,7 +186,8 @@ END
     public function getUniqueDDL(Unique $unique)
     {
         $pattern = 'CONSTRAINT %s UNIQUE NONCLUSTERED (%s) ON [PRIMARY]';
-        return sprintf($pattern,
+        return sprintf(
+            $pattern,
             $this->quoteIdentifier($unique->getName()),
             $this->getColumnListDDL($unique->getColumnObjects())
         );
@@ -196,7 +199,8 @@ END
             return;
         }
         $pattern = 'CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)';
-        $script = sprintf($pattern,
+        $script = sprintf(
+            $pattern,
             $this->quoteIdentifier($fk->getName()),
             $this->getColumnListDDL($fk->getLocalColumnObjects()),
             $this->quoteIdentifier($fk->getForeignTableName()),

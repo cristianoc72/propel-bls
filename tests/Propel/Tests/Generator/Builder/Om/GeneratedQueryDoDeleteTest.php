@@ -133,7 +133,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
 
         $obj = MediaQuery::create()->findPk($mediaId);
         $this->assertNull($obj, "Expect NULL when retrieving on no matching Media.");
-
     }
 
     /**
@@ -142,7 +141,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
      */
     public function testDoDelete_Cascade_CompositePK()
     {
-
         $origBceCount = BookstoreContestEntryQuery::create()->count();
 
         $cust1 = new Customer();
@@ -200,7 +198,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
 
         $bcetest2 = BookstoreContestEntryQuery::create()->findPk([$store1->getId(), $c2->getId(), $cust1->getId()]);
         $this->assertNotNull($bcetest2, "Expected BCE for store2 to NOT be cascade deleted.");
-
     }
 
     /**
@@ -223,7 +220,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
 
         $book = BookQuery::create()->findPk($bookId);
         $this->assertNull($book->getAuthorId(), "Expect the book.author_id to be NULL after the author was removed.");
-
     }
 
     /**
@@ -241,7 +237,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
         // 3) now make sure it's gone
         $obj = BookQuery::create()->findPk($bookId);
         $this->assertNull($obj, "Expect NULL when retrieving on no matching Book.");
-
     }
 
     public function testDoDelete_ByPks()
@@ -279,7 +274,6 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
         // 3) now make sure it's gone
         $obj = BookQuery::create()->findPk($bookId);
         $this->assertNull($obj, "Expect NULL when retrieving on no matching Book.");
-
     }
 
     /**
@@ -405,7 +399,7 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
 
         $matches = PublisherQuery::create()->filterByName($name)->find();
         $this->assertCount(1, $matches, "Expect there to be exactly 1 publisher just-inserted.");
-        $this->assertTrue( 1 != $matches[0]->getId(), "Expected to have different ID than one put in values Criteria.");
+        $this->assertTrue(1 != $matches[0]->getId(), "Expected to have different ID than one put in values Criteria.");
     }
 
     /**
@@ -421,7 +415,7 @@ class GeneratedQueryDoDeleteTest extends BookstoreEmptyTestBase
 
         $matches = PublisherQuery::create()->filterByName($name)->find();
         $this->assertCount(1, $matches, "Expect there to be exactly 1 publisher just-inserted.");
-        $this->assertTrue( 1 != $matches[0]->getId(), "Expected to have different ID than one put in values Criteria.");
+        $this->assertTrue(1 != $matches[0]->getId(), "Expected to have different ID than one put in values Criteria.");
     }
 
     /**

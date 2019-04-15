@@ -124,7 +124,7 @@ class SqliteSchemaParser extends AbstractSchemaParser
                 $filter = sprintf(" AND name LIKE '%s§%%'", $schema);
             }
             $filter .= sprintf(" AND (name = '%s' OR name LIKE '%%§%1\$s')", $filterTable->getCommonName());
-        } else if ($schema = $database->getSchema()) {
+        } elseif ($schema = $database->getSchema()) {
             $filter = sprintf(" AND name LIKE '%s§%%'", $schema);
         }
 
@@ -217,8 +217,8 @@ class SqliteSchemaParser extends AbstractSchemaParser
                 if ("'" !== substr($default, 0, 1) && strpos($default, '(')) {
                     $defaultType = ColumnDefaultValue::TYPE_EXPR;
                     if ('datetime(CURRENT_TIMESTAMP, \'localtime\')' === $default) {
-                            $default = 'CURRENT_TIMESTAMP';
-                        }
+                        $default = 'CURRENT_TIMESTAMP';
+                    }
                 } else {
                     $defaultType = ColumnDefaultValue::TYPE_VALUE;
                     $default = str_replace("'", '', $default);

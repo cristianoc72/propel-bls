@@ -7,7 +7,7 @@ use Propel\Generator\Util\QuickBuilder;
 
 /**
  * This test proves the bug described in https://github.com/propelorm/Propel2/issues/989.
- * 
+ *
  * @group database
  */
 class Issue989Test extends TestCase
@@ -54,13 +54,13 @@ class Issue989Test extends TestCase
         // Collection
         $collection = new \Propel\Runtime\Collection\ObjectCollection();
         $collection->setModel('\RechercheNature');
-        $collection->setData(array($rechercheNature));
+        $collection->setData([$rechercheNature]);
 
         // Recherche
         $recherche = new \Recherche();
         $recherche->setRechercheNatures($collection);
         
-        $countBeforeSave = $recherche->countRechercheNatures(); 
+        $countBeforeSave = $recherche->countRechercheNatures();
 
         $recherche->save();
 

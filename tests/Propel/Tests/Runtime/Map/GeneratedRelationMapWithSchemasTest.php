@@ -77,5 +77,4 @@ class GeneratedRelationMapWithSchemasTest extends TestCaseFixturesDatabase
         $this->assertEquals(['bookstore_schemas'.$del.'customer_account.customer_id' => 'bookstore_schemas'.$del.'customer.id'], $bookCustomerTable->getRelation('CustomerAccount')->getColumnMappings(), 'getColumnMappings returns local to foreign by default');
         $this->assertEquals(['bookstore_schemas'.$del.'customer.id' => 'bookstore_schemas'.$del.'customer_account.customer_id'], $bookCustomerTable->getRelation('CustomerAccount')->getColumnMappings(RelationMap::LEFT_TO_RIGHT), 'getColumnMappings returns foreign to local when asked left to right for a one to one relationship');
     }
-
 }

@@ -555,5 +555,4 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $diff = DatabaseComparator::computeDiff($d1, $d2, false, true, true, ['Bar']);
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
     }
-
 }

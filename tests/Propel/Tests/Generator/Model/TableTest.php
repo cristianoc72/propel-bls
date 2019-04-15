@@ -318,8 +318,8 @@ class TableTest extends ModelTestCase
         $names = $table->getChildrenNames();
 
         $this->assertCount(2, $names);
-        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class ($names[0]));
-        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class ($names[1]));
+        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class($names[0]));
+        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class($names[1]));
     }
 
     public function testCantGetChildrenNames()

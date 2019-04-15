@@ -801,7 +801,6 @@ CREATE TABLE `foo`
 
     public function testVendorOptionsQuoting()
     {
-
         $schema   = <<<EOF
 <database name="test" identifierQuoting="true">
     <table name="foo">
@@ -851,7 +850,4 @@ CREATE TABLE `foo`
         $this->getPlatform()->normalizeTable($table);
         $this->assertEquals("`price` DECIMAL(10,3)", $this->getPlatform()->getColumnDDL($column));
     }
-
-
-
 }

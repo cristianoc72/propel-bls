@@ -117,5 +117,4 @@ class TypeTest extends BookstoreTestBase
 
         $this->assertEquals($q, $typeObjectEntity->getDetails());
     }
-
 }

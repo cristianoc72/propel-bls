@@ -286,5 +286,4 @@ class MigrationTest extends TestCaseFixturesDatabase
         $content = file_get_contents($file);
         $this->assertNotContains('CREATE TABLE ', $content);
     }
-
 }

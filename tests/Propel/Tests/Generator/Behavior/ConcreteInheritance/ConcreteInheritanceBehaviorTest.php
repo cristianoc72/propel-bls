@@ -274,7 +274,7 @@ EOF;
         $this->assertEquals(5, $article->getId(), 'getParentOrCreate() keeps manually set pk');
         $this->assertTrue($content instanceof \ConcreteContentSetPk, 'getParentOrCreate() returns an instance of the parent class');
         $this->assertTrue($content->isNew(), 'getParentOrCreate() returns a new instance of the parent class if the object is new');
-        $this->assertEquals(5,$content->getId(), 'getParentOrCreate() returns a instance of the parent class with pk set');
+        $this->assertEquals(5, $content->getId(), 'getParentOrCreate() returns a instance of the parent class with pk set');
         $this->assertEquals('ConcreteArticleSetPk', $content->getDescendantClass(), 'getParentOrCreate() correctly sets the descendant_class of the parent object');
     }
 
@@ -321,5 +321,4 @@ EOF;
             $this->assertTrue(true, 'SetPk fails when allowPkInsert is false');
         }
     }
-
 }

@@ -23,7 +23,6 @@ use Propel\Tests\Bookstore\Behavior\AggregatePoll;
 use Propel\Tests\Bookstore\Behavior\AggregatePollQuery;
 use Propel\Tests\Helpers\Bookstore\BookstoreTestBase;
 
-
 /**
  * Tests for AggregateColumnBehavior class
  *
@@ -232,5 +231,4 @@ class AggregateColumnBehaviorTest extends BookstoreTestBase
 
         return [$poll, $item1, $item2];
     }
-
 }

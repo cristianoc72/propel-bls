@@ -40,5 +40,4 @@ class BasicModelCriterion extends AbstractModelCriterion
             $sb .= $this->clause;
         }
     }
-
 }

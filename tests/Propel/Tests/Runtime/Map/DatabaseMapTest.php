@@ -129,7 +129,6 @@ class DatabaseMapTest extends TestCaseFixtures
     {
         $this->assertEquals('book', Propel::getServiceContainer()->getDatabaseMap('bookstore')->getTableByPhpName('Propel\Tests\Bookstore\Book')->getName(), 'getTableByPhpName() can autoload a TableMap when the class is generated and autoloaded');
     }
-
 }
 
 class TestDatabaseBuilder

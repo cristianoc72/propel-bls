@@ -102,7 +102,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         // note that this is different from how it's represented in schema, but should resolve to same unix timestamp
         $review->setReviewDate('2001-01-01');
         $this->assertTrue($review->isModified(), "Expect Review to have been marked 'modified' after default date/time value set.");
-
     }
 
     /**
@@ -391,7 +390,6 @@ class GeneratedObjectTest extends BookstoreTestBase
 
         $this->assertEquals($pub1->getId(), $book->getPublisherId(), "Expected book to have old publisher id (again).");
         $this->assertSame($pub1, $book->getPublisher(), "Expected book to have old publisher object associated (again).");
-
     }
 
     /**
@@ -421,7 +419,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         $opinion2 = BookOpinionQuery::create()->findPk([$bookId, $readerId]);
 
         $this->assertSame($opinion, $opinion2, "Expected same object to be retrieved from differently type-casted primary key values.");
-
     }
 
     /**
@@ -430,7 +427,6 @@ class GeneratedObjectTest extends BookstoreTestBase
      */
     public function testSaveReturnValues()
     {
-
         $author = new Author();
         $author->setFirstName("Mark");
         $author->setLastName("Kurlansky");
@@ -468,7 +464,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         $book->setTitle("Salt: A World History");
         $affected = $book->save();
         $this->assertEquals(2, $affected, "Expected 2 affected rows when saving updated book with updated author.");
-
     }
 
     public function testSaveCanInsertNonEmptyObjects()
@@ -498,7 +493,6 @@ class GeneratedObjectTest extends BookstoreTestBase
         $super->addSubordinate($e2);
 
         $affected = $super->save();
-
     }
 
     public function testIsModifiedIsFalseForNewObjects()

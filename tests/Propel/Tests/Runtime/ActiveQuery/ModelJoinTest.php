@@ -89,5 +89,4 @@ class ModelJoinTest extends TestCaseFixtures
         $this->assertEquals([ReaderFavoriteTableMap::COL_BOOK_ID, ReaderFavoriteTableMap::COL_READER_ID], $join->getLeftColumns(), 'setRelationMap() automatically sets the left columns for composite relationships');
         $this->assertEquals([BookOpinionTableMap::COL_BOOK_ID, BookOpinionTableMap::COL_READER_ID], $join->getRightColumns(), 'setRelationMap() automatically sets the right columns for composite relationships');
     }
-
 }

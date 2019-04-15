@@ -6,13 +6,11 @@ use Propel\Generator\Util\QuickBuilder;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Tests\TestCase;
 
-
 /**
  * Regression test for https://github.com/propelorm/Propel2/issues/656
  */
 class Issue656Test extends TestCase
 {
-
     public function setUp()
     {
         if (!class_exists('\Issue656TestObject')) {
@@ -55,5 +53,4 @@ EOF;
 
         $this->assertEquals($collection, $objectA->getIssue656TestObjectsRelatedByTo());
     }
-
 }

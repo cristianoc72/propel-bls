@@ -61,9 +61,9 @@ EOF;
     {
         $this->assertTrue(method_exists('ComplexColumnTypeJsonEntity', 'setBar'));
         $e = new \PublicComplexColumnTypeJsonEntity();
-        $e->setBar(array(
+        $e->setBar([
             'key' => 'value'
-        ));
+        ]);
         $this->assertEquals('{"key":"value"}', $e->bar);
         $e->setBar(null);
         $this->assertNull($e->getBar());
@@ -71,42 +71,42 @@ EOF;
     
     public function testIsModified()
     {
-      $this->assertTrue(method_exists('ComplexColumnTypeJsonEntity', 'setBar'));
-      $e = new \PublicComplexColumnTypeJsonEntity();
-      $e->setBar(array(
+        $this->assertTrue(method_exists('ComplexColumnTypeJsonEntity', 'setBar'));
+        $e = new \PublicComplexColumnTypeJsonEntity();
+        $e->setBar([
           'key' => 'value'
-      ));
-      $this->assertTrue($e->isModified());
+      ]);
+        $this->assertTrue($e->isModified());
       
-      $e = new \PublicComplexColumnTypeJsonEntity();
-      $e->setBar(array(
+        $e = new \PublicComplexColumnTypeJsonEntity();
+        $e->setBar([
           'defaultKey' => 'defaultValue'
-      ));
-      $this->assertFalse($e->isModified());
+      ]);
+        $this->assertFalse($e->isModified());
       
-      $e->setBar('{"defaultKey":"defaultValue"}');
-      $this->assertFalse($e->isModified());
+        $e->setBar('{"defaultKey":"defaultValue"}');
+        $this->assertFalse($e->isModified());
       
-      $e->setBar('{"defaultKey"  :  "defaultValue"}');
-      $this->assertFalse($e->isModified());
+        $e->setBar('{"defaultKey"  :  "defaultValue"}');
+        $this->assertFalse($e->isModified());
       
-      $e->setBar((object)array(
+        $e->setBar((object)[
           'defaultKey' => 'defaultValue'
-      ));
-      $this->assertFalse($e->isModified());
+      ]);
+        $this->assertFalse($e->isModified());
       
-      $e->setBar((object)array(
+        $e->setBar((object)[
           'key' => 'value'
-      ));
-      $this->assertTrue($e->isModified());
+      ]);
+        $this->assertTrue($e->isModified());
     }
 
     public function testValueIsPersisted()
     {
         $e = new \ComplexColumnTypeJsonEntity();
-        $e->setBar(array(
+        $e->setBar([
             'key' => 'value'
-        ));
+        ]);
         $e->save();
         \Map\ComplexColumnTypeJsonEntityTableMap::clearInstancePool();
         $e = \ComplexColumnTypeJsonEntityQuery::create()->findOne();
@@ -117,9 +117,9 @@ EOF;
     public function testValueIsCopied()
     {
         $e1 = new \ComplexColumnTypeJsonEntity();
-        $e1->setBar(array(
+        $e1->setBar([
             'key' => 'value'
-        ));
+        ]);
         $e2 = new \ComplexColumnTypeJsonEntity();
         $e1->copyInto($e2);
         $this->assertEquals('value', $e2->getBar()['key']);

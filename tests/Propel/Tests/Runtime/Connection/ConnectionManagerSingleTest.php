@@ -76,5 +76,4 @@ class ConnectionManagerSingleTest extends BaseTestCase
         $conn = $manager->getWriteConnection();
         $this->assertSame($connection, $conn);
     }
-
 }

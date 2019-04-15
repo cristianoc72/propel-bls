@@ -22,7 +22,7 @@ use Propel\Tests\TestCaseFixturesDatabase;
  */
 class RelatedMapSymmetricalWithSchemasTest extends TestCaseFixturesDatabase
 {
-  protected $databaseMap;
+    protected $databaseMap;
 
     protected function setUp()
     {

@@ -36,7 +36,6 @@ class SortableBehaviorTableMapBuilderModifier
         $col = '';
 
         if ($this->behavior->useScope()) {
-
             if ($this->behavior->hasMultipleScopes()) {
                 $col = [];
                 
@@ -64,5 +63,4 @@ class SortableBehaviorTableMapBuilderModifier
     {
         return $this->behavior->getColumnForParameter($name)->getName();
     }
-
 }

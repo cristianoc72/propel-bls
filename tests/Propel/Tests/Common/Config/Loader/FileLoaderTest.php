@@ -162,7 +162,6 @@ class FileLoaderTest extends TestCase
         //cleanup environment
         putenv('host');
         putenv('user');
-
     }
 
     /**
@@ -339,12 +338,10 @@ class TestableFileLoader extends BaseFileLoader
 {
     public function load($file, $type = null)
     {
-
     }
 
     public function supports($resource, $type = null)
     {
-
     }
 
     public function checkSupports($ext, string $resource): bool
