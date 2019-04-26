@@ -805,26 +805,6 @@ class TableTest extends ModelTestCase
         $this->assertSame('Book', $table->getAlias());
     }
 
-    public function testTablePrefix()
-    {
-        $database = new Database();
-        $database->loadMapping([
-            'name'                   => 'bookstore',
-            'defaultIdMethod'        => 'native',
-            'defaultPhpNamingMethod' => 'underscore',
-            'tablePrefix'            => 'acme_',
-            'defaultStringFormat'    => 'XML',
-        ]);
-
-        $table = new Table();
-        $database->addTable($table);
-        $table->loadMapping([
-           'name' => 'books'
-        ]);
-        $this->assertEquals('Books', $table->getPhpName());
-        $this->assertEquals('acme_books', $table->getCommonName());
-    }
-
     public function testSetContainsForeignPK()
     {
         $table = new Table();

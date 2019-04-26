@@ -161,23 +161,6 @@ class Table extends ScopedMappingModel implements IdMethod
         $this->unices                    = [];
     }
 
-    /**
-     * Returns a qualified name of this table with scheme and common name
-     * separated by '_'.
-     *
-     * If autoPrefix is set. Otherwise get the common name.
-     *
-     * @return string
-     */
-    private function getStdSeparatedName()
-    {
-        if ($this->schema && $this->getBuildProperty('generator.schema.autoPrefix')) {
-            return $this->schema . NameGeneratorInterface::STD_SEPARATOR_CHAR . $this->getCommonName();
-        }
-
-        return $this->getCommonName();
-    }
-
     public function setupObject()
     {
         parent::setupObject();
@@ -187,11 +170,7 @@ class Table extends ScopedMappingModel implements IdMethod
         // retrieves the method for converting from specified name to a PHP name.
         $this->phpNamingMethod = $this->getAttribute('phpNamingMethod', $this->database->getDefaultPhpNamingMethod());
 
-        $this->phpName = $this->getAttribute('phpName', $this->buildPhpName($this->getStdSeparatedName()));
-
-        if ($this->database->getTablePrefix()) {
-            $this->commonName = $this->database->getTablePrefix() . $this->commonName;
-        }
+        $this->phpName = $this->getAttribute('phpName', $this->buildPhpName($this->getCommonName()));
 
         $this->idMethod = $this->getAttribute('idMethod', $this->database->getDefaultIdMethod());
         $this->allowPkInsert = $this->booleanValue($this->getAttribute('allowPkInsert'));
@@ -1143,7 +1122,7 @@ class Table extends ScopedMappingModel implements IdMethod
     public function getPhpName()
     {
         if (null === $this->phpName) {
-            $this->phpName = $this->buildPhpName($this->getStdSeparatedName());
+            $this->phpName = $this->buildPhpName($this->getCommonName());
         }
 
         return $this->phpName;

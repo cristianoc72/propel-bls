@@ -107,7 +107,7 @@ class AggregateColumnBehavior extends Behavior
             $conditions[] = $localColumn->getFullyQualifiedName() . ' = :p' . ($index + 1);
             $bindings[$index + 1]   = $foreignColumn->getPhpName();
         }
-        $tableName = $database->getTablePrefix() . $this->getParameter('foreign_table');
+        $tableName = $this->getParameter('foreign_table');
         if ($database->getPlatform()->supportsSchemas() && $this->getParameter('foreign_schema')) {
             $tableName = $this->getParameter('foreign_schema')
                 .$database->getPlatform()->getSchemaDelimiter()
@@ -138,7 +138,7 @@ class AggregateColumnBehavior extends Behavior
     protected function getForeignTable()
     {
         $database = $this->getTable()->getDatabase();
-        $tableName = $database->getTablePrefix() . $this->getParameter('foreign_table');
+        $tableName = $this->getParameter('foreign_table');
         if ($database->getPlatform()->supportsSchemas() && $this->getParameter('foreign_schema')) {
             $tableName = $this->getParameter('foreign_schema'). $database->getPlatform()->getSchemaDelimiter() . $tableName;
         }

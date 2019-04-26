@@ -33,7 +33,6 @@ PHP class or method name.
   defaultPhpNamingMethod (nochange|underscore|phpname) "underscore"
   heavyIndexing (true|false) "false"
   identifierQuoting (true|false) "false"
-  tablePrefix CDATA #IMPLIED
   defaultStringFormat CDATA #IMPLIED
   xmlns:xsi CDATA #IMPLIED
   xsi:noNamespaceSchemaLocation CDATA #IMPLIED

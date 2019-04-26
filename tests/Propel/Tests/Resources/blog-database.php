@@ -169,7 +169,6 @@ $table6->addVendorInfo(new VendorInfo('mysql', ['Engine' => 'MyISAM']));
 /* Database */
 $database = new Database('acme_blog', new MysqlPlatform());
 $database->setSchema('acme');
-$database->setTablePrefix('acme_');
 $database->setNamespace('Acme\\Model');
 $database->setBaseClass('Acme\\Model\\ActiveRecord');
 $database->setPackage('Acme');

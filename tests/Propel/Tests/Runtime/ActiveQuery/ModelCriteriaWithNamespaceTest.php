@@ -24,16 +24,16 @@ class ModelCriteriaWithNamespaceTest extends NamespacesTestBase
     public static function conditionsForTestReplaceNamesWithNamespaces()
     {
         return [
-            ['Foo\\Bar\\NamespacedBook.Title = ?', 'Title', 'namespaced_book.title = ?'], // basic case
-            ['Foo\\Bar\\NamespacedBook.Title=?', 'Title', 'namespaced_book.title=?'], // without spaces
-            ['Foo\\Bar\\NamespacedBook.Id<= ?', 'Id', 'namespaced_book.id<= ?'], // with non-equal comparator
-            ['Foo\\Bar\\NamespacedBook.AuthorId LIKE ?', 'AuthorId', 'namespaced_book.author_id LIKE ?'], // with SQL keyword separator
-            ['(Foo\\Bar\\NamespacedBook.AuthorId) LIKE ?', 'AuthorId', '(namespaced_book.author_id) LIKE ?'], // with parenthesis
-            ['(Foo\\Bar\\NamespacedBook.Id*1.5)=1', 'Id', '(namespaced_book.id*1.5)=1'], // ignore numbers
+            ['Foo\\Bar\\NamespacedBook.Title = ?', 'Title', 'book.title = ?'], // basic case
+            ['Foo\\Bar\\NamespacedBook.Title=?', 'Title', 'book.title=?'], // without spaces
+            ['Foo\\Bar\\NamespacedBook.Id<= ?', 'Id', 'book.id<= ?'], // with non-equal comparator
+            ['Foo\\Bar\\NamespacedBook.AuthorId LIKE ?', 'AuthorId', 'book.author_id LIKE ?'], // with SQL keyword separator
+            ['(Foo\\Bar\\NamespacedBook.AuthorId) LIKE ?', 'AuthorId', '(book.author_id) LIKE ?'], // with parenthesis
+            ['(Foo\\Bar\\NamespacedBook.Id*1.5)=1', 'Id', '(book.id*1.5)=1'], // ignore numbers
             // dealing with quotes
-            ["Foo\\Bar\\NamespacedBook.Id + ' ' + Foo\\Bar\\NamespacedBook.AuthorId", null, "namespaced_book.id + ' ' + namespaced_book.author_id"],
-            ["'Foo\\Bar\\NamespacedBook.Id' + Foo\\Bar\\NamespacedBook.AuthorId", null, "'Foo\\Bar\\NamespacedBook.Id' + namespaced_book.author_id"],
-            ["Foo\\Bar\\NamespacedBook.Id + 'Foo\\Bar\\NamespacedBook.AuthorId'", null, "namespaced_book.id + 'Foo\\Bar\\NamespacedBook.AuthorId'"],
+            ["Foo\\Bar\\NamespacedBook.Id + ' ' + Foo\\Bar\\NamespacedBook.AuthorId", null, "book.id + ' ' + book.author_id"],
+            ["'Foo\\Bar\\NamespacedBook.Id' + Foo\\Bar\\NamespacedBook.AuthorId", null, "'Foo\\Bar\\NamespacedBook.Id' + book.author_id"],
+            ["Foo\\Bar\\NamespacedBook.Id + 'Foo\\Bar\\NamespacedBook.AuthorId'", null, "book.id + 'Foo\\Bar\\NamespacedBook.AuthorId'"],
         ];
     }
 

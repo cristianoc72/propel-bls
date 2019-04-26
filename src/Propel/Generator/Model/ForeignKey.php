@@ -132,7 +132,7 @@ class ForeignKey extends MappingModel
 
     protected function setupObject()
     {
-        $this->foreignTableCommonName = $this->parentTable->getDatabase()->getTablePrefix() . $this->getAttribute('foreignTable');
+        $this->foreignTableCommonName = $this->getAttribute('foreignTable');
         $this->foreignSchemaName      = $this->getAttribute('foreignSchema');
 
         $this->name        = $this->getAttribute('name');

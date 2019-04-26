@@ -232,38 +232,4 @@ EOF;
         $this->assertEquals('Saint Etienne', $footballer->getName());
         $footballer->save(); // should not throw exception
     }
-
-    public function testTablePrefixSameDatabase()
-    {
-        $schema = <<<EOF
-<database name="testTablePrefixSameDatabase_database" tablePrefix="foo">
-
-    <table name="testTablePrefixSameDatabase_main">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="title" type="VARCHAR" size="100" primaryString="true" />
-        <column name="delegate_id" type="INTEGER" />
-        <foreign-key foreignTable="testTablePrefixSameDatabase_delegate">
-            <reference local="delegate_id" foreign="id" />
-        </foreign-key>
-        <behavior name="delegate">
-            <parameter name="to" value="testTablePrefixSameDatabase_delegate" />
-        </behavior>
-    </table>
-
-    <table name="testTablePrefixSameDatabase_delegate">
-        <column name="id" required="true" primaryKey="true" autoIncrement="true" type="INTEGER" />
-        <column name="subtitle" type="VARCHAR" size="100" primaryString="true" />
-    </table>
-
-</database>
-EOF;
-        QuickBuilder::buildSchema($schema);
-        $main = new \TestTablePrefixSameDatabaseMain();
-        $main->setSubtitle('bar');
-        $delegate = $main->getTestTablePrefixSameDatabaseDelegate();
-        $this->assertInstanceOf('TestTablePrefixSameDatabaseDelegate', $delegate);
-        $this->assertTrue($delegate->isNew());
-        $this->assertEquals('bar', $delegate->getSubtitle());
-        $this->assertEquals('bar', $main->getSubtitle());
-    }
 }

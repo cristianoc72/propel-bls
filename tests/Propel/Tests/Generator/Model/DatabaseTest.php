@@ -33,7 +33,6 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame('YAML', $database->getDefaultStringFormat());
         $this->assertSame('native', $database->getDefaultIdMethod());
         $this->assertSame('underscore', $database->getDefaultPhpNamingMethod());
-        $this->assertEmpty($database->getTablePrefix());
         $this->assertNull($database->getParentSchema());
         $this->assertNull($database->getDomain('BOOLEAN'));
         $this->assertNull($database->getGeneratorConfig());
@@ -57,7 +56,6 @@ class DatabaseTest extends ModelTestCase
             'defaultIdMethod'        => 'native',
             'defaultPhpNamingMethod' => 'underscore',
             'heavyIndexing'          => 'true',
-            'tablePrefix'            => 'acme_',
             'defaultStringFormat'    => 'XML',
         ]);
 
@@ -67,7 +65,6 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame('XML', $database->getDefaultStringFormat());
         $this->assertSame('native', $database->getDefaultIdMethod());
         $this->assertSame('underscore', $database->getDefaultPhpNamingMethod());
-        $this->assertSame('acme_', $database->getTablePrefix());
         $this->assertTrue($database->isHeavyIndexing());
         $this->assertTrue($database->getHeavyIndexing());
     }

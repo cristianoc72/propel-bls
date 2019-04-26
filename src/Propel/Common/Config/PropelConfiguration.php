@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -7,8 +7,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Common\Config;
 
@@ -315,7 +313,6 @@ class PropelConfiguration implements ConfigurationInterface
                     ->fixXmlConfig('connection')
                     ->children()
                         ->scalarNode('defaultConnection')->end()
-                        ->scalarNode('tablePrefix')->end()
                         ->scalarNode('platformClass')->defaultNull()->end()
                         ->scalarNode('targetPackage')->end()
                         ->booleanNode('packageObjectModel')->defaultTrue()->end()

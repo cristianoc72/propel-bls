@@ -139,10 +139,6 @@ class XmlDumper implements DumperInterface
             $databaseNode->setAttribute('heavyIndexing', 'true');
         }
 
-        if ($tablePrefix = $database->getTablePrefix()) {
-            $databaseNode->setAttribute('tablePrefix', $tablePrefix);
-        }
-
         if ($database->isIdentifierQuotingEnabled()) {
             $databaseNode->setAttribute('identifierQuoting', 'true');
         }

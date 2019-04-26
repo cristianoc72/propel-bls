@@ -101,7 +101,6 @@ class Database extends ScopedMappingModel
     private $sequences;
 
     protected $defaultStringFormat;
-    protected $tablePrefix;
 
     /**
      * Constructs a new Database object.
@@ -147,7 +146,6 @@ class Database extends ScopedMappingModel
         $this->defaultPhpNamingMethod = $this->getAttribute('defaultPhpNamingMethod', NameGeneratorInterface::CONV_METHOD_UNDERSCORE);
         $this->heavyIndexing = $this->booleanValue($this->getAttribute('heavyIndexing'));
         $this->identifierQuoting = $this->getAttribute('identifierQuoting') ? $this->booleanValue($this->getAttribute('identifierQuoting')) : false;
-        $this->tablePrefix = $this->getAttribute('tablePrefix', $this->getBuildProperty('generator.tablePrefix'));
         $this->defaultStringFormat = $this->getAttribute('defaultStringFormat', static::DEFAULT_STRING_FORMAT);
     }
 
@@ -743,26 +741,6 @@ class Database extends ScopedMappingModel
         if ($config = $this->getGeneratorConfig()) {
             return $config->getConfigProperty($name);
         }
-    }
-
-    /**
-     * Returns the table prefix for this database.
-     *
-     * @return string
-     */
-    public function getTablePrefix()
-    {
-        return $this->tablePrefix;
-    }
-
-    /**
-     * Sets the tables' prefix.
-     *
-     * @param string $tablePrefix
-     */
-    public function setTablePrefix($tablePrefix)
-    {
-        $this->tablePrefix = $tablePrefix;
     }
 
     /**
