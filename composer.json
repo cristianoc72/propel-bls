@@ -1,7 +1,7 @@
 {
-    "name": "propel/propel",
+    "name": "susina/propel",
     "type": "library",
-    "description": "Propel2 is an open-source Object-Relational Mapping (ORM) for PHP 7.2 and up.",
+    "description": "Propel is an open-source Object-Relational Mapping (ORM) for PHP 7.2 and up.",
     "keywords": [
         "ORM",
         "persistence",
@@ -18,28 +18,40 @@
     "require": {
         "php": ">=7.2",
         "ext-simplexml": "*",
-        "symfony/yaml": "^3.4|^4.1",
-        "symfony/finder": "^3.4|^4.1",
-        "symfony/validator": "^3.4|^4.1",
-        "symfony/filesystem": "^3.4|^4.1",
-        "symfony/config": "^3.4|^4.1",
+        "symfony/yaml": "^4.1",
+        "symfony/finder": "^4.1",
+        "symfony/validator": "^4.1",
+        "symfony/filesystem": "^4.1",
+        "symfony/config": "^4.1",
         "psr/log": "^1.0",
-        "symfony/console": "^3.4|^4.1",
-        "symfony/translation": "^3.4|^4.1",
+        "symfony/console": "^4.1",
+        "symfony/translation": "^4.1",
         "phootwork/json": "^1.2",
         "cristianoc72/pluralizer": "^1.0"
     },
     "require-dev": {
         "monolog/monolog": "^1.23",
         "phpunit/phpunit": "^7.3",
-        "mikey179/vfsStream": "^1.6"
+        "mikey179/vfsstream": "^1.6"
     },
     "suggest": {
         "monolog/monolog": "The recommended logging library to use with Propel."
     },
     "autoload": {
-        "psr-0": {
-            "Propel": "src/"
+        "psr-4": {
+            "Propel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Propel\\Tests\\": [
+                "tests/",
+                "tests/Fixtures/bookstore/build/classes/Propel/Tests",
+                "tests/Fixtures/schemas/build/classes/Propel/Tests",
+                "tests/Fixtures/quoting/build/classes/Propel/Tests"
+            ],
+            "Foo\\": "tests/Fixtures/namespaced/build/classes/Foo/",
+            "Baz\\": "tests/Fixtures/namespaced/build/classes/Baz/"
         }
     },
     "bin": [
