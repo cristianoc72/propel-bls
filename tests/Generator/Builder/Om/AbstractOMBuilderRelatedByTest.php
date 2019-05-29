@@ -13,7 +13,7 @@ namespace Propel\Tests\Generator\Builder\Om;
 use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Builder\Om\AbstractOMBuilder;
 use Propel\Generator\Builder\Util\SchemaReader;
-use Propel\Generator\Platform\DefaultPlatform;
+use Propel\Generator\Platform\SqlDefaultPlatform;
 use Propel\Tests\TestCase;
 
 /**
@@ -30,7 +30,7 @@ class AbstractOMBuilderRelatedByTest extends TestCase
     {
         // run only once to save execution time
         if (null == self::$database) {
-            $schemaReader = new SchemaReader(new DefaultPlatform());
+            $schemaReader = new SchemaReader(new SqlDefaultPlatform());
             $appData = $schemaReader->parseFile(realpath(__DIR__ . '/../../../Fixtures/bookstore/schema.xml'));
             self::$database = $appData->getDatabase("bookstore");
         }

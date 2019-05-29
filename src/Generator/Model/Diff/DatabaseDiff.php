@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -10,8 +10,8 @@
 
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Generator\Model\IdMethod;
-use Propel\Generator\Model\Table;
+use Propel\Common\Collection\Map;
+use Propel\Generator\Model\Model;
 
 /**
  * Value object for storing Database object diffs
@@ -20,244 +20,120 @@ use Propel\Generator\Model\Table;
  */
 class DatabaseDiff
 {
+    /** @var Map */
     protected $addedTables;
+
+    /** @var Map */
     protected $removedTables;
+
+    /** @var Map */
     protected $modifiedTables;
+
+    /** @var Map  */
     protected $renamedTables;
+
+    /** @var Map  */
     protected $possibleRenamedTables;
 
     public function __construct()
     {
-        $this->addedTables    = [];
-        $this->removedTables  = [];
-        $this->modifiedTables = [];
-        $this->renamedTables  = [];
-        $this->possibleRenamedTables  = [];
+        $this->addedTables    = new Map();
+        $this->removedTables  = new Map();
+        $this->modifiedTables = new Map();
+        $this->renamedTables  = new Map();
+        $this->possibleRenamedTables  = new Map();
     }
 
     /**
-     * Sets the added tables.
-     *
-     * @param array $tables
+     * @return Map
      */
-    public function setAddedTables($tables)
-    {
-        $this->addedTables = $tables;
-    }
-
-    /**
-     * Adds an added table.
-     *
-     * @param string $name
-     * @param Table  $table
-     */
-    public function addAddedTable($name, Table $table)
-    {
-        $this->addedTables[$name] = $table;
-    }
-
-    /**
-     * Removes an added table.
-     *
-     * @param string $name
-     */
-    public function removeAddedTable($name)
-    {
-        unset($this->addedTables[$name]);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getPossibleRenamedTables()
+    public function getPossibleRenamedTables(): Map
     {
         return $this->possibleRenamedTables;
     }
 
     /**
-     * Adds a possible renamed table.
-     *
-     * @param string $fromName
-     * @param string $toName
-     */
-    public function addPossibleRenamedTable($fromName, $toName)
-    {
-        $this->possibleRenamedTables[$fromName] = $toName;
-    }
-
-    /**
      * Returns the list of added tables.
      *
-     * @return Table[]
+     * @return Map
      */
-    public function getAddedTables()
+    public function getAddedTables(): Map
     {
         return $this->addedTables;
     }
 
     /**
-     * Returns the number of added tables.
+     * Set the addedTables collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $tables
      */
-    public function countAddedTables()
+    public function setAddedTables(Map $tables): void
     {
-        return count($this->addedTables);
-    }
-
-    /**
-     * Returns an added table by its name.
-     *
-     * @param string $name
-     * @param Table
-     */
-    public function getAddedTable($name)
-    {
-        return $this->addedTables[$name];
-    }
-
-    /**
-     * Sets the removes tables.
-     *
-     * @param array $tables
-     */
-    public function setRemovedTables($tables)
-    {
-        $this->removedTables = $tables;
-    }
-
-    /**
-     * Adds a table to remove.
-     *
-     * @param string $name
-     * @param Table  $table
-     */
-    public function addRemovedTable($name, Table $table)
-    {
-        $this->removedTables[$name] = $table;
-    }
-
-    /**
-     * Removes a removed table.
-     *
-     * @param string $name
-     */
-    public function removeRemovedTable($name)
-    {
-        unset($this->removedTables[$name]);
+        $this->addedTables->clear();
+        $this->addedTables->setAll($tables);
     }
 
     /**
      * Returns the list of removed tables.
      *
-     * @return Table[]
+     * @return Map
      */
-    public function getRemovedTables()
+    public function getRemovedTables(): Map
     {
         return $this->removedTables;
     }
 
     /**
-     * Returns the number of removed tables.
+     * Set the removedTables collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $tables
      */
-    public function countRemovedTables()
+    public function setRemovedTables(Map $tables): void
     {
-        return count($this->removedTables);
-    }
-
-    /**
-     * Returns a removed table.
-     *
-     * @param string $name
-     * @param Table
-     */
-    public function getRemovedTable($name)
-    {
-        return $this->removedTables[$name];
-    }
-
-    /**
-     * Sets the modified tables
-     *
-     * @param array $tables
-     */
-    public function setModifiedTables($tables)
-    {
-        $this->modifiedTables = $tables;
-    }
-
-    /**
-     * Adds a table difference.
-     *
-     * @param string    $name
-     * @param TableDiff $difference
-     */
-    public function addModifiedTable($name, TableDiff $difference)
-    {
-        $this->modifiedTables[$name] = $difference;
-    }
-
-    /**
-     * Returns the number of modified tables.
-     *
-     * @return integer
-     */
-    public function countModifiedTables()
-    {
-        return count($this->modifiedTables);
+        $this->removedTables->clear();
+        $this->removedTables->setAll($tables);
     }
 
     /**
      * Returns the modified tables.
      *
-     * @return TableDiff[]
+     * @return Map
      */
-    public function getModifiedTables()
+    public function getModifiedTables(): Map
     {
         return $this->modifiedTables;
     }
 
     /**
-     * Sets the renamed tables.
+     * Set the modifiedTables collection: all data will be overridden.
      *
-     * @param array $tables
+     * @param Map $tables
      */
-    public function setRenamedTables($tables)
+    public function setModifiedTables(Map $tables): void
     {
-        $this->renamedTables = $tables;
-    }
-
-    /**
-     * Adds a renamed table.
-     *
-     * @param string $fromName
-     * @param string $toName
-     */
-    public function addRenamedTable($fromName, $toName)
-    {
-        $this->renamedTables[$fromName] = $toName;
+        $this->modifiedTables->clear();
+        $this->modifiedTables->setAll($tables);
     }
 
     /**
      * Returns the list of renamed tables.
      *
-     * @return array
+     * @return Map
      */
-    public function getRenamedTables()
+    public function getRenamedTables(): Map
     {
         return $this->renamedTables;
     }
 
     /**
-     * Returns the number of renamed tables.
+     * Set the renamedTables collection: all data will be overridden.
      *
-     * @return integer
+     * @param Map $table
      */
-    public function countRenamedTables()
+    public function setRenamedTables(Map $table): void
     {
-        return count($this->renamedTables);
+        $this->renamedTables->clear();
+        $this->renamedTables->setAll($table);
     }
 
     /**
@@ -265,22 +141,22 @@ class DatabaseDiff
      *
      * @return DatabaseDiff
      */
-    public function getReverseDiff()
+    public function getReverseDiff(): DatabaseDiff
     {
         $diff = new self();
         $diff->setAddedTables($this->getRemovedTables());
         // idMethod is not set for tables build from reverse engineering
         // FIXME: this should be handled by reverse classes
         foreach ($diff->getAddedTables() as $table) {
-            if ($table->getIdMethod() == IdMethod::NO_ID_METHOD) {
-                $table->setIdMethod(IdMethod::NATIVE);
+            if ($table->getIdMethod() == Model::ID_METHOD_NONE) {
+                $table->setIdMethod(Model::ID_METHOD_NATIVE);
             }
         }
         $diff->setRemovedTables($this->getAddedTables());
-        $diff->setRenamedTables(array_flip($this->getRenamedTables()));
-        $tableDiffs = [];
+        $diff->setRenamedTables(new Map(array_flip($this->getRenamedTables()->toArray())));
+        $tableDiffs = new Map();
         foreach ($this->getModifiedTables() as $name => $tableDiff) {
-            $tableDiffs[$name] = $tableDiff->getReverseDiff();
+            $tableDiffs->set($name, $tableDiff->getReverseDiff());
         }
         $diff->setModifiedTables($tableDiffs);
 
@@ -292,19 +168,19 @@ class DatabaseDiff
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         $changes = [];
-        if ($count = $this->countAddedTables()) {
+        if ($count = $this->getAddedTables()->size()) {
             $changes[] = sprintf('%d added tables', $count);
         }
-        if ($count = $this->countRemovedTables()) {
+        if ($count = $this->getRemovedTables()->size()) {
             $changes[] = sprintf('%d removed tables', $count);
         }
-        if ($count = $this->countModifiedTables()) {
+        if ($count = $this->getModifiedTables()->size()) {
             $changes[] = sprintf('%d modified tables', $count);
         }
-        if ($count = $this->countRenamedTables()) {
+        if ($count = $this->getRenamedTables()->size()) {
             $changes[] = sprintf('%d renamed tables', $count);
         }
 

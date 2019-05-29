@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -11,6 +11,7 @@
 namespace Propel\Generator\Behavior\Timestampable;
 
 use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Column;
 
 /**
  * Gives a model class the ability to track creation and last modification dates
@@ -23,19 +24,18 @@ class TimestampableBehavior extends Behavior
     protected $parameters = [
         'create_column' => 'created_at',
         'update_column' => 'updated_at',
-        'disable_created_at' => 'false',
-        'disable_updated_at' => 'false',
+        'disable_created_at' => false,
+        'disable_updated_at' => false,
     ];
 
-
-    protected function withUpdatedAt()
+    public function withUpdatedAt(): bool
     {
-        return !$this->booleanValue($this->getParameter('disable_updated_at'));
+        return !$this->getParameter('disable_updated_at');
     }
 
-    protected function withCreatedAt()
+    public function withCreatedAt(): bool
     {
-        return !$this->booleanValue($this->getParameter('disable_created_at'));
+        return !$this->getParameter('disable_created_at');
     }
 
     /**
@@ -46,16 +46,16 @@ class TimestampableBehavior extends Behavior
         $table = $this->getTable();
 
         if ($this->withCreatedAt() && !$table->hasColumn($this->getParameter('create_column'))) {
-            $table->addColumn([
-                'name' => $this->getParameter('create_column'),
-                'type' => 'TIMESTAMP'
-            ]);
+            $createColumn = new Column();
+            $createColumn->setName($this->getParameter('create_column'));
+            $createColumn->setType('TIMESTAMP');
+            $table->addColumn($createColumn);
         }
         if ($this->withUpdatedAt() && !$table->hasColumn($this->getParameter('update_column'))) {
-            $table->addColumn([
-                'name' => $this->getParameter('update_column'),
-                'type' => 'TIMESTAMP'
-            ]);
+            $updateColumn = new Column();
+            $updateColumn->setName($this->getParameter('update_column'));
+            $updateColumn->setType('TIMESTAMP');
+            $table->addColumn($updateColumn);
         }
     }
 

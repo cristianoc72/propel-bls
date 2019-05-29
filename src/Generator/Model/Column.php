@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -10,7 +10,17 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\lang\Text;
+use Propel\Common\Collection\Map;
+use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\EngineException;
+use Propel\Generator\Model\Parts\DescriptionPart;
+use Propel\Generator\Model\Parts\DomainPart;
+use Propel\Generator\Model\Parts\TablePart;
+use Propel\Generator\Model\Parts\GeneratorPart;
+use Propel\Generator\Model\Parts\NamePart;
+use Propel\Generator\Model\Parts\PlatformAccessorPart;
+use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 
 /**
@@ -24,32 +34,28 @@ use Propel\Generator\Platform\PlatformInterface;
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Bernd Goldschmidt <bgoldschmidt@rapidsoft.de>
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
+ * @author Cristiano Cinotti
  */
-class Column extends MappingModel
+class Column
 {
-    const DEFAULT_TYPE       = 'VARCHAR';
-    const DEFAULT_VISIBILITY = 'public';
-    const CONSTANT_PREFIX    = 'COL_';
+    use DomainPart, NamePart, GeneratorPart, TablePart, PlatformAccessorPart, DescriptionPart, VendorPart;
 
-    public static $validVisibilities = [ 'public', 'protected', 'private' ];
+    const CONSTANT_PREFIX    = 'COLUMN_';
 
-    private $name;
-    private $description;
-    private $phpName;
-    private $phpSingularName;
-    private $phpNamingMethod;
-    private $isNotNull;
-    private $namePrefix;
-    private $accessorVisibility;
-    private $mutatorVisibility;
-    private $typeHint;
+    //
+    // Model properties
+    // ---------------------------------
 
     /**
-     * The name to use for the tableMap constant that identifies this column.
-     * (Will be converted to all-uppercase in the templates.)
-     * @var string
+     * @var Text The name of the mapped column
      */
-    private $tableMapName;
+    private $columnName;
+
+    /** @var Text */
+    private $singularName;
+
+    /** @var bool  */
+    private $isNotNull;
 
     /**
      * Native PHP type (scalar or class name)
@@ -57,26 +63,27 @@ class Column extends MappingModel
      */
     private $phpType;
 
-    /**
-     * @var Domain
-     */
-    private $domain;
-    /**
-     * @var Table
-     */
-    private $parentTable;
-
+    /** @var int */
     private $position;
+
+    /** @var bool  */
     private $isPrimaryKey;
-    private $isNodeKey;
-    private $nodeKeySep;
-    private $isNestedSetLeftKey;
-    private $isNestedSetRightKey;
-    private $isTreeScopeKey;
+
+    /** @var bool  */
     private $isUnique;
+
+    /** @var bool  */
     private $isAutoIncrement;
+
+    /** @var bool  */
+    private $skipCodeGeneration = false;
+
+    /** @var bool  */
     private $isLazyLoad;
-    private $referrers;
+
+    /**
+     * @var bool
+     */
     private $isPrimaryString;
 
     // only one type is supported currently, which assumes the
@@ -84,34 +91,47 @@ class Column extends MappingModel
     // classnames specified in the schema.    Others may be
     // supported later.
 
+    /** @var string 'single' or 'false' are accepted values */
     private $inheritanceType;
-    private $isInheritance;
+
+    /** @var bool  */
     private $isEnumeratedClasses;
+
+    /**
+     * @var Map
+     */
     private $inheritanceList;
 
-    // maybe this can be retrieved from vendor specific information
+    /**
+     * @var bool
+     */
     private $needsTransactionInPostgres;
 
+    /**
+     * @var Set
+     */
     protected $valueSet;
+
+    /**
+     * @var Set
+     */
+    protected $referrers;
 
     /**
      * Creates a new column and set the name.
      *
      * @param string $name The column's name
      * @param string $type The column's type
-     * @param string $size The column's size
+     * @param int $size The column's size
      */
-    public function __construct($name = null, $type = null, $size = null)
+    public function __construct(string $name = null, string $type = PropelTypes::VARCHAR, int $size = null)
     {
-        parent::__construct();
-
         if (null !== $name) {
             $this->setName($name);
         }
 
-        if (null !== $type) {
-            $this->setType($type);
-        }
+        $this->domain = new Domain();
+        $this->setType($type);
 
         if (null !== $size) {
             $this->setSize($size);
@@ -120,211 +140,26 @@ class Column extends MappingModel
         $this->isAutoIncrement            = false;
         $this->isEnumeratedClasses        = false;
         $this->isLazyLoad                 = false;
-        $this->isNestedSetLeftKey         = false;
-        $this->isNestedSetRightKey        = false;
-        $this->isNodeKey                  = false;
         $this->isNotNull                  = false;
         $this->isPrimaryKey               = false;
         $this->isPrimaryString            = false;
-        $this->isTreeScopeKey             = false;
         $this->isUnique                   = false;
         $this->needsTransactionInPostgres = false;
-        $this->valueSet = [];
+        $this->valueSet = new Set();
+        $this->inheritanceList = new Set();
+        $this->referrers =  new Set();
+        $this->vendor = new Map([], Vendor::class);
+        $this->mutatorVisibility = Model::VISIBILITY_PUBLIC;
+        $this->accessorVisibility = Model::VISIBILITY_PUBLIC;
     }
 
     /**
-     * @return mixed
+     * @inheritdoc
+     * @return Table
      */
-    public function getTypeHint()
+    protected function getSuperordinate(): ?Table
     {
-        return $this->typeHint;
-    }
-
-    /**
-     * @param mixed $typeHint
-     */
-    public function setTypeHint($typeHint)
-    {
-        $this->typeHint = $typeHint;
-    }
-
-    protected function setupObject()
-    {
-        try {
-            $database = $this->getDatabase();
-            $domain   = $this->getDomain();
-
-            $platform = null;
-            if ($this->hasPlatform()) {
-                $platform = $this->getPlatform();
-            }
-
-            $dom = $this->getAttribute('domain');
-            if ($dom) {
-                $domain->copy($database->getDomain($dom));
-            } else {
-                $type = strtoupper($this->getAttribute('type'));
-                if ($type) {
-                    if ($platform) {
-                        $domain->copy($platform->getDomainForType($type));
-                    } else {
-                        // no platform - probably during tests
-                        $this->setDomain(new Domain($type));
-                    }
-                } else {
-                    if ($platform) {
-                        $domain->copy($platform->getDomainForType(self::DEFAULT_TYPE));
-                    } else {
-                        // no platform - probably during tests
-                        $this->setDomain(new Domain(self::DEFAULT_TYPE));
-                    }
-                }
-            }
-
-            $this->name = $this->getAttribute('name');
-            $this->phpName = $this->getAttribute('phpName');
-            $this->phpSingularName = $this->getAttribute('phpSingularName');
-            $this->phpType = $this->getAttribute('phpType');
-            $this->typeHint = $this->getAttribute('typeHint');
-            $this->tableMapName = $this->getAttribute('tableMapName');
-            $this->description = $this->getAttribute('description');
-
-            /*
-                Retrieves the method for converting from specified name
-                to a PHP name, defaulting to parent tables default method.
-            */
-            $this->phpNamingMethod = $this->getAttribute('phpNamingMethod', $database->getDefaultPhpNamingMethod());
-
-            $this->namePrefix = $this->getAttribute(
-                'prefix',
-                $this->parentTable->getAttribute('columnPrefix')
-            );
-
-            // Accessor visibility
-            $visibility = $this->getMethodVisibility('accessorVisibility', 'defaultAccessorVisibility');
-            $this->setAccessorVisibility($visibility);
-
-            // Mutator visibility
-            $visibility = $this->getMethodVisibility('mutatorVisibility', 'defaultMutatorVisibility');
-            $this->setMutatorVisibility($visibility);
-
-            $this->isPrimaryString = $this->booleanValue($this->getAttribute('primaryString'));
-
-            $this->isPrimaryKey = $this->booleanValue($this->getAttribute('primaryKey'));
-
-            $this->isNodeKey = $this->booleanValue($this->getAttribute('nodeKey'));
-            $this->nodeKeySep = $this->getAttribute('nodeKeySep', '.');
-
-            $this->isNestedSetLeftKey = $this->booleanValue($this->getAttribute('nestedSetLeftKey'));
-            $this->isNestedSetRightKey = $this->booleanValue($this->getAttribute('nestedSetRightKey'));
-            $this->isTreeScopeKey = $this->booleanValue($this->getAttribute('treeScopeKey'));
-
-            $this->isNotNull = ($this->booleanValue($this->getAttribute('required'), false) || $this->isPrimaryKey); // primary keys are required
-
-            // AutoIncrement/Sequences
-            $this->isAutoIncrement = $this->booleanValue($this->getAttribute('autoIncrement'));
-            $this->isLazyLoad = $this->booleanValue($this->getAttribute('lazyLoad'));
-
-            // Add type, size information to associated Domain object
-            $domain->replaceSqlType($this->getAttribute('sqlType'));
-            if (!$this->getAttribute('size')
-                && $domain->getType() === 'VARCHAR'
-                && !$this->getAttribute('sqlType')
-                && $platform
-                && !$platform->supportsVarcharWithoutSize()) {
-                $size = 255;
-            } else {
-                $size = $this->getAttribute('size');
-            }
-
-            $domain->replaceSize($size);
-            $domain->replaceScale($this->getAttribute('scale'));
-
-            $defval = $this->getAttribute('defaultValue', $this->getAttribute('default'));
-            if (null !== $defval && 'null' !== strtolower($defval)) {
-                $domain->setDefaultValue(new ColumnDefaultValue($defval, ColumnDefaultValue::TYPE_VALUE));
-            } elseif (null !== $this->getAttribute('defaultExpr')) {
-                $domain->setDefaultValue(new ColumnDefaultValue($this->getAttribute('defaultExpr'), ColumnDefaultValue::TYPE_EXPR));
-            }
-
-            if ($this->getAttribute('valueSet')) {
-                $this->setValueSet($this->getAttribute('valueSet'));
-            }
-
-            $this->inheritanceType = $this->getAttribute('inheritance');
-
-            /*
-                here we are only checking for 'false', so don't
-                use booleanValue()
-            */
-            $this->isInheritance = (null !== $this->inheritanceType && 'false' !== $this->inheritanceType);
-        } catch (\Exception $e) {
-            throw new EngineException(sprintf(
-                'Error setting up column %s: %s',
-                $this->getAttribute('name'),
-                $e->getMessage()
-            ));
-        }
-    }
-
-    /**
-     * Returns the generated methods visibility by looking for the
-     * attribute value in the column, parent table or parent database.
-     * Finally, it defaults to the default visibility (public).
-     *
-     * @param  string $attribute       Local column attribute
-     * @param  string $parentAttribute Parent (table or database) attribute
-     * @return string
-     */
-    private function getMethodVisibility($attribute, $parentAttribute)
-    {
-        $database = $this->getDatabase();
-
-        $visibility = $this->getAttribute(
-            $attribute,
-            $this->parentTable->getAttribute(
-                $parentAttribute,
-                $database->getAttribute(
-                    $parentAttribute,
-                    self::DEFAULT_VISIBILITY
-                )
-            )
-        );
-
-        return $visibility;
-    }
-
-    /**
-     * Returns the database object the current column is in.
-     *
-     * @return Database
-     */
-    private function getDatabase()
-    {
-        return $this->parentTable->getDatabase();
-    }
-
-    /**
-     * Gets domain for this column, creating a new empty domain object if none is set.
-     * @return Domain
-     */
-    public function getDomain()
-    {
-        if (null === $this->domain) {
-            $this->domain = new Domain();
-        }
-
-        return $this->domain;
-    }
-
-    /**
-     * Sets the domain for this column.
-     *
-     * @param Domain $domain
-     */
-    public function setDomain(Domain $domain)
-    {
-        $this->domain = $domain;
+        return $this->table;
     }
 
     /**
@@ -332,49 +167,49 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getFullyQualifiedName()
+    public function getFullyQualifiedName(): string
     {
-        return $this->parentTable->getName() . '.' . strtoupper($this->getName());
+        return "{$this->getTable()->getName()}.{$this->getName()->toUpperCase()}";
     }
 
     /**
-     * Returns the column name.
+     * Facility method for builders
      *
-     * @return string
+     * @return Text
      */
-    public function getName()
+    public function getMethodName(): Text
     {
-        return $this->name;
+        return $this->getName()->toStudlyCase();
     }
 
     /**
-     * Returns the lowercased column name.
+     * Return the name of the database column
      *
-     * @return string
+     * @return Text
      */
-    public function getLowercasedName()
+    public function getColumnName(): Text
     {
-        return strtolower($this->name);
+        if (null == $this->columnName) {
+            $this->columnName = $this->getName()->toSnakeCase();
+        }
+
+        return $this->columnName;
     }
 
     /**
-     * Returns the uppercased column name.
-     *
-     * @return string
+     * @param string $columnName
      */
-    public function getUppercasedName()
+    public function setColumnName(string $columnName): void
     {
-        return strtoupper($this->name);
+        $this->columnName = new Text($columnName);
     }
 
     /**
-     * Sets the column name.
-     *
-     * @param string $name
+     * @param string $phpType
      */
-    public function setName($name)
+    public function setPhpType(string $phpType): void
     {
-        $this->name = $name;
+        $this->phpType = $phpType;
     }
 
     /**
@@ -382,7 +217,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isNamePlural()
+    public function isNamePlural(): bool
     {
         return $this->getSingularName() !== $this->name;
     }
@@ -390,183 +225,36 @@ class Column extends MappingModel
     /**
      * Returns the column singular name.
      *
-     * @return string
+     * @return Text
      */
-    public function getSingularName()
+    public function getSingularName(): Text
     {
-        if ($this->getAttribute('phpSingularName')) {
-            return $this->getAttribute('phpSingularName');
-        }
-        return rtrim($this->name, 's');
-    }
-
-    /**
-     * Returns the column description.
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
-     * Sets the column description.
-     *
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    /**
-     * Returns the name to use in PHP sources. It will set & return
-     * a self-generated phpName from its name if its not already set.
-     *
-     * @return string
-     */
-    public function getPhpName()
-    {
-        if (null === $this->phpName) {
-            $this->setPhpName();
+        if (!$this->singularName->isEmpty()) {
+            return $this->singularName;
         }
 
-        return $this->phpName;
+        return $this->getName()->toSingular();
     }
 
     /**
-     * Returns the singular form of the name to use in PHP sources.
-     * It will set & return a self-generated phpName from its name
-     * if its not already set.
-     *
-     * @return string
+     * @param string $singularName
      */
-    public function getPhpSingularName()
+    public function setSingularName(string $singularName)
     {
-        if (null === $this->phpSingularName) {
-            $this->setPhpSingularName();
-        }
-
-        return $this->phpSingularName;
+        $this->singularName = new Text($singularName);
     }
 
     /**
-     * Sets the name to use in PHP sources.
-     *
-     * It will generate a phpName from its name if no
-     * $phpName is passed.
-     *
-     * @param string $phpName
-     */
-    public function setPhpName($phpName = null)
-    {
-        if (null === $phpName) {
-            $this->phpName = self::generatePhpName($this->name, $this->phpNamingMethod, $this->namePrefix);
-        } else {
-            $this->phpName = $phpName;
-        }
-    }
-
-    /**
-     * Sets the singular forn of the name to use in PHP
-     * sources.
-     *
-     * It will generate a phpName from its name if no
-     * $phpSingularName is passed.
-     *
-     * @param string $phpSingularName
-     */
-    public function setPhpSingularName($phpSingularName = null)
-    {
-        if (null === $phpSingularName) {
-            $this->phpSingularName = self::generatePhpSingularName($this->getPhpName());
-        } else {
-            $this->phpSingularName = $phpSingularName;
-        }
-    }
-
-    /**
-     * Returns the camelCase version of the PHP name.
-     *
-     * The studly name is the PHP name with the first character lowercase.
-     *
-     * @return string
-     */
-    public function getCamelCaseName()
-    {
-        return lcfirst($this->getPhpName());
-    }
-
-    /**
-     * Returns the accessor methods visibility of this column / attribute.
-     *
-     * @return string
-     */
-    public function getAccessorVisibility()
-    {
-        if (null !== $this->accessorVisibility) {
-            return $this->accessorVisibility;
-        }
-
-        return self::DEFAULT_VISIBILITY;
-    }
-
-    /**
-     * Sets the accessor methods visibility for this column / attribute.
-     *
-     * @param string $visibility
-     */
-    public function setAccessorVisibility($visibility)
-    {
-        $visibility = strtolower($visibility);
-        if (!in_array($visibility, self::$validVisibilities)) {
-            $visibility = self::DEFAULT_VISIBILITY;
-        }
-
-        $this->accessorVisibility = $visibility;
-    }
-
-    /**
-     * Returns the mutator methods visibility for this current column.
-     *
-     * @return string
-     */
-    public function getMutatorVisibility()
-    {
-        if (null !== $this->mutatorVisibility) {
-            return $this->mutatorVisibility;
-        }
-
-        return self::DEFAULT_VISIBILITY;
-    }
-
-    /**
-     * Sets the mutator methods visibility for this column / attribute.
-     *
-     * @param string $visibility
-     */
-    public function setMutatorVisibility($visibility)
-    {
-        $visibility = strtolower($visibility);
-        if (!in_array($visibility, self::$validVisibilities)) {
-            $visibility = self::DEFAULT_VISIBILITY;
-        }
-
-        $this->mutatorVisibility = $visibility;
-    }
-
-    /**
-     * Returns the full column constant name (e.g. TableMapName::COL_COLUMN_NAME).
+     * Returns the full column constant name (e.g. TableMapName::COLUMN_COLUMN_NAME).
      *
      * @return string A column constant name for insertion into PHP code
      */
-    public function getFQConstantName()
+    public function getFQConstantName(): string
     {
-        $classname = $this->parentTable->getPhpName() . 'TableMap';
+        $classname = $this->getTable()->getName() . 'TableMap';
         $const = $this->getConstantName();
 
-        return $classname.'::'.$const;
+        return "$classname::$const";
     }
 
     /**
@@ -574,34 +262,9 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getConstantName()
+    public function getConstantName(): string
     {
-        // was it overridden in schema.xml ?
-        if ($this->getTableMapName()) {
-            return self::CONSTANT_PREFIX.strtoupper($this->getTableMapName());
-        }
-
-        return self::CONSTANT_PREFIX.strtoupper($this->getName());
-    }
-
-    /**
-     * Returns the TableMap constant name that will identify this column.
-     *
-     * @return string
-     */
-    public function getTableMapName()
-    {
-        return $this->tableMapName;
-    }
-
-    /**
-     * Sets the TableMap constant name that will identify this column.
-     *
-     * @param string $name
-     */
-    public function setTableMapName($name)
-    {
-        $this->tableMapName = $name;
+        return self::CONSTANT_PREFIX . $this->getName()->toSnakeCase()->toUpperCase()->toString();
     }
 
     /**
@@ -611,9 +274,9 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getPhpType()
+    public function getPhpType(): string
     {
-        return $this->phpType ? $this->phpType : $this->getPhpNative();
+        return $this->phpType ?? PropelTypes::getPhpNative($this->getType());
     }
 
     /**
@@ -621,7 +284,7 @@ class Column extends MappingModel
      *
      * @return integer
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -631,65 +294,25 @@ class Column extends MappingModel
      *
      * @param integer $position
      */
-    public function setPosition($position)
+    public function setPosition(int $position)
     {
         $this->position = (int) $position;
-    }
-
-    /**
-     * Sets the parent table.
-     *
-     * @param Table $table
-     */
-    public function setTable(Table $table)
-    {
-        $this->parentTable = $table;
-    }
-
-    /**
-     * Returns the parent table.
-     *
-     * @return Table
-     */
-    public function getTable()
-    {
-        return $this->parentTable;
-    }
-
-    /**
-     * Returns the parent table name.
-     *
-     * @return string
-     */
-    public function getTableName()
-    {
-        return $this->parentTable->getName();
     }
 
     /**
      * Adds a new inheritance definition to the inheritance list and sets the
      * parent column of the inheritance to the current column.
      *
-     * @param  Inheritance|array $inheritance
+     * @param  Inheritance $inheritance
      * @return Inheritance
      */
-    public function addInheritance($inheritance)
+    public function addInheritance(Inheritance $inheritance): Inheritance
     {
-        if ($inheritance instanceof Inheritance) {
-            $inheritance->setColumn($this);
-            if (null === $this->inheritanceList) {
-                $this->inheritanceList = [];
-                $this->isEnumeratedClasses = true;
-            }
-            $this->inheritanceList[] = $inheritance;
+        $inheritance->setColumn($this);
+        $this->inheritanceList->add($inheritance);
+        $this->isEnumeratedClasses = true;
 
-            return $inheritance;
-        }
-
-        $inh = new Inheritance();
-        $inh->loadMapping($inheritance);
-
-        return $this->addInheritance($inh);
+        return $inheritance;
     }
 
     /**
@@ -697,17 +320,22 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getInheritanceType()
+    public function getInheritanceType(): string
     {
         return $this->inheritanceType;
+    }
+
+    public function setInheritanceType(string $type): void
+    {
+        $this->inheritanceType = $type;
     }
 
     /**
      * Returns the inheritance list.
      *
-     * @return Inheritance[]
+     * @return Set
      */
-    public function getInheritanceList()
+    public function getInheritanceList(): Set
     {
         return $this->inheritanceList;
     }
@@ -715,22 +343,22 @@ class Column extends MappingModel
     /**
      * Returns the inheritance definitions.
      *
-     * @return Inheritance[]
+     * @return Set
      */
-    public function getChildren()
+    public function getChildren(): Set
     {
         return $this->inheritanceList;
     }
 
     /**
-     * Returns whether or not this column is a normal property or specifies a
+     * Returns whether or not this column is a normal property or specifies
      * the classes that are represented in the table containing this column.
      *
      * @return boolean
      */
-    public function isInheritance()
+    public function isInheritance(): bool
     {
-        return $this->isInheritance;
+        return $this->inheritanceType === 'single';
     }
 
     /**
@@ -739,7 +367,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isEnumeratedClasses()
+    public function isEnumeratedClasses(): bool
     {
         return $this->isEnumeratedClasses;
     }
@@ -749,7 +377,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isNotNull()
+    public function isNotNull(): bool
     {
         return $this->isNotNull;
     }
@@ -759,9 +387,9 @@ class Column extends MappingModel
      *
      * @param boolean $flag
      */
-    public function setNotNull($flag = true)
+    public function setNotNull(bool $flag = true)
     {
-        $this->isNotNull = (Boolean) $flag;
+        $this->isNotNull = $flag;
     }
 
     /**
@@ -769,9 +397,9 @@ class Column extends MappingModel
      *
      * @return string.
      */
-    public function getNotNullString()
+    public function getNotNullString(): string
     {
-        return $this->parentTable->getPlatform()->getNullString($this->isNotNull);
+        return $this->getPlatform()->getNullString(true);
     }
 
     /**
@@ -782,9 +410,9 @@ class Column extends MappingModel
      *
      * @param boolean $isPrimaryString
      */
-    public function setPrimaryString($isPrimaryString)
+    public function setPrimaryString(bool $isPrimaryString): void
     {
-        $this->isPrimaryString = (Boolean) $isPrimaryString;
+        $this->isPrimaryString = $isPrimaryString;
     }
 
     /**
@@ -793,7 +421,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isPrimaryString()
+    public function isPrimaryString(): bool
     {
         return $this->isPrimaryString;
     }
@@ -803,9 +431,14 @@ class Column extends MappingModel
      *
      * @param boolean $flag
      */
-    public function setPrimaryKey($flag = true)
+    public function setPrimaryKey(bool $flag = true): void
     {
-        $this->isPrimaryKey = (Boolean) $flag;
+        $this->isPrimaryKey = $flag;
+
+        //Primary key can't be null
+        if (true === $flag) {
+            $this->setNotNull(true);
+        }
     }
 
     /**
@@ -813,109 +446,9 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isPrimaryKey()
+    public function isPrimaryKey(): bool
     {
         return $this->isPrimaryKey;
-    }
-
-    /**
-     * Sets whether or not the column is a node key of a tree.
-     *
-     * @param boolean $isNodeKey
-     */
-    public function setNodeKey($isNodeKey)
-    {
-        $this->isNodeKey = (Boolean) $isNodeKey;
-    }
-
-    /**
-     * Returns whether or not the column is a node key of a tree.
-     *
-     * @return boolean
-     */
-    public function isNodeKey()
-    {
-        return $this->isNodeKey;
-    }
-
-    /**
-     * Sets the separator for the node key column in a tree.
-     *
-     * @param string $sep
-     */
-    public function setNodeKeySep($sep)
-    {
-        $this->nodeKeySep = (string) $sep;
-    }
-
-    /**
-     * Returns the node key column separator for a tree.
-     *
-     * @return string
-     */
-    public function getNodeKeySep()
-    {
-        return $this->nodeKeySep;
-    }
-
-    /**
-     * Sets whether or not the column is the nested set left key of a tree.
-     *
-     * @param boolean $isNestedSetLeftKey
-     */
-    public function setNestedSetLeftKey($isNestedSetLeftKey)
-    {
-        $this->isNestedSetLeftKey = (Boolean) $isNestedSetLeftKey;
-    }
-
-    /**
-     * Returns whether or not the column is a nested set key of a tree.
-     *
-     * @return boolean
-     */
-    public function isNestedSetLeftKey()
-    {
-        return $this->isNestedSetLeftKey;
-    }
-
-    /**
-     * Set if the column is the nested set right key of a tree.
-     *
-     * @param boolean $isNestedSetRightKey
-     */
-    public function setNestedSetRightKey($isNestedSetRightKey)
-    {
-        $this->isNestedSetRightKey = (Boolean) $isNestedSetRightKey;
-    }
-
-    /**
-     * Return whether or not the column is a nested set right key of a tree.
-     *
-     * @return boolean
-     */
-    public function isNestedSetRightKey()
-    {
-        return $this->isNestedSetRightKey;
-    }
-
-    /**
-     * Sets whether or not the column is the scope key of a tree.
-     *
-     * @param boolean $isTreeScopeKey
-     */
-    public function setTreeScopeKey($isTreeScopeKey)
-    {
-        $this->isTreeScopeKey = (Boolean) $isTreeScopeKey;
-    }
-
-    /**
-     * Returns whether or not the column is a scope key of a tree.
-     *
-     * @return boolean
-     */
-    public function isTreeScopeKey()
-    {
-        return $this->isTreeScopeKey;
     }
 
     /**
@@ -923,7 +456,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isUnique()
+    public function isUnique(): bool
     {
         return $this->isUnique;
     }
@@ -933,7 +466,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function requiresTransactionInPostgres()
+    public function requiresTransactionInPostgres(): bool
     {
         return $this->needsTransactionInPostgres;
     }
@@ -943,9 +476,9 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isForeignKey()
+    public function isForeignKey(): bool
     {
-        return count($this->getForeignKeys()) > 0;
+        return $this->getForeignKeys()->size() > 0;
     }
 
     /**
@@ -953,9 +486,9 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function hasMultipleFK()
+    public function hasMultipleFK(): bool
     {
-        return count($this->getForeignKeys()) > 1;
+        return $this->getForeignKeys()->size() > 1;
     }
 
     /**
@@ -963,11 +496,11 @@ class Column extends MappingModel
      *
      * Only if it is a foreign key or part of a foreign key.
      *
-     * @return ForeignKey[]
+     * @return Set
      */
-    public function getForeignKeys()
+    public function getForeignKeys(): Set
     {
-        return $this->parentTable->getColumnForeignKeys($this->name);
+        return $this->getTable()->getColumnForeignKeys($this->getName());
     }
 
     /**
@@ -975,37 +508,30 @@ class Column extends MappingModel
      *
      * @param ForeignKey $fk
      */
-    public function addReferrer(ForeignKey $fk)
+    public function addReferrer(ForeignKey $fk): void
     {
-        if (null === $this->referrers) {
-            $this->referrers = [];
-        }
-
-        $this->referrers[] = $fk;
+        $this->referrers->add($fk);
     }
 
     /**
      * Returns the list of references to this column.
      *
-     * @return ForeignKey[]
+     * @return Set
      */
-    public function getReferrers()
+    public function getReferrers(): Set
     {
-        if (null === $this->referrers) {
-            $this->referrers = [];
-        }
-
         return $this->referrers;
     }
 
+
     /**
-     * Returns whether or not this column has referers.
+     * Returns whether or not this column has referrers.
      *
      * @return boolean
      */
-    public function hasReferrers()
+    public function hasReferrers(): bool
     {
-        return is_array($this->referrers) && count($this->referrers) > 0;
+        return !$this->getReferrers()->isEmpty();
     }
 
     /**
@@ -1015,27 +541,27 @@ class Column extends MappingModel
      * @param  ForeignKey $fk
      * @return boolean
      */
-    public function hasReferrer(ForeignKey $fk)
+    public function hasReferrer(ForeignKey $fk): bool
     {
-        return $this->hasReferrers() && in_array($fk, $this->referrers, true);
+        return $this->getReferrers()->contains($fk);
     }
 
     /**
      * Clears all referrers.
      *
      */
-    public function clearReferrers()
+    public function clearReferrers(): void
     {
-        $this->referrers = null;
+        $this->getReferrers()->clear();
     }
 
     /**
      * Clears all inheritance children.
      *
      */
-    public function clearInheritanceList()
+    public function clearInheritanceList(): void
     {
-        $this->inheritanceList = [];
+        $this->getInheritanceList()->clear();
     }
 
     /**
@@ -1046,7 +572,7 @@ class Column extends MappingModel
      *
      * @param string $mappingType
      */
-    public function setDomainForType($mappingType)
+    public function setDomainForType(string $mappingType): void
     {
         $this->getDomain()->copy($this->getPlatform()->getDomainForType($mappingType));
     }
@@ -1057,7 +583,7 @@ class Column extends MappingModel
      * @param string $mappingType
      * @see Domain::setType()
      */
-    public function setType($mappingType)
+    public function setType(string $mappingType): void
     {
         $this->getDomain()->setType($mappingType);
 
@@ -1072,7 +598,7 @@ class Column extends MappingModel
      * @return string
      * @see Domain::getType()
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->getDomain()->getType();
     }
@@ -1081,13 +607,19 @@ class Column extends MappingModel
      * Returns the column PDO type integer for this column's mapping type.
      *
      * @return integer
+     * @deprecated use PropelTypes::getPDOType()
      */
-    public function getPDOType()
+    public function getPDOType(): int
     {
         return PropelTypes::getPDOType($this->getType());
     }
 
-    public function isDefaultSqlType(PlatformInterface $platform = null)
+    /**
+     * @param PlatformInterface|null $platform
+     *
+     * @return bool
+     */
+    public function isDefaultSqlType(PlatformInterface $platform = null): bool
     {
         if (null === $this->domain
             || null === $this->domain->getSqlType()
@@ -1105,7 +637,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isLobType()
+    public function isLobType(): bool
     {
         return PropelTypes::isLobType($this->getType());
     }
@@ -1115,7 +647,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isTextType()
+    public function isTextType(): bool
     {
         return PropelTypes::isTextType($this->getType());
     }
@@ -1125,7 +657,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isNumericType()
+    public function isNumericType(): bool
     {
         return PropelTypes::isNumericType($this->getType());
     }
@@ -1135,7 +667,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isBooleanType()
+    public function isBooleanType(): bool
     {
         return PropelTypes::isBooleanType($this->getType());
     }
@@ -1145,7 +677,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isTemporalType()
+    public function isTemporalType(): bool
     {
         return PropelTypes::isTemporalType($this->getType());
     }
@@ -1155,19 +687,9 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isPhpArrayType()
+    public function isPhpArrayType(): bool
     {
         return PropelTypes::isPhpArrayType($this->getType());
-    }
-
-    /**
-     * Returns whether or not this column is an ENUM or SET column.
-     *
-     * @return boolean
-     */
-    public function isValueSetType()
-    {
-        return ($this->isEnumType() || $this->isSetType());
     }
 
     /**
@@ -1175,42 +697,44 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isEnumType()
+    public function isEnumType(): bool
     {
-        return PropelTypes::ENUM === $this->getType();
+        return $this->getType() === PropelTypes::ENUM;
     }
 
     /**
-     * Returns whether or not this column is a SET column.
-     *
-     * @return boolean
+     * @return bool
      */
-    public function isSetType()
+    public function isFloatingPointNumber(): bool
     {
-        return PropelTypes::SET === $this->getType();
+        return in_array($this->getType(), [PropelTypes::FLOAT, PropelTypes::DOUBLE, PropelTypes::REAL]);
     }
 
     /**
-     * Sets the list of possible values for an ENUM or SET column.
+     * Sets the list of possible values for an ENUM column.
      *
-     * @param array|string
+     * @param Set|string|array
      */
-    public function setValueSet($valueSet)
+    public function setValueSet($valueSet): void
     {
         if (is_string($valueSet)) {
             $valueSet = explode(',', $valueSet);
             $valueSet = array_map('trim', $valueSet);
         }
 
+        if (is_array($valueSet)) {
+            $valueSet = new Set($valueSet);
+        }
+
         $this->valueSet = $valueSet;
     }
 
     /**
-     * Returns the list of possible values for an ENUM or SET column.
+     * Returns the list of possible values for an ENUM column.
      *
-     * @return array
+     * @return Set
      */
-    public function getValueSet()
+    public function getValueSet(): Set
     {
         return $this->valueSet;
     }
@@ -1220,9 +744,9 @@ class Column extends MappingModel
      *
      * @return integer
      */
-    public function getSize()
+    public function getSize(): ?int
     {
-        return $this->domain ? $this->domain->getSize() : false;
+        return $this->domain->getSize();
     }
 
     /**
@@ -1230,7 +754,7 @@ class Column extends MappingModel
      *
      * @param integer $size
      */
-    public function setSize($size)
+    public function setSize(int $size)
     {
         $this->domain->setSize($size);
     }
@@ -1240,7 +764,7 @@ class Column extends MappingModel
      *
      * @return integer
      */
-    public function getScale()
+    public function getScale(): int
     {
         return $this->domain->getScale();
     }
@@ -1250,7 +774,7 @@ class Column extends MappingModel
      *
      * @param integer $scale
      */
-    public function setScale($scale)
+    public function setScale(int $scale)
     {
         $this->domain->setScale($scale);
     }
@@ -1262,7 +786,7 @@ class Column extends MappingModel
      *
      * return string
      */
-    public function getSizeDefinition()
+    public function getSizeDefinition(): string
     {
         return $this->domain->getSizeDefinition();
     }
@@ -1272,7 +796,7 @@ class Column extends MappingModel
      *
      * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return null !== $this->getDefaultValue();
     }
@@ -1282,7 +806,7 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getDefaultValueString()
+    public function getDefaultValueString(): string
     {
         $defaultValue = $this->getDefaultValue();
 
@@ -1291,15 +815,16 @@ class Column extends MappingModel
         }
 
         if ($this->isNumericType()) {
-            return (float) $defaultValue->getValue();
+            $out = (float) $defaultValue->getValue();
+            return (string) $out;
         }
 
         if ($this->isTextType() || $this->getDefaultValue()->isExpression()) {
-            return sprintf("'%s'", str_replace("'", "\'", $defaultValue->getValue()));
+            return sprintf("'%s'", str_replace("'", "\\'", $defaultValue->getValue()));
         }
 
         if ($this->getType() === PropelTypes::BOOLEAN) {
-            return $this->booleanValue($defaultValue->getValue()) ? 'true' : 'false';
+            return PropelTypes::booleanValue($defaultValue->getValue()) ? 'true' : 'false';
         }
 
         return sprintf("'%s'", $defaultValue->getValue());
@@ -1309,9 +834,8 @@ class Column extends MappingModel
      * Sets a string that will give this column a default value.
      *
      * @param  ColumnDefaultValue|mixed $defaultValue The column's default value
-     * @return Column
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): void
     {
         if (!$defaultValue instanceof ColumnDefaultValue) {
             $defaultValue = new ColumnDefaultValue($defaultValue, ColumnDefaultValue::TYPE_VALUE);
@@ -1321,12 +845,26 @@ class Column extends MappingModel
     }
 
     /**
+     * Sets a string that will give this column a default expression.
+     *
+     * @param  ColumnDefaultValue|string $defaultExpression The column's default value
+     */
+    public function setDefaultExpression($defaultExpression): void
+    {
+        if (!$defaultExpression instanceof ColumnDefaultValue) {
+            $defaultExpression = new ColumnDefaultValue($defaultExpression, ColumnDefaultValue::TYPE_EXPR);
+        }
+
+        $this->domain->setDefaultValue($defaultExpression);
+    }
+
+    /**
      * Returns the default value object for this column.
      *
      * @return ColumnDefaultValue
      * @see Domain::getDefaultValue()
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): ?ColumnDefaultValue
     {
         return $this->domain->getDefaultValue();
     }
@@ -1349,7 +887,7 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isAutoIncrement()
+    public function isAutoIncrement(): bool
     {
         return $this->isAutoIncrement;
     }
@@ -1362,9 +900,14 @@ class Column extends MappingModel
      *
      * @return boolean
      */
-    public function isLazyLoad()
+    public function isLazyLoad(): bool
     {
         return $this->isLazyLoad;
+    }
+
+    public function setLazyLoad(bool $lazyLoad = false): void
+    {
+        $this->isLazyLoad = $lazyLoad;
     }
 
     /**
@@ -1372,9 +915,9 @@ class Column extends MappingModel
      *
      * @return string
      */
-    public function getAutoIncrementString()
+    public function getAutoIncrementString(): string
     {
-        if ($this->isAutoIncrement() && IdMethod::NATIVE === $this->parentTable->getIdMethod()) {
+        if ($this->isAutoIncrement() && Model::ID_METHOD_NATIVE === $this->getTable()->getIdMethod()) {
             return $this->getPlatform()->getAutoIncrement();
         }
 
@@ -1382,7 +925,7 @@ class Column extends MappingModel
             throw new EngineException(sprintf(
                 'You have specified autoIncrement for column "%s", but you have not specified idMethod="native" for table "%s".',
                 $this->name,
-                $this->parentTable->getName()
+                $this->getTable()->getName()
             ));
         }
 
@@ -1396,9 +939,25 @@ class Column extends MappingModel
      *
      * @param boolean $flag
      */
-    public function setAutoIncrement($flag = true)
+    public function setAutoIncrement(bool $flag = true): void
     {
         $this->isAutoIncrement = (Boolean) $flag;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSkipCodeGeneration(): bool
+    {
+        return $this->skipCodeGeneration;
+    }
+
+    /**
+     * @param boolean $skipCodeGeneration
+     */
+    public function setSkipCodeGeneration(bool $skipCodeGeneration): void
+    {
+        $this->skipCodeGeneration = $skipCodeGeneration;
     }
 
     /**
@@ -1407,8 +966,9 @@ class Column extends MappingModel
      * objects.
      *
      * @return string
+     * @deprecated use PropelTypes::getPhpNative()
      */
-    public function getPhpNative()
+    public function getPhpNative(): string
     {
         return PropelTypes::getPhpNative($this->getType());
     }
@@ -1419,8 +979,9 @@ class Column extends MappingModel
      *
      * @return boolean
      * @see PropelTypes::isPhpPrimitiveType()
+     * @deprecated use PropelTypes::isPhpPrimitiveType()
      */
-    public function isPhpPrimitiveType()
+    public function isPhpPrimitiveType(): bool
     {
         return PropelTypes::isPhpPrimitiveType($this->getPhpType());
     }
@@ -1431,8 +992,9 @@ class Column extends MappingModel
      *
      * @return boolean
      * @see PropelTypes::isPhpPrimitiveNumericType()
+     * @deprecated use PropelTypes::isPhpPrimitiveNumericType()
      */
-    public function isPhpPrimitiveNumericType()
+    public function isPhpPrimitiveNumericType(): bool
     {
         return PropelTypes::isPhpPrimitiveNumericType($this->getPhpType());
     }
@@ -1442,34 +1004,16 @@ class Column extends MappingModel
      *
      * @return boolean
      * @see PropelTypes::isPhpObjectType()
+     * @deprecated use PropelTypes::isPhpObjectType()
      */
-    public function isPhpObjectType()
+    public function isPhpObjectType(): bool
     {
         return PropelTypes::isPhpObjectType($this->getPhpType());
     }
 
-    /**
-     * Returns an instance of PlatformInterface interface.
-     *
-     * @return PlatformInterface
-     */
-    public function getPlatform()
+    public function setSqlType(string $sqlType)
     {
-        return $this->parentTable->getPlatform();
-    }
-
-    /**
-     * Returns whether or not this column has a platform adapter.
-     *
-     * @return boolean
-     */
-    public function hasPlatform()
-    {
-        if (null === $this->parentTable) {
-            return false;
-        }
-
-        return $this->parentTable->getPlatform() ? true : false;
+        $this->getDomain()->replaceSqlType($sqlType);
     }
 
     /**
@@ -1478,33 +1022,20 @@ class Column extends MappingModel
      */
     public function __clone()
     {
-        $this->referrers = null;
+        if ($this->referrers) {
+            $this->referrers = clone $this->referrers;
+        }
+        if ($this->valueSet) {
+            $this->valueSet = clone $this->valueSet;
+        }
+        if ($this->inheritanceList) {
+            $this->inheritanceList = clone $this->inheritanceList;
+        }
+        if ($this->vendor) {
+            $this->vendor = clone $this->vendor;
+        }
         if ($this->domain) {
             $this->domain = clone $this->domain;
         }
-    }
-
-    /**
-     * Returns a generated PHP name.
-     *
-     * @param  string $name
-     * @param  string $phpNamingMethod
-     * @param  string $namePrefix
-     * @return string
-     */
-    public static function generatePhpName($name, $phpNamingMethod = PhpNameGenerator::CONV_METHOD_CLEAN, $namePrefix = null)
-    {
-        return NameFactory::generateName(NameFactory::PHP_GENERATOR, [ $name, $phpNamingMethod, $namePrefix ]);
-    }
-
-    /**
-     * Generates the singular form of a PHP name.
-     *
-     * @param  string $phpname
-     * @return string
-     */
-    public static function generatePhpSingularName($phpname)
-    {
-        return rtrim($phpname, 's');
     }
 }

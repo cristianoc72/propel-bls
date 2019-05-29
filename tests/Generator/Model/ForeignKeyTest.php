@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
@@ -46,7 +46,7 @@ class ForeignKeyTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getTable')
+            ->method('getTableByName')
             ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignTable))
         ;
@@ -73,7 +73,7 @@ class ForeignKeyTest extends ModelTestCase
 
         $fk = new ForeignKey();
         $fk->setTable($localTable);
-        $fk->setForeignTableCommonName('authors');
+        $fk->setForeignTableName('authors');
         $fk->addReference('author_id', 'id');
 
         $fkMapping = $fk->getColumnObjectsMapping();
@@ -146,7 +146,7 @@ class ForeignKeyTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getTable')
+            ->method('getTableByName')
             ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignTable))
         ;
@@ -164,9 +164,8 @@ class ForeignKeyTest extends ModelTestCase
         $fk = new ForeignKey();
         $fk->setTable($localTable);
         $fk->addReference('author_id', 'id');
-        $fk->setForeignTableCommonName('authors');
+        $fk->setForeignTableName('authors');
 
-        $this->assertSame('authors', $fk->getForeignTableCommonName());
         $this->assertSame('authors', $fk->getForeignTableName());
         $this->assertNull($fk->getInverseFK());
         $this->assertFalse($fk->isMatchedByInverseFK());
@@ -185,16 +184,14 @@ class ForeignKeyTest extends ModelTestCase
 
         $database
             ->expects($this->any())
-            ->method('getTable')
-            ->with($this->equalTo('bookstore.authors'))
+            ->method('getTableByName')
+            ->with($this->equalTo('authors'))
             ->will($this->returnValue($foreignTable))
         ;
 
         $inversedFk = new ForeignKey();
         $inversedFk->addReference('id', 'author_id');
         $inversedFk->setTable($localTable);
-        $inversedFk->setForeignSchemaName('bookstore');
-        $inversedFk->setForeignTableCommonName('authors');
 
         $foreignTable
             ->expects($this->any())
@@ -205,11 +202,9 @@ class ForeignKeyTest extends ModelTestCase
         $fk = new ForeignKey();
         $fk->setTable($localTable);
         $fk->addReference('author_id', 'id');
-        $fk->setForeignSchemaName('bookstore');
-        $fk->setForeignTableCommonName('authors');
+        $fk->setForeignTableName('authors');
 
-        $this->assertSame('authors', $fk->getForeignTableCommonName());
-        $this->assertSame('bookstore.authors', $fk->getForeignTableName());
+        $this->assertSame('authors', $fk->getForeignTableName());
         $this->assertInstanceOf('Propel\Generator\Model\Table', $fk->getForeignTable());
         $this->assertSame($inversedFk, $fk->getInverseFK());
         $this->assertTrue($fk->isMatchedByInverseFK());
@@ -295,14 +290,6 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertCount(2, $fk->getOtherFks());
     }
 
-    public function testSetForeignSchemaName()
-    {
-        $fk = new ForeignKey();
-        $fk->setForeignSchemaName('authors');
-
-        $this->assertSame('authors', $fk->getForeignSchemaName());
-    }
-
     public function testClearReferences()
     {
         $fk = new ForeignKey();
@@ -324,12 +311,12 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertCount(2, $fk->getLocalColumns());
         $this->assertCount(2, $fk->getForeignColumns());
 
-        $this->assertSame('book_id', $fk->getLocalColumnName(0));
-        $this->assertSame('id', $fk->getForeignColumnName(0));
+        $this->assertSame('book_id', $fk->getLocalColumns()->get(0));
+        $this->assertSame('id', $fk->getForeignColumns()->get(0));
         $this->assertSame('id', $fk->getMappedForeignColumn('book_id'));
 
-        $this->assertSame('author_id', $fk->getLocalColumnName(1));
-        $this->assertSame('id', $fk->getForeignColumnName(1));
+        $this->assertSame('author_id', $fk->getLocalColumns()->get(1));
+        $this->assertSame('id', $fk->getForeignColumns()->get(1));
         $this->assertSame('id', $fk->getMappedForeignColumn('author_id'));
     }
 
@@ -379,7 +366,7 @@ class ForeignKeyTest extends ModelTestCase
         $table = $this->getTableMock('book');
         $table
             ->expects($this->once())
-            ->method('getSchema')
+            ->method('getSchemaName')
             ->will($this->returnValue('books'))
         ;
 
@@ -403,12 +390,12 @@ class ForeignKeyTest extends ModelTestCase
     {
         $fk = new ForeignKey();
         $fk->setName('book_author');
-        $fk->setPhpName('Author');
-        $fk->setRefPhpName('Books');
+        $fk->setColumn('author');
+        $fk->setRefColumn('books');
 
         $this->assertSame('book_author', $fk->getName());
-        $this->assertSame('Author', $fk->getPhpName());
-        $this->assertSame('Books', $fk->getRefPhpName());
+        $this->assertSame('author', $fk->getColumn());
+        $this->assertSame('books', $fk->getRefColumn());
     }
 
     public function testSkipSql()

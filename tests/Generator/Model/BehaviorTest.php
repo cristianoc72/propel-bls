@@ -1,68 +1,36 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
 
-use Propel\Generator\Builder\Util\SchemaReader;
+namespace Propel\Tests\Generator\Model;
+
+use org\bovigo\vfs\vfsStream;
+use phootwork\lang\Text;
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Table;
-use Propel\Tests\TestCase;
+use Propel\Generator\Schema\SchemaReader;
 
 /**
  * Tests for Behavior class
  *
  * @author Martin Poeschl <mpoeschl@marmot.at>
  */
-class BehaviorTest extends TestCase
+class BehaviorTest extends ModelTestCase
 {
-    private $schemaReader;
-    private $appData;
-
-    public function testSetupObject()
-    {
-        $b = new Behavior();
-        $b->loadMapping(['name' => 'foo']);
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-    }
-
-    public function testSetupObjectWithMultipleBehaviorWithNoId()
-    {
-        $b = new Propel\Tests\Helpers\MultipleBehavior();
-        $b->loadMapping(['name' => 'foo']);
-
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-        $this->assertEquals($b->getId(), 'foo', 'setupObject() sets the Behavior id from its name when no explicit id is given');
-    }
-
-    public function testSetupObjectWithMultipleBehaviorWithId()
-    {
-        $b = new Propel\Tests\Helpers\MultipleBehavior();
-        $b->loadMapping(['name' => 'foo', 'id' => 'bar']);
-
-        $this->assertEquals($b->getName(), 'foo', 'setupObject() sets the Behavior name from XML attributes');
-        $this->assertEquals($b->getId(), 'bar', 'setupObject() sets the Behavior id from XML attributes');
-    }
-
-    /**
-     * @expectedException Propel\Generator\Exception\LogicException
-     */
-    public function testSetupObjectFailIfIdGivenOnNotMultipleBehavior()
-    {
-        $b = new Behavior();
-        $b->loadMapping(['name' => 'foo', 'id' => 'lala']);
-    }
-
     public function testName()
     {
         $b = new Behavior();
-        $this->assertNull($b->getName(), 'Behavior name is null by default');
+        $this->assertInstanceOf(Text::class,$b->getName(), 'Behavio name is a Text object');
+        $this->assertEquals('', $b->getName()->toString(), 'Behavior name is null string by default');
         $b->setName('foo');
-        $this->assertEquals($b->getName(), 'foo', 'setName() sets the name, and getName() gets it');
+        $this->assertEquals('foo', $b->getName()->toString(), 'setName() sets the name, and getName() gets it');
     }
 
     public function testTable()
@@ -70,7 +38,7 @@ class BehaviorTest extends TestCase
         $b = new Behavior();
         $this->assertNull($b->getTable(), 'Behavior Table is null by default');
         $t = new Table();
-        $t->setCommonName('fooTable');
+        $t->setName('FooTable');
         $b->setTable($t);
         $this->assertEquals($b->getTable(), $t, 'setTable() sets the name, and getTable() gets it');
     }
@@ -78,16 +46,17 @@ class BehaviorTest extends TestCase
     public function testParameters()
     {
         $b = new Behavior();
-        $this->assertEquals($b->getParameters(), [], 'Behavior parameters is an empty array by default');
+        $this->assertInstanceOf(Map::class, $b->getParameters());
+        $this->assertEquals($b->getParameters()->toArray(), [], 'Behavior parameters is an empty array by default');
         $b->addParameter(['name' => 'foo', 'value' => 'bar']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar'], 'addParameter() sets a parameter from an associative array');
+        $this->assertEquals($b->getParameters(), new Map(['foo' => 'bar']), 'addParameter() sets a parameter from an associative array');
         $b->addParameter(['name' => 'foo2', 'value' => 'bar2']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar', 'foo2' => 'bar2'], 'addParameter() adds a parameter from an associative array');
+        $this->assertEquals($b->getParameters()->toArray(), ['foo' => 'bar', 'foo2' => 'bar2'], 'addParameter() adds a parameter from an associative array');
         $b->addParameter(['name' => 'foo', 'value' => 'bar3']);
-        $this->assertEquals($b->getParameters(), ['foo' => 'bar3', 'foo2' => 'bar2'], 'addParameter() changes a parameter from an associative array');
+        $this->assertEquals($b->getParameters()->toArray(), ['foo' => 'bar3', 'foo2' => 'bar2'], 'addParameter() changes a parameter from an associative array');
         $this->assertEquals($b->getParameter('foo'), 'bar3', 'getParameter() retrieves a parameter value by name');
         $b->setParameters(['foo3' => 'bar3', 'foo4' => 'bar4']);
-        $this->assertEquals($b->getParameters(), ['foo3' => 'bar3', 'foo4' => 'bar4'], 'setParameters() changes the whole parameter array');
+        $this->assertEquals($b->getParameters()->toArray(), ['foo3' => 'bar3', 'foo4' => 'bar4'], 'setParameters() changes the whole parameter array');
     }
 
     /**
@@ -97,7 +66,7 @@ class BehaviorTest extends TestCase
     public function testSchemaReader()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <table name="table1">
     <column name="id" type="INTEGER" primaryKey="true" />
@@ -111,14 +80,16 @@ class BehaviorTest extends TestCase
   </table>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $table = $appData->getDatabase('test1')->getTable('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
+        $table = $appData->getDatabase('test1')->getTableByName('Table1');
         $behaviors = $table->getBehaviors();
         $this->assertEquals(1, count($behaviors), 'SchemaReader ads as many behaviors as there are behaviors tags');
         $behavior = $table->getBehavior('timestampable');
-        $this->assertEquals('table1', $behavior->getTable()->getName(), 'SchemaReader sets the behavior table correctly');
+        $this->assertEquals('Table1', $behavior->getTable()->getName(), 'SchemaReader sets the behavior table correctly');
         $this->assertEquals(
-            ['create_column' => 'created_on', 'update_column' => 'updated_on', 'disable_created_at' => 'false', 'disable_updated_at' => 'false'],
+            ['create_column' => 'created_on', 'update_column' => 'updated_on', 'disable_created_at' => false, 'disable_updated_at' => false],
             $behavior->getParameters(),
             'SchemaReader sets the behavior parameters correctly'
         );
@@ -130,7 +101,7 @@ EOF;
     public function testUnknownBehavior()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <table name="table1">
     <column name="id" type="INTEGER" primaryKey="true" />
@@ -138,13 +109,14 @@ EOF;
   </table>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
     }
 
     public function testModifyTable()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <table name="table2">
     <column name="id" type="INTEGER" primaryKey="true" />
@@ -153,15 +125,17 @@ EOF;
   </table>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $table = $appData->getDatabase('test1')->getTable('table2');
-        $this->assertEquals(count($table->getColumns()), 4, 'A behavior can modify its table by implementing modifyTable()');
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
+        $table = $appData->getDatabase('test1')->getTableByName('Table2');
+        $this->assertEquals(4, $table->getColumns()->size(), 'A behavior can modify its table by implementing modifyTable()');
     }
 
     public function testModifyDatabase()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <behavior name="timestampable" />
   <table name="table1">
@@ -169,15 +143,17 @@ EOF;
   </table>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $table = $appData->getDatabase('test1')->getTable('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $appData->getPlatform()->doFinalInitialization($appData);
+        $table = $appData->getDatabase('test1')->getTableByName('Table1');
         $this->assertTrue(array_key_exists('timestampable', $table->getBehaviors()), 'A database behavior is automatically copied to all its table');
     }
 
     public function testGetColumnForParameter()
     {
         $schemaReader = new SchemaReader();
-        $schema = <<<EOF
+        $content = <<<EOF
 <database name="test1">
   <table name="table1">
     <column name="id" type="INTEGER" primaryKey="true" />
@@ -191,8 +167,9 @@ EOF;
   </table>
 </database>
 EOF;
-        $appData = $schemaReader->parseString($schema);
-        $table = $appData->getDatabase('test1')->getTable('table1');
+        $schema = vfsStream::newFile('schema.xml')->at($this->getRoot())->setContent($content);
+        $appData = $schemaReader->parse($schema->url());
+        $table = $appData->getDatabase('test1')->getTableByName('Table1');
         $behavior = $table->getBehavior('timestampable');
         $this->assertEquals($table->getColumn('created_on'), $behavior->getColumnForParameter('create_column'), 'getColumnForParameter() returns the configured column for behavior based on a parameter name');
     }

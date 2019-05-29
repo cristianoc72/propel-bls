@@ -27,7 +27,7 @@ use Propel\Generator\Model\Unique;
  *
  * @author Hans Lellelid <hans@xmpl.org>
  */
-class SqlitePlatform extends DefaultPlatform
+class SqlitePlatform extends SqlDefaultPlatform
 {
     /**
      * If we should generate FOREIGN KEY statements.

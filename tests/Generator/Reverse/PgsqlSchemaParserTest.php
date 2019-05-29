@@ -13,7 +13,7 @@ namespace Propel\Tests\Generator\Reverse;
 use Propel\Generator\Config\QuickGeneratorConfig;
 use Propel\Generator\Model\ColumnDefaultValue;
 use Propel\Generator\Model\Database;
-use Propel\Generator\Platform\DefaultPlatform;
+use Propel\Generator\Platform\SqlDefaultPlatform;
 use Propel\Generator\Reverse\PgsqlSchemaParser;
 use Propel\Runtime\Propel;
 use Propel\Tests\TestCaseFixturesDatabase;
@@ -72,7 +72,7 @@ class PgsqlSchemaParserTest extends TestCaseFixturesDatabase
 
         $database = new Database();
         $database->setSchema('public');
-        $database->setPlatform(new DefaultPlatform());
+        $database->setPlatform(new SqlDefaultPlatform());
 
         // make sure our DDL insert produced exactly the SQL we inserted
         $this->assertGreaterThanOrEqual(1, $parser->parse($database), 'We parsed at least one table.');

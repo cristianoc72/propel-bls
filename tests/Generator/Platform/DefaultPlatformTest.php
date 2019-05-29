@@ -10,7 +10,7 @@
 
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\PropelTypes;
-use Propel\Generator\Platform\DefaultPlatform;
+use Propel\Generator\Platform\SqlDefaultPlatform;
 use Propel\Runtime\Propel;
 use \Propel\Tests\TestCase;
 
@@ -26,7 +26,7 @@ class DefaultPlatformTest extends TestCase
     protected function getPlatform()
     {
         if (null === $this->platform) {
-            $this->platform = new DefaultPlatform();
+            $this->platform = new SqlDefaultPlatform();
         }
 
         return $this->platform;

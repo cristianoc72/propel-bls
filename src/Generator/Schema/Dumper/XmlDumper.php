@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ *  
  * @license MIT License
  */
 
@@ -13,15 +13,15 @@ namespace Propel\Generator\Schema\Dumper;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\ForeignKey;
-use Propel\Generator\Model\IdMethod;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Inheritance;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Unique;
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 
 /**
  * A class for dumping a schema to an XML representation.
@@ -70,14 +70,13 @@ class XmlDumper implements DumperInterface
      * Dumps a single Schema model into an XML formatted version.
      *
      * @param  Schema  $schema                The schema object
-     * @param  boolean $doFinalInitialization Whether or not to validate the schema
      * @return string
      */
-    public function dumpSchema(Schema $schema, $doFinalInitialization = true)
+    public function dumpSchema(Schema $schema)
     {
         $rootNode = $this->document->createElement('app-data');
         $this->document->appendChild($rootNode);
-        foreach ($schema->getDatabases($doFinalInitialization) as $database) {
+        foreach ($schema->getDatabases() as $database) {
             $this->appendDatabaseNode($database, $rootNode);
         }
 
@@ -94,13 +93,9 @@ class XmlDumper implements DumperInterface
     {
         $databaseNode = $parentNode->appendChild($this->document->createElement('database'));
         $databaseNode->setAttribute('name', $database->getName());
-        $databaseNode->setAttribute('defaultIdMethod', $database->getDefaultIdMethod());
+        $databaseNode->setAttribute('defaultIdMethod', $database->getIdMethod());
 
-        if ($package = $database->getPackage()) {
-            $databaseNode->setAttribute('package', $package);
-        }
-
-        if ($schema = $database->getSchema()) {
+        if ($schema = $database->getSchemaName()) {
             $databaseNode->setAttribute('schema', $schema);
         }
 
@@ -108,39 +103,23 @@ class XmlDumper implements DumperInterface
             $databaseNode->setAttribute('namespace', $namespace);
         }
 
-        if ($baseClass = $database->getBaseClass()) {
-            $databaseNode->setAttribute('baseClass', $baseClass);
-        }
-
-        if ($baseQueryClass = $database->getBaseQueryClass()) {
-            $databaseNode->setAttribute('baseQueryClass', $baseQueryClass);
-        }
-
-        if ($defaultNamingMethod = $database->getDefaultPhpNamingMethod()) {
-            $databaseNode->setAttribute('defaultPhpNamingMethod', $defaultNamingMethod);
-        }
-
-        $defaultAccessorVisibility = $database->getDefaultAccessorVisibility();
-        if ($defaultAccessorVisibility !== Database::VISIBILITY_PUBLIC) {
+        $defaultAccessorVisibility = $database->getAccessorVisibility();
+        if ($defaultAccessorVisibility !== Model::VISIBILITY_PUBLIC) {
             $databaseNode->setAttribute('defaultAccessorVisibility', $defaultAccessorVisibility);
         }
 
-        $defaultMutatorVisibility = $database->getDefaultMutatorVisibility();
-        if ($defaultMutatorVisibility !== Database::VISIBILITY_PUBLIC) {
+        $defaultMutatorVisibility = $database->getMutatorVisibility();
+        if ($defaultMutatorVisibility !== Model::VISIBILITY_PUBLIC) {
             $databaseNode->setAttribute('defaultMutatorVisibility', $defaultMutatorVisibility);
         }
 
-        $defaultStringFormat = $database->getDefaultStringFormat();
-        if (Database::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
+        $defaultStringFormat = $database->getStringFormat();
+        if (Model::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $databaseNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }
 
         if ($database->isHeavyIndexing()) {
             $databaseNode->setAttribute('heavyIndexing', 'true');
-        }
-
-        if ($database->isIdentifierQuotingEnabled()) {
-            $databaseNode->setAttribute('identifierQuoting', 'true');
         }
 
         /*
@@ -152,7 +131,7 @@ class XmlDumper implements DumperInterface
                 $this->appendDomainNode($databaseNode);
             }
          */
-        foreach ($database->getVendorInformation() as $vendorInformation) {
+        foreach ($database->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $databaseNode);
         }
 
@@ -164,11 +143,16 @@ class XmlDumper implements DumperInterface
     /**
      * Appends the generated <vendor> XML node to its parent node.
      *
-     * @param VendorInfo $vendorInfo The VendorInfo model instance
+     * @param Vendor $vendorInfo The VendorInfo model instance
      * @param \DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendVendorInformationNode(VendorInfo $vendorInfo, \DOMNode $parentNode)
+    private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode)
     {
+        //It's an empty Vendor created by VendorPart::getVendorByType method
+        if ([] === $vendorInfo->getParameters()) {
+            return;
+        }
+
         $vendorNode = $parentNode->appendChild($this->document->createElement('vendor'));
         $vendorNode->setAttribute('type', $vendorInfo->getType());
 
@@ -189,25 +173,20 @@ class XmlDumper implements DumperInterface
     private function appendTableNode(Table $table, \DOMNode $parentNode)
     {
         $tableNode = $parentNode->appendChild($this->document->createElement('table'));
-        $tableNode->setAttribute('name', $table->getCommonName());
+        $tableNode->setAttribute('name', $table->getName());
 
         $database = $table->getDatabase();
-        $schema = $table->getSchema();
-        if ($schema && $schema !== $database->getSchema()) {
+        $schema = $table->getSchemaName();
+        if ($schema && $schema !== $database->getSchemaName()) {
             $tableNode->setAttribute('schema', $schema);
         }
 
-        if (IdMethod::NO_ID_METHOD !== ($idMethod = $table->getIdMethod())) {
+        if (Model::ID_METHOD_NATIVE !== ($idMethod = $table->getIdMethod())) {
             $tableNode->setAttribute('idMethod', $idMethod);
         }
 
-        if ($phpName = $table->getPhpName()) {
-            $tableNode->setAttribute('phpName', $phpName);
-        }
-
-        $package = $table->getPackage();
-        if ($package && !$table->isPackageOverriden()) {
-            $tableNode->setAttribute('package', $package);
+        if ($tableName = $table->getTableName()) {
+            $tableNode->setAttribute('tableName', $tableName);
         }
 
         if ($namespace = $table->getNamespace()) {
@@ -218,29 +197,8 @@ class XmlDumper implements DumperInterface
             $tableNode->setAttribute('skipSql', 'true');
         }
 
-        if ($table->isAbstract()) {
-            $tableNode->setAttribute('abstract', 'true');
-        }
-
-        if ($interface = $table->getInterface()) {
-            $tableNode->setAttribute('interface', $interface);
-        }
-
         if ($table->isCrossRef()) {
             $tableNode->setAttribute('isCrossRef', 'true');
-        }
-
-        $phpNamingMethod = $table->getPhpNamingMethod();
-        if ($phpNamingMethod && $phpNamingMethod !== $database->getDefaultPhpNamingMethod()) {
-            $tableNode->setAttribute('phpNamingMethod', $phpNamingMethod);
-        }
-
-        if ($baseClass = $table->getBaseClass()) {
-            $tableNode->setAttribute('baseClass', $baseClass);
-        }
-
-        if ($baseQueryClass = $table->getBaseQueryClass()) {
-            $tableNode->setAttribute('baseQueryClass', $baseQueryClass);
         }
 
         if ($table->isReadOnly()) {
@@ -255,7 +213,7 @@ class XmlDumper implements DumperInterface
             $tableNode->setAttribute('reloadOnUpdate', 'true');
         }
 
-        if (null !== ($referenceOnly = $table->isForReferenceOnly())) {
+        if ($referenceOnly = $table->isForReferenceOnly()) {
             $tableNode->setAttribute('forReferenceOnly', $referenceOnly ? 'true' : 'false');
         }
 
@@ -267,18 +225,18 @@ class XmlDumper implements DumperInterface
             $tableNode->setAttribute('description', $description);
         }
 
-        $defaultStringFormat = $table->getDefaultStringFormat();
-        if (Table::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
+        $defaultStringFormat = $table->getStringFormat();
+        if (Model::DEFAULT_STRING_FORMAT !== $defaultStringFormat) {
             $tableNode->setAttribute('defaultStringFormat', $defaultStringFormat);
         }
 
-        $defaultAccessorVisibility = $table->getDefaultAccessorVisibility();
-        if ($defaultAccessorVisibility !== Table::VISIBILITY_PUBLIC) {
+        $defaultAccessorVisibility = $table->getAccessorVisibility();
+        if ($defaultAccessorVisibility !== Model::VISIBILITY_PUBLIC) {
             $tableNode->setAttribute('defaultAccessorVisibility', $defaultAccessorVisibility);
         }
 
-        $defaultMutatorVisibility = $table->getDefaultMutatorVisibility();
-        if ($defaultMutatorVisibility !== Table::VISIBILITY_PUBLIC) {
+        $defaultMutatorVisibility = $table->getMutatorVisibility();
+        if ($defaultMutatorVisibility !== Model::VISIBILITY_PUBLIC) {
             $tableNode->setAttribute('defaultMutatorVisibility', $defaultMutatorVisibility);
         }
 
@@ -302,7 +260,7 @@ class XmlDumper implements DumperInterface
             $this->appendUniqueIndexNode($index, $tableNode);
         }
 
-        foreach ($table->getVendorInformation() as $vendorInformation) {
+        foreach ($table->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $tableNode);
         }
 
@@ -329,7 +287,7 @@ class XmlDumper implements DumperInterface
         foreach ($behavior->getParameters() as $name => $value) {
             $parameterNode = $behaviorNode->appendChild($this->document->createElement('parameter'));
             $parameterNode->setAttribute('name', $name);
-            $parameterNode->setAttribute('value', $value);
+            $parameterNode->setAttribute('value', is_bool($value) ? (true === $value ? 'true' : 'false') : $value);
         }
     }
 
@@ -344,24 +302,20 @@ class XmlDumper implements DumperInterface
         $columnNode = $parentNode->appendChild($this->document->createElement('column'));
         $columnNode->setAttribute('name', $column->getName());
 
-        if ($phpName = $column->getPhpName()) {
-            $columnNode->setAttribute('phpName', $phpName);
-        }
-
         $columnNode->setAttribute('type', $column->getType());
 
         $domain = $column->getDomain();
         if ($size = $domain->getSize()) {
-            $columnNode->setAttribute('size', $size);
+            $columnNode->setAttribute('size', (string)$size);
         }
 
-        if (null !== ($scale = $domain->getScale())) {
-            $columnNode->setAttribute('scale', $scale);
+        if ($scale = $domain->getScale()) {
+            $columnNode->setAttribute('scale', (string)$scale);
         }
 
         $platform = $column->getPlatform();
-        if ($platform && !$column->isDefaultSqlType($platform)) {
-            $columnNode->setAttribute('sqlType', $domain->getSqlType());
+        if (!$column->isDefaultSqlType($platform)) {
+            $columnNode->setAttribute('sqlType', $platform->getDomainForType($column->getType())->getSqlType());
         }
 
         if ($description = $column->getDescription()) {
@@ -393,14 +347,7 @@ class XmlDumper implements DumperInterface
             }
         }
 
-        if ($column->isNodeKey()) {
-            $columnNode->setAttribute('nodeKey', 'true');
-            if ($nodeKeySeparator = $column->getNodeKeySep()) {
-                $columnNode->setAttribute('nodeKeySep', $nodeKeySeparator);
-            }
-        }
-
-        foreach ($column->getVendorInformation() as $vendorInformation) {
+        foreach ($column->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $columnNode);
         }
     }
@@ -430,21 +377,16 @@ class XmlDumper implements DumperInterface
      */
     private function appendForeignKeyNode(ForeignKey $foreignKey, \DOMNode $parentNode)
     {
-        $foreignKeyNode = $parentNode->appendChild($this->document->createElement('foreign-key'));
-        $foreignKeyNode->setAttribute('foreignTable', $foreignKey->getForeignTableCommonName());
+        $foreignKeyNode = $parentNode->appendChild($this->document->createElement('foreignKey'));
+        $foreignKeyNode->setAttribute('target', $foreignKey->getForeignTableName());
 
-        if ($schema = $foreignKey->getForeignSchemaName()) {
-            $foreignKeyNode->setAttribute('foreignSchema', $schema);
+        if ($foreignKey->hasName()) {
+            $foreignKeyNode->setAttribute('name', $foreignKey->getName());
         }
+        $foreignKeyNode->setAttribute('column', $foreignKey->getColumn());
 
-        $foreignKeyNode->setAttribute('name', $foreignKey->getName());
-
-        if ($phpName = $foreignKey->getPhpName()) {
-            $foreignKeyNode->setAttribute('phpName', $phpName);
-        }
-
-        if ($refPhpName = $foreignKey->getRefPhpName()) {
-            $foreignKeyNode->setAttribute('refPhpName', $refPhpName);
+        if ($refColumn = $foreignKey->getRefColumn()) {
+            $foreignKeyNode->setAttribute('refColumn', $refColumn);
         }
 
         if ($defaultJoin = $foreignKey->getDefaultJoin()) {
@@ -459,13 +401,13 @@ class XmlDumper implements DumperInterface
             $foreignKeyNode->setAttribute('onUpdate', $onUpdateBehavior);
         }
 
-        for ($i = 0, $size = count($foreignKey->getLocalColumns()); $i < $size; $i++) {
+        for ($i = 0, $size = $foreignKey->getLocalColumns()->size(); $i < $size; $i++) {
             $refNode = $foreignKeyNode->appendChild($this->document->createElement('reference'));
-            $refNode->setAttribute('local', $foreignKey->getLocalColumnName($i));
-            $refNode->setAttribute('foreign', $foreignKey->getForeignColumnName($i));
+            $refNode->setAttribute('local', $foreignKey->getLocalColumn($i)->getName());
+            $refNode->setAttribute('foreign', $foreignKey->getForeignColumns()->get($i));
         }
 
-        foreach ($foreignKey->getVendorInformation() as $vendorInformation) {
+        foreach ($foreignKey->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $foreignKeyNode);
         }
     }
@@ -479,9 +421,6 @@ class XmlDumper implements DumperInterface
     private function appendIdMethodParameterNode(IdMethodParameter $parameter, \DOMNode $parentNode)
     {
         $idMethodParameterNode = $parentNode->appendChild($this->document->createElement('id-method-parameter'));
-        if ($name = $parameter->getName()) {
-            $idMethodParameterNode->setAttribute('name', $name);
-        }
         $idMethodParameterNode->setAttribute('value', $parameter->getValue());
     }
 
@@ -499,7 +438,7 @@ class XmlDumper implements DumperInterface
     /**
      * Appends the generated <unique> XML node to its parent node.
      *
-     * @param Unique   $unique     The Unique model instance
+     * @param Unique   $index     The Unique model instance
      * @param \DOMNode $parentNode The parent DOMNode object
      */
     private function appendUniqueIndexNode(Unique $index, \DOMNode $parentNode)
@@ -519,16 +458,16 @@ class XmlDumper implements DumperInterface
         $indexNode = $parentNode->appendChild($this->document->createElement($nodeType));
         $indexNode->setAttribute('name', $index->getName());
 
-        foreach ($index->getColumns() as $columnName) {
+        foreach ($index->getColumns() as $column) {
             $indexColumnNode = $indexNode->appendChild($this->document->createElement($nodeType.'-column'));
-            $indexColumnNode->setAttribute('name', $columnName);
+            $indexColumnNode->setAttribute('name', $column->getName());
 
-            if ($size = $index->getColumnSize($columnName)) {
-                $indexColumnNode->setAttribute('size', $size);
+            if ($size = $index->getColumnSizes()->get($column->getName())) {
+                $indexColumnNode->setAttribute('size', (string)$size);
             }
         }
 
-        foreach ($index->getVendorInformation() as $vendorInformation) {
+        foreach ($index->getVendor() as $vendorInformation) {
             $this->appendVendorInformationNode($vendorInformation, $indexNode);
         }
     }

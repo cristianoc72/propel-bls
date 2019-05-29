@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -10,7 +10,7 @@
 
 namespace Propel\Tests\Generator\Model;
 
-use Propel\Generator\Model\VendorInfo;
+use Propel\Generator\Model\Vendor;
 use Propel\Tests\TestCase;
 
 /**
@@ -22,15 +22,24 @@ class VendorInfoTest extends TestCase
 {
     public function testSetupObject()
     {
-        $info = new VendorInfo();
-        $info->loadMapping(['type' => 'foo']);
+        $info = new Vendor();
+        $info->setType('foo');
 
         $this->assertSame('foo', $info->getType());
     }
 
+    public function testSetUpObjectWithParameters()
+    {
+        $info = new Vendor('foo', ['bar' => 'baz']);
+
+        $this->assertSame('foo', $info->getType());
+        $this->assertTrue($info->hasParameter('bar'));
+        $this->assertEquals('baz', $info->getParameter('bar'));
+    }
+
     public function testGetSetType()
     {
-        $info = new VendorInfo('foo');
+        $info = new Vendor('foo');
 
         $this->assertSame('foo', $info->getType());
         $this->assertTrue($info->isEmpty());
@@ -38,7 +47,7 @@ class VendorInfoTest extends TestCase
 
     public function testSetParameter()
     {
-        $info = new VendorInfo();
+        $info = new Vendor();
         $info->setParameter('foo', 'bar');
 
         $this->assertFalse($info->isEmpty());
@@ -48,7 +57,7 @@ class VendorInfoTest extends TestCase
 
     public function testSetParameters()
     {
-        $info = new VendorInfo();
+        $info = new Vendor();
         $info->setParameters(['foo' => 'bar', 'baz' => 'bat']);
 
         $this->assertFalse($info->isEmpty());
@@ -58,15 +67,15 @@ class VendorInfoTest extends TestCase
 
     public function testMergeVendorInfo()
     {
-        $current = new VendorInfo('mysql');
+        $current = new Vendor('mysql');
         $current->setParameters(['foo' => 'bar', 'baz' => 'bat']);
 
-        $toMerge = new VendorInfo('mysql');
+        $toMerge = new Vendor('mysql');
         $toMerge->setParameters(['foo' => 'wat', 'int' => 'mix']);
 
         $merged = $current->getMergedVendorInfo($toMerge);
 
-        $this->assertInstanceOf('Propel\Generator\Model\VendorInfo', $merged);
+        $this->assertInstanceOf('Propel\Generator\Model\Vendor', $merged);
 
         $this->assertSame('wat', $merged->getParameter('foo'));
         $this->assertSame('bat', $merged->getParameter('baz'));

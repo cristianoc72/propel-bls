@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -31,40 +31,48 @@ class ForeignKeyComparator
      *
      * @return boolean false if the two fks are similar, true if they have differences
      */
-    public static function computeDiff(ForeignKey $fromFk, ForeignKey $toFk, $caseInsensitive = false)
+    public static function computeDiff(ForeignKey $fromFk, ForeignKey $toFk)
     {
-        // Check for differences in local and remote table
-        $test = $caseInsensitive ?
-            strtolower($fromFk->getTableName()) !== strtolower($toFk->getTableName()) :
-            $fromFk->getTableName() !== $toFk->getTableName()
-        ;
-
-        if ($test) {
+        if ($fromFk->getTableName() !== $toFk->getTableName()) {
             return true;
         }
 
-        $test = $caseInsensitive ?
-            strtolower($fromFk->getForeignTableName()) !== strtolower($toFk->getForeignTableName()) :
-            $fromFk->getForeignTableName() !== $toFk->getForeignTableName()
-        ;
-
-        if ($test) {
+        if ($fromFk->getForeignTableName() !== $toFk->getForeignTableName()) {
             return true;
         }
 
         // compare columns
         $fromFkLocalColumns = $fromFk->getLocalColumns();
-        sort($fromFkLocalColumns);
+        $fromFkLocalColumns = $fromFkLocalColumns->sort();
         $toFkLocalColumns = $toFk->getLocalColumns();
-        sort($toFkLocalColumns);
-        if (array_map('strtolower', $fromFkLocalColumns) !== array_map('strtolower', $toFkLocalColumns)) {
+        $toFkLocalColumns = $toFkLocalColumns->sort();
+        //Why case insensitive comparison?
+        $fromFkLocalColumns = $fromFkLocalColumns->map(function (string $element) {
+            return strtolower($element);
+        });
+        $toFkLocalColumns = $toFkLocalColumns->map(function (string $element) {
+            return strtolower($element);
+        });
+
+        if ($fromFkLocalColumns != $toFkLocalColumns) {
             return true;
         }
+
         $fromFkForeignColumns = $fromFk->getForeignColumns();
-        sort($fromFkForeignColumns);
+        $fromFkForeignColumns = $fromFkForeignColumns->sort();
         $toFkForeignColumns = $toFk->getForeignColumns();
-        sort($toFkForeignColumns);
-        if (array_map('strtolower', $fromFkForeignColumns) !== array_map('strtolower', $toFkForeignColumns)) {
+        $toFkForeignColumns = $toFkForeignColumns->sort();
+        //Why case insensitive comparison?
+        $fromFkForeignColumns = $fromFkForeignColumns->map(function (string $element) {
+            return strtolower($element);
+        });
+        $toFkForeignColumns = $toFkForeignColumns->map(function (string $element) {
+            return strtolower($element);
+        });
+
+
+
+        if ($fromFkForeignColumns != $toFkForeignColumns) {
             return true;
         }
 

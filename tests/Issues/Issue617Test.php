@@ -9,7 +9,7 @@ use Propel\Tests\Helpers\PlatformDatabaseBuildTimeBase;
 /**
  * This test proves the bug described in https://github.com/propelorm/Propel/issues/617.
  * Since the build property `addVendorInfo` is per default not set (= false), the `MysqlSchemaParser` **did**
- * not return the `Engine` of the table. Since we depend on that information in `MysqlPlatform`,
+ * not return the `Engine` of the table. Since we depend on that information in `MysqlPlatformSql`,
  * we really need that kind of information.
  *
  * @group mysql

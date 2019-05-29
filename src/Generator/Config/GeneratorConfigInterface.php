@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -8,17 +8,15 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Config;
 
 use cristianoc72\Pluralizer\PluralizerInterface;
 use Propel\Generator\Builder\DataModelBuilder;
+use Propel\Generator\Manager\BehaviorManager;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Reverse\SchemaParserInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
 
 interface GeneratorConfigInterface
 {
@@ -39,38 +37,42 @@ interface GeneratorConfigInterface
      */
     public function getConfiguredPluralizer(): PluralizerInterface;
 
-
     /**
      * Creates and configures a new Platform class.
      *
+     * @param  string              $platform full or short class name
      * @param  ConnectionInterface $con
-     * @param  string              $database
-     * @return PlatformInterface
      *
-     * @throws \Propel\Generator\Exception\ClassNotFoundException if the platform class doesn't exists
-     * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of PlatformInterface
+     * @return PlatformInterface
      */
-    public function getConfiguredPlatform(ConnectionInterface $con = null, string $database = null): ?PlatformInterface;
+    public function createPlatform(string $platform, ConnectionInterface $con = null): PlatformInterface;
+
+    /**
+     * @param string|null $name returns default platform if null
+     * @param ConnectionInterface $con
+     *
+     * @return PlatformInterface
+     */
+    public function createPlatformForDatabase(string $name = null, ConnectionInterface $con = null): PlatformInterface;
+
+    /**
+     * Returns the behavior locator.
+     *
+     * @return BehaviorManager
+     */
+    public function getBehaviorManager(): BehaviorManager;
 
     /**
      * Creates and configures a new SchemaParser class for a specified platform.
      *
      * @param  ConnectionInterface $con
-     * @param  string              $database
      *
      * @return SchemaParserInterface
      *
      * @throws \Propel\Generator\Exception\ClassNotFoundException if the class doesn't exist
      * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of SchemaParserInterface
      */
-    public function getConfiguredSchemaParser(ConnectionInterface $con = null, string $database = null): ?SchemaParserInterface;
-
-    /**
-     * Returns the behavior locator.
-     *
-     * @return BehaviorLocator
-     */
-    public function getBehaviorLocator(): BehaviorLocator;
+    public function getConfiguredSchemaParser(ConnectionInterface $con = null): ?SchemaParserInterface;
 
     /**
      * Return a specific configuration property.

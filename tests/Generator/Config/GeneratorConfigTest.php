@@ -147,7 +147,7 @@ class GeneratorConfigTest extends TestCase
 
     /**
      * @expectedException Propel\Generator\Exception\BuildException
-     * @expectedExceptionMessage Specified class (\Propel\Generator\Platform\MysqlPlatform) does not implement \Propel\Generator\Reverse\SchemaParserInterface interface.
+     * @expectedExceptionMessage Specified class (\Propel\Generator\Platform\MysqlPlatformSql) does not implement \Propel\Generator\Reverse\SchemaParserInterface interface.
      */
     public function testGetConfiguredSchemaParserGivenNonSchemaParserClass()
     {

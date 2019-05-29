@@ -1,19 +1,26 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
 
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\CrossForeignKey;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Index;
 use Propel\Generator\Model\Table;
+use Propel\Generator\Model\Inheritance;
+use Propel\Generator\Model\NamingTool;
+use Propel\Generator\Model\ForeignKey;
+use Propel\Generator\Model\Unique;
+use Propel\Generator\Platform\SqlitePlatform;
 
 /**
  * Unit test suite for Table model class.
@@ -27,7 +34,7 @@ class TableTest extends ModelTestCase
     {
         $table = new Table('books');
 
-        $this->assertSame('books', $table->getCommonName());
+        $this->assertSame('books', $table->getName());
         $this->assertFalse($table->isAllowPkInsert());
         $this->assertFalse($table->isCrossRef());
         $this->assertFalse($table->isReloadOnInsert());
@@ -35,7 +42,7 @@ class TableTest extends ModelTestCase
         $this->assertFalse($table->isSkipSql());
         $this->assertFalse($table->isReadOnly());
         $this->assertSame(0, $table->getNumLazyLoadColumns());
-        $this->assertNull($table->getChildrenNames());
+        $this->assertEmpty($table->getChildrenNames());
         $this->assertFalse($table->hasForeignKeys());
     }
 
@@ -63,6 +70,44 @@ class TableTest extends ModelTestCase
         ];
     }
 
+    public function testNames()
+    {
+        $table = new Table('Wurst\\Und\\Kaese');
+        $this->assertEquals('Kaese', $table->getName());
+        $this->assertEquals('Wurst\\Und', $table->getNamespace());
+
+
+        $table = new Table();
+        $this->assertEmpty($table->getName());
+
+        $table->setName('Book');
+        $this->assertEquals('Book', $table->getName());
+        $this->assertEquals('book', $table->getTableName());
+
+        $table->setName('BookAuthor');
+        $this->assertEquals('BookAuthor', $table->getName());
+        $this->assertEquals('book_author', $table->getTableName());
+
+        $table->setTableName('book_has_author');
+        $this->assertEquals('BookAuthor', $table->getName());
+        $this->assertEquals('book_has_author', $table->getTableName());
+
+        $table->setScope('bookstore_');
+        $this->assertEquals('bookstore_book_has_author', $table->getScopedTableName());
+
+        $table->setNamespace('Bookstore');
+        $this->assertEquals('Bookstore\\BookAuthor', $table->getFullName());
+
+        $table = new Table();
+        $database = new Database();
+        $database->setScope('bookings_');
+        $database->setNamespace('Bookstore');
+        $table->setDatabase($database);
+
+        $this->assertEquals('Bookstore', $table->getNamespace());
+        $this->assertEquals('bookings_', $table->getScope());
+    }
+
     public function testGetGeneratorConfig()
     {
         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
@@ -79,23 +124,6 @@ class TableTest extends ModelTestCase
         $table->setDatabase($database);
 
         $this->assertSame($config, $table->getGeneratorConfig());
-    }
-
-    public function testGetBuildProperty()
-    {
-        $table = new Table();
-        $this->assertEmpty($table->getBuildProperty('propel.foo.bar'));
-
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->once())
-            ->method('getBuildProperty')
-            ->with('propel.foo.bar')
-            ->will($this->returnValue('baz'))
-        ;
-
-        $table->setDatabase($database);
-        $this->assertSame('baz', $table->getBuildProperty('propel.foo.bar'));
     }
 
     public function testApplyBehaviors()
@@ -157,19 +185,6 @@ class TableTest extends ModelTestCase
         $this->assertFalse($table->hasAdditionalBuilders());
     }
 
-    public function testGetColumnList()
-    {
-        $columns = [
-            $this->getColumnMock('foo'),
-            $this->getColumnMock('bar'),
-            $this->getColumnMock('baz'),
-        ];
-
-        $table = new Table();
-
-        $this->assertSame('foo|bar|baz', $table->getColumnList($columns, '|'));
-    }
-
     public function testGetNameWithoutPlatform()
     {
         $table = new Table('books');
@@ -183,21 +198,31 @@ class TableTest extends ModelTestCase
      */
     public function testGetNameWithPlatform($supportsSchemas, $schemaName, $expectedName)
     {
-        $database = $this->getDatabaseMock($schemaName, [
-            'platform' => $this->getPlatformMock($supportsSchemas),
-        ]);
-
-        $database
+        $platform = $this->getPlatformMock($supportsSchemas);
+        $platform
             ->expects($supportsSchemas ? $this->once() : $this->never())
             ->method('getSchemaDelimiter')
             ->will($this->returnValue('.'))
         ;
 
-        $table = new Table('books');
-        $table->setSchema($schemaName);
-        $table->setDatabase($database);
+        $database = $this->getDatabaseMock($schemaName, [
+            'platform' => $platform,
+        ]);
 
-        $this->assertSame($expectedName, $table->getName());
+        $schema = $this->getSchemaMock($schemaName);
+        $database
+            ->method('getSchema')
+            ->will($this->returnValue($schema))
+        ;
+
+        $table = new Table('books');
+        if ($supportsSchemas) {
+            $table->setSchemaName($schemaName);
+        }
+        $table->setDatabase($database);
+        $table->getDatabase()->setSchema($schema);
+
+        $this->assertSame($expectedName, $table->getFullTableName());
     }
 
     public function provideSchemaNames()
@@ -207,6 +232,15 @@ class TableTest extends ModelTestCase
             [false, null, 'books'],
             [true, 'bookstore', 'bookstore.books'],
         ];
+    }
+
+    public function testGetOverrideSchemaName()
+    {
+        $table = new Table();
+        $table->setDatabase($this->getDatabaseMock('bookstore'));
+        $table->setSchemaName('my_schema');
+
+        $this->assertEquals('my_schema', $table->guessSchemaName());
     }
 
     public function testSetDefaultPhpName()
@@ -233,43 +267,43 @@ class TableTest extends ModelTestCase
         $this->assertFalse($table->hasDescription());
 
         $table->setDescription('Some description');
-        $this->assertTrue($table->hasDescription());
+        $this->assertNotNull($table->getDescription());
         $this->assertSame('Some description', $table->getDescription());
     }
 
-    public function testSetInvalidDefaultStringFormat()
+    public function testSetInvalidStringFormat()
     {
         $this->expectException('Propel\Generator\Exception\InvalidArgumentException');
 
         $table = new Table();
-        $table->setDefaultStringFormat('FOO');
+        $table->setStringFormat('FOO');
     }
 
-    public function testGetDefaultStringFormatFromDatabase()
+    public function testGetStringFormatFromDatabase()
     {
         $database = $this->getDatabaseMock('bookstore');
         $database
             ->expects($this->once())
-            ->method('getDefaultStringFormat')
+            ->method('getStringFormat')
             ->will($this->returnValue('XML'))
         ;
 
         $table = new Table();
         $table->setDatabase($database);
 
-        $this->assertSame('XML', $table->getDefaultStringFormat());
+        $this->assertSame('XML', $table->getStringFormat());
     }
 
     /**
      * @dataProvider provideStringFormats
      *
      */
-    public function testGetDefaultStringFormat($format)
+    public function testGetStringFormat($format)
     {
         $table = new Table();
-        $table->setDefaultStringFormat($format);
+        $table->setStringFormat($format);
 
-        $this->assertSame($format, $table->getDefaultStringFormat());
+        $this->assertSame($format, $table->getStringFormat());
     }
 
     public function provideStringFormats()
@@ -295,31 +329,25 @@ class TableTest extends ModelTestCase
 
     public function testGetChildrenNames()
     {
-        $column = $this->getColumnMock('created_at', ['inheritance' => true]);
+        $column = new Column('created_at');
+        $column->setInheritanceType('single');
 
-        $column
-            ->expects($this->any())
-            ->method('isEnumeratedClasses')
-            ->will($this->returnValue(true))
-        ;
+        $inherit = new Inheritance();
+        $inherit->setKey('one');
+        $column->addInheritance($inherit);
 
-        $children[] = $this->getMockBuilder('Propel\Generator\Model\Inheritance')->getMock();
-        $children[] = $this->getMockBuilder('Propel\Generator\Model\Inheritance')->getMock();
-
-        $column
-            ->expects($this->any())
-            ->method('getChildren')
-            ->will($this->returnValue($children))
-        ;
+        $inherit1 = new Inheritance();
+        $inherit1->setKey('two');
+        $column->addInheritance($inherit1);
 
         $table = new Table('books');
         $table->addColumn($column);
 
         $names = $table->getChildrenNames();
-
         $this->assertCount(2, $names);
-        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class($names[0]));
-        $this->assertSame('Propel\Generator\Model\Inheritance', get_parent_class($names[1]));
+
+        $this->assertSame('Propel\Generator\Model\Inheritance', $names[0]);
+        $this->assertSame('Propel\Generator\Model\Inheritance', $names[1]);
     }
 
     public function testCantGetChildrenNames()
@@ -335,18 +363,17 @@ class TableTest extends ModelTestCase
         $table = new Table('books');
         $table->addColumn($column);
 
-        $this->assertNull($table->getChildrenNames());
+        $this->assertEmpty($table->getChildrenNames());
     }
 
     public function testAddInheritanceColumn()
     {
         $table = new Table('books');
         $column = $this->getColumnMock('created_at', ['inheritance' => true]);
-
-        $this->assertInstanceOf('Propel\Generator\Model\Column', $table->addColumn($column));
+        $table->addColumn($column);
         $this->assertInstanceOf('Propel\Generator\Model\Column', $table->getChildrenColumn());
-        $this->assertTrue($table->hasColumn($column, true));
-        $this->assertTrue($table->hasColumn($column, false));
+        $this->assertTrue($table->hasColumn($column));
+        $this->assertTrue($table->hasColumn($column));
         $this->assertCount(1, $table->getColumns());
         $this->assertSame(1, $table->getNumColumns());
         $this->assertTrue($table->requiresTransactionInPostgres());
@@ -375,17 +402,29 @@ class TableTest extends ModelTestCase
         $this->assertSame($behavior3, $table->getBehavior('Baz'));
     }
 
+    public function testUnregisterBehavior()
+    {
+        $behavior = new Behavior();
+        $behavior->setName('foo');
+        $table = new Table();
+        $table->addBehavior($behavior);
+        $this->assertTrue($table->hasBehavior('foo'));
+        $this->assertSame($table, $behavior->getTable());
+
+        $table->removeBehavior($behavior);
+        $this->assertFalse($table->hasBehavior('foo'));
+        $this->assertNull($behavior->getTable());
+    }
+
     public function testAddColumn()
     {
         $table = new Table('books');
-        $column = $this->getColumnMock('created_at');
-
-        $this->assertInstanceOf('Propel\Generator\Model\Column', $table->addColumn($column));
+        $column = $this->getColumnMock('createdAt');
+        $table->addColumn($column);
         $this->assertNull($table->getChildrenColumn());
         $this->assertTrue($table->requiresTransactionInPostgres());
         $this->assertTrue($table->hasColumn($column));
-        $this->assertTrue($table->hasColumn('CREATED_AT', true));
-        $this->assertSame($column, $table->getColumnByPhpName('CreatedAt'));
+        $this->assertSame($column, $table->getColumn('createdAt'));
         $this->assertCount(1, $table->getColumns());
         $this->assertSame(1, $table->getNumColumns());
     }
@@ -451,30 +490,30 @@ class TableTest extends ModelTestCase
         $this->assertSame(2, $table->getNumLazyLoadColumns());
     }
 
-    public function testHasValueSetColumns()
+    public function testHasEnumColumns()
     {
         $column1 = $this->getColumnMock('created_at');
         $column2 = $this->getColumnMock('updated_at');
 
         $column1
             ->expects($this->any())
-            ->method('isValueSetType')
+            ->method('isEnumType')
             ->will($this->returnValue(false))
         ;
 
         $column2
             ->expects($this->any())
-            ->method('isValueSetType')
+            ->method('isEnumType')
             ->will($this->returnValue(true))
         ;
 
         $table = new Table('books');
 
         $table->addColumn($column1);
-        $this->assertFalse($table->hasValueSetColumns());
+        $this->assertFalse($table->hasEnumColumns());
 
         $table->addColumn($column2);
-        $this->assertTrue($table->hasValueSetColumns());
+        $this->assertTrue($table->hasEnumColumns());
     }
 
     public function testCantGetColumn()
@@ -482,8 +521,16 @@ class TableTest extends ModelTestCase
         $table = new Table('books');
 
         $this->assertFalse($table->hasColumn('FOO', true));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCantGetColumnException()
+    {
+        $table = new Table('books');
+
         $this->assertNull($table->getColumn('FOO'));
-        $this->assertNull($table->getColumnByPhpName('Foo'));
     }
 
     public function testSetAbstract()
@@ -507,7 +554,10 @@ class TableTest extends ModelTestCase
     {
         $table = new Table();
         $index = new Index();
-        $index->addColumn(['name' => 'bla']);
+        $column = new Column();
+        $column->setName('bla');
+        $column->setTable($table);
+        $index->addColumn($column);
         $table->addIndex($index);
 
         $this->assertCount(1, $table->getIndices());
@@ -524,12 +574,29 @@ class TableTest extends ModelTestCase
         $this->assertCount(1, $table->getIndices());
     }
 
-    public function testAddArrayIndex()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddAlreadyCreatedIndex()
+    {
+        $index = $this->getIndexMock('idx_fake_table');
+        $table = new Table();
+        $table->addIndex($index);
+        $this->assertCount(1, $table->getIndices());
+
+        $table->addIndex($index);
+    }
+
+    public function testCreateIndex()
     {
         $table = new Table();
-        $table->addIndex(['name' => 'author_idx', 'columns' => [['name' => 'bla']]]);
+        $column1 = $this->getColumnMock('id_mock');
+        $column2 = $this->getColumnMock('foo_mock');
+        $table->addColumns([$column1, $column2]);
+        $table->createIndex('idx_foo_bar', [$column1, $column2]);
 
-        $this->assertCount(1, $table->getIndices());
+        $this->assertTrue($table->hasIndex('idx_foo_bar'));
+        $this->assertTrue($table->isIndex([$column1, $column2]));
     }
 
     public function testIsIndex()
@@ -541,13 +608,25 @@ class TableTest extends ModelTestCase
         $table->addColumn($column2);
 
         $index = new Index('test_index');
-        $index->setColumns([$column1, $column2]);
+        $index->addColumns([$column1, $column2]);
         $table->addIndex($index);
 
         $this->assertTrue($table->isIndex(['category_id', 'type']));
         $this->assertTrue($table->isIndex(['type', 'category_id']));
         $this->assertFalse($table->isIndex(['category_id', 'type2']));
         $this->assertFalse($table->isIndex(['asd']));
+    }
+
+    public function testRemoveIndex()
+    {
+        $table = new Table();
+        $index = $this->getIndexMock('idx_fake', ['table' => $table]);
+        $table->addIndex($index);
+        $this->assertTrue($table->hasIndex('idx_fake'));
+
+        $table->removeIndex('idx_fake');
+
+        $this->assertFalse($table->hasIndex('idx_fake'));
     }
 
     public function testAddUniqueIndex()
@@ -558,12 +637,67 @@ class TableTest extends ModelTestCase
         $this->assertCount(1, $table->getUnices());
     }
 
-    public function testAddArrayUnique()
+    public function testRemoveUniqueIndex()
     {
         $table = new Table();
-        $table->addUnique(['name' => 'author_unq']);
-
+        $unique = $this->getUniqueIndexMock('author_unq', ['table' => $table]);
+        $table->addUnique($unique);
         $this->assertCount(1, $table->getUnices());
+
+        $table->removeUnique('author_unq');
+
+        $this->assertCount(0, $table->getUnices());
+    }
+
+    public function testIsUnique()
+    {
+        $table = new Table();
+        $column1 = $this->getColumnMock('category_id');
+        $column2 = $this->getColumnMock('type');
+        $table->addColumn($column1);
+        $table->addColumn($column2);
+
+        $unique = new Unique('test_unique');
+        $unique->addColumns([$column1, $column2]);
+        $table->addUnique($unique);
+
+        $this->assertTrue($table->isUnique(['category_id', 'type']));
+        $this->assertTrue($table->isUnique(['type', 'category_id']));
+        $this->assertFalse($table->isUnique(['category_id', 'type2']));
+        $this->assertTrue($table->isUnique([$column1, $column2]));
+        $this->assertTrue($table->isUnique([$column2, $column1]));
+    }
+
+    public function testIsUniqueWhenUniqueColumn()
+    {
+        $table = new Table();
+        $column = $this->getColumnMock('unique_id', ['table' => $table, 'unique' => true]);
+        $table->addColumn($column);
+        $this->assertTrue($table->isUnique([$column]));
+    }
+
+    public function testIsUniquePrimaryKey()
+    {
+        $table = new Table();
+        $column = $this->getColumnMock('id', ['primary' => true, 'table' => $table]);
+
+        $table->addColumn($column);
+        $this->assertTrue($table->isUnique(['id']));
+        $this->assertTrue($table->isUnique([$column]));
+    }
+
+    public function testisUniqueWithCompositePrimaryKey()
+    {
+        $table = new Table();
+        $column1 = $this->getColumnMock('author_id', ['primary' => true, 'table' => $table]);
+        $column2 = $this->getColumnMock('book_id', ['primary' => true, 'table' => $table]);
+        $column3 = $this->getColumnMock('title', ['table' => $table]);
+        $table->addColumns([$column1, $column2, $column3]);
+
+        $this->assertTrue($table->isUnique(['author_id', 'book_id']));
+        $this->assertTrue($table->isUnique([$column1, $column2]));
+        $this->assertFalse($table->isUnique(['author_id', 'title']));
+        $this->assertFalse($table->isUnique([$column2, $column3]));
     }
 
     public function testGetCompositePrimaryKey()
@@ -666,14 +800,6 @@ class TableTest extends ModelTestCase
         $this->assertCount(1, $table->getIdMethodParameters());
     }
 
-    public function testAddArrayIdMethodParameter()
-    {
-        $table = new Table();
-        $table->addIdMethodParameter(['name' => 'foo', 'value' => 'bar']);
-
-        $this->assertCount(1, $table->getIdMethodParameters());
-    }
-
     public function testAddReferrerForeignKey()
     {
         $table = new Table('books');
@@ -689,38 +815,32 @@ class TableTest extends ModelTestCase
         ]);
 
         $table = new Table('books');
-
-        $this->assertInstanceOf('Propel\Generator\Model\ForeignKey', $table->addForeignKey($fk));
+        $table->addForeignKey($fk);
         $this->assertCount(1, $table->getForeignKeys());
         $this->assertTrue($table->hasForeignKeys());
-        $this->assertContains('authors', $table->getForeignTableNames());
+        $this->assertTrue($table->getForeignTableNames()->search(function ($elem) {
+            return 'authors' === $elem;
+        }));
     }
 
-    public function testAddArrayForeignKey()
+    public function testAddForeignKeys()
     {
-        $table = new Table('books');
-        $table->setDatabase($this->getDatabaseMock('bookstore'));
-
-        $fk = $table->addForeignKey([
-            'name'         => 'fk_author_id',
-            'phpName'      => 'Author',
-            'refPhpName'   => 'Books',
-            'onDelete'     => 'CASCADE',
-            'foreignTable' => 'authors',
-        ]);
-
-        $this->assertInstanceOf('Propel\Generator\Model\ForeignKey', $fk);
-        $this->assertCount(1, $table->getForeignKeys());
+        $authorRel = $this->getForeignKeyMock('author_id', ['target' => 'Authors']);
+        $publisherRel = $this->getForeignKeyMock('publisher_id', ['target' => 'Publishers']);
+        $fks = [$authorRel, $publisherRel];
+        $table = new Table('Books');
+        $table->addForeignKeys($fks);
+        $this->assertCount(2, $table->getForeignKeys());
         $this->assertTrue($table->hasForeignKeys());
-
-        $this->assertContains('authors', $table->getForeignTableNames());
+        $this->assertSame($authorRel, $table->getForeignKey('author_id'));
+        $this->assertSame($publisherRel, $table->getForeignKey('publisher_id'));
     }
 
     public function testGetForeignKeysReferencingTable()
     {
-        $fk1 = $this->getForeignKeyMock('fk1', ['foreign_table_name' => 'authors']);
-        $fk2 = $this->getForeignKeyMock('fk2', ['foreign_table_name' => 'categories']);
-        $fk3 = $this->getForeignKeyMock('fk3', ['foreign_table_name' => 'authors']);
+        $fk1 = $this->getForeignKeyMock('fk1', ['target' => 'authors']);
+        $fk2 = $this->getForeignKeyMock('fk2', ['target' => 'categories']);
+        $fk3 = $this->getForeignKeyMock('fk1', ['target' => 'authors']);
 
         $table = new Table();
         $table->addForeignKey($fk1);
@@ -841,6 +961,145 @@ class TableTest extends ModelTestCase
         $this->assertTrue($table->isForReferenceOnly());
     }
 
+    public function testSetDatabaseWhenTableBelongsToDifferentDatabase()
+    {
+        $db1 = new Database('bookstore1');
+        $db2 =new Database('bookstore2');
+        $table = new Table('Book');
+        $db1->addTable($table);
+        $table->setDatabase($db2);
+
+        $this->assertSame($db2, $table->getDatabase());
+    }
+
+    public function testGetAutoincrementColumnNames()
+    {
+        $table= new Table();
+        $column1 = $this->getColumnMock('author_id', ['table' => $table, 'auto_increment' => true]);
+        $column2 = $this->getColumnMock('book_id', ['table' => $table, 'auto_increment' => true]);
+        $table->addColumns([$column1, $column2]);
+
+        $this->assertEquals(['author_id', 'book_id'], $table->getAutoIncrementColumnNames());
+    }
+
+    public function testHasAutoincrement()
+    {
+        $table1 = new Table();
+        $column1 = $this->getColumnMock('id', ['auto_increment' => true, 'table' => $table1]);
+        $table1->addColumn($column1);
+
+        $this->assertTrue($table1->hasAutoIncrement());
+
+        $table2 = new Table();
+        $column2 = $this->getColumnMock('title', ['table' => $table1]);
+        $table2->addColumn($column2);
+
+        $this->assertFalse($table2->hasAutoIncrement());
+    }
+
+    public function testQuoteIdentifier()
+    {
+        $database = $this->getDatabaseMock('test_db', ['platform' => new SqlitePlatform()]);
+        $table = new Table();
+        $table->setDatabase($database);
+        $table->setIdentifierQuoting(true);
+        $this->assertTrue($table->isIdentifierQuotingEnabled());
+        $this->assertEquals('[text]', $table->quoteIdentifier('text'));
+    }
+
+    public function testNoQuoteIdentifier()
+    {
+        $database = $this->getDatabaseMock('test_db', ['platform' => new SqlitePlatform()]);
+        $table = new Table();
+        $table->setDatabase($database);
+        $table->setIdentifierQuoting(false);
+        $this->assertFalse($table->isIdentifierQuotingEnabled());
+        $this->assertEquals('text', $table->quoteIdentifier('text'));
+    }
+
+    public function testGetIdentifierQuoting()
+    {
+        $table = new Table();
+        $this->assertNull($table->getIdentifierQuoting());
+        $table->setIdentifierQuoting(true);
+        $this->assertTrue($table->getIdentifierQuoting());
+    }
+
+    /**
+     * @expectedException \Propel\Runtime\Exception\RuntimeException
+     */
+    public function testQuoteIdentifierNoPlatform()
+    {
+        $table = new Table();
+        $database = $this->getDatabaseMock('test_db');
+        $table->setDatabase($database);
+        $table->quoteIdentifier('text');
+    }
+
+    public function testClone()
+    {
+        $table = new Table('Book');
+        $table->addColumn($this->getColumnMock('id', ['table' => $table, 'primary' => true, 'auto_increment' => true]));
+        $table->addColumn($this->getColumnMock('title', ['table' => $table]));
+        $table->addColumn($this->getColumnMock('children', ['table' => $table, 'inheritance' => true]));
+        $table->addForeignKey($this->getForeignKeyMock('Rel1', ['table' => $table]));
+
+        $clone = clone $table;
+
+        $this->assertEquals($table, $clone, 'Tables are equals');
+        $this->assertNotSame($table, $clone, 'Tables are different objects');
+        $this->assertEquals($table->getColumns(), $clone->getColumns(), 'Column sets are equals');
+        $this->assertNotSame($table->getColumns(), $clone->getColumns(), 'Column sets are not the same object');
+
+        foreach ($table->getColumns() as $column) {
+            $cloneColumn = $clone->getColumnByName($column->getName());
+            $this->assertNotNull($cloneColumn, 'Cloned set contains the given column');
+            $this->assertNotSame($column, $cloneColumn, 'Columns are different objects');
+        }
+
+        $this->assertEquals($table->getChildrenColumn(), $clone->getChildrenColumn());
+        $this->assertNotSame($table->getChildrenColumn(), $clone->getChildrenColumn());
+        $this->assertEquals($table->getForeignKey('Rel1'), $clone->getForeignKey('Rel1'));
+        $this->assertNotSame($table->getForeignKey('Rel1'), $clone->getForeignKey('Rel1'));
+    }
+
+    public function testGetCrossForeignKey()
+    {
+        $user = new Table('User');
+        $user->addColumn($this->getColumnMock('id', ['table' => $user, 'primary' => true, 'required' => true]));
+        $user->addColumn($this->getColumnMock('name', ['table' => $user]));
+
+        $role = new Table('Role');
+        $role->addColumn($this->getColumnMock('id', ['table' => $role, 'primary' => true, 'required' => true]));
+        $role->addColumn($this->getColumnMock('role', ['table' => $role]));
+
+        $userXrole = new Table('UserXRole');
+        $userXrole->addColumn($this->getColumnMock('user_id', ['table' => $userXrole, 'primary' => true, 'required' => true]));
+        $userXrole->addColumn($this->getColumnMock('role_id', ['table' => $userXrole, 'primary' => true, 'required' => true]));
+        $userXrole->setCrossRef(true);
+
+        $rel1 = new ForeignKey();
+        $rel1->setTable($userXrole);
+        $rel1->setForeignTable($user);
+        $rel1->addReference('user_id', 'id');
+        $userXrole->addForeignKey($rel1);
+        $user->addReferrer($rel1);
+
+        $rel2 = new ForeignKey();
+        $rel2->setTable($userXrole);
+        $rel2->setForeignTable($role);
+        $rel2->addReference('role_id', 'id');
+        $userXrole->addForeignKey($rel2);
+        $role->addReferrer($rel2);
+
+        $crossRels = $user->getCrossForeignKeys();
+
+        $this->assertCount(1, $crossRels);
+        $this->assertInstanceOf(CrossForeignKey::class, $crossRels[0]);
+        $this->assertTrue($user->hasCrossForeignKeys());
+        $this->assertTrue($role->hasCrossForeignKeys());
+    }
+
     /**
      * Returns a dummy Column object.
      *
@@ -855,11 +1114,13 @@ class TableTest extends ModelTestCase
             'auto_increment' => false,
             'inheritance' => false,
             'lazy' => false,
-            'phpName' => str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $name)))),
+            'phpName' => NamingTool::toStudlyCase($name),
             'pg_transaction' => true,
+            'unique' => false,
+            'required' => false
         ];
 
-        // Overwrite default options with custom options
+        //Overwrite default options with custom options
         $options = array_merge($defaults, $options);
 
         $column = parent::getColumnMock($name, $options);
@@ -908,6 +1169,16 @@ class TableTest extends ModelTestCase
             ->expects($this->any())
             ->method('requiresTransactionInPostgres')
             ->will($this->returnValue($options['pg_transaction']))
+        ;
+        $column
+            ->expects($this->any())
+            ->method('isUnique')
+            ->will($this->returnValue($options['unique']))
+        ;
+        $column
+            ->expects($this->any())
+            ->method('isNotNull')
+            ->will($this->returnValue($options['required']))
         ;
 
         return $column;

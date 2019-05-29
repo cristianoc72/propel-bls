@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -9,6 +9,9 @@
  */
 
 namespace Propel\Generator\Model;
+
+use Propel\Common\Collection\Set;
+use Propel\Generator\Model\Parts\TablePart;
 
 /**
  * A class for information about table cross foreign keys which are used in many-to-many relations.
@@ -43,13 +46,7 @@ namespace Propel\Generator\Model;
  */
 class CrossForeignKeys
 {
-
-    /**
-     * The middle-table.
-     *
-     * @var Table
-     */
-    protected $table;
+    use TablePart;
 
     /**
      * The target table (which has crossRef=true).
@@ -63,7 +60,7 @@ class CrossForeignKeys
      *
      * @var ForeignKey[]
      */
-    protected $crossForeignKeys = [];
+    protected $crossForeignKeys;
 
     /**
      * The incoming foreign key from the middle-table to this table.
@@ -85,7 +82,7 @@ class CrossForeignKeys
     /**
      * @param ForeignKey $foreignKey
      */
-    public function setIncomingForeignKey($foreignKey)
+    public function setIncomingForeignKey(ForeignKey $foreignKey): void
     {
         $this->setMiddleTable($foreignKey ? $foreignKey->getTable() : null);
         $this->incomingForeignKey = $foreignKey;
@@ -96,7 +93,7 @@ class CrossForeignKeys
      *
      * @return ForeignKey
      */
-    public function getIncomingForeignKey()
+    public function getIncomingForeignKey(): ForeignKey
     {
         return $this->incomingForeignKey;
     }
@@ -130,7 +127,7 @@ class CrossForeignKeys
      * @param  ForeignKey $fk
      * @return bool
      */
-    public function isAtLeastOneLocalPrimaryKeyNotCovered(ForeignKey $fk)
+    public function isAtLeastOneLocalPrimaryKeyNotCovered(ForeignKey $fk): bool
     {
         $primaryKeys = $fk->getLocalPrimaryKeys();
         foreach ($primaryKeys as $primaryKey) {
@@ -155,7 +152,7 @@ class CrossForeignKeys
      *
      * @return Column[]
      */
-    public function getUnclassifiedPrimaryKeys()
+    public function getUnclassifiedPrimaryKeys(): array
     {
         $pks = [];
         foreach ($this->getMiddleTable()->getPrimaryKey() as $pk) {
@@ -183,7 +180,7 @@ class CrossForeignKeys
     /**
      * @param ForeignKey $foreignKey
      */
-    public function addCrossForeignKey(ForeignKey $foreignKey)
+    public function addCrossForeignKey(ForeignKey $foreignKey): void
     {
         $this->crossForeignKeys[] = $foreignKey;
     }
@@ -191,7 +188,7 @@ class CrossForeignKeys
     /**
      * @return bool
      */
-    public function hasCrossForeignKeys()
+    public function hasCrossForeignKeys(): bool
     {
         return !!$this->crossForeignKeys;
     }
@@ -199,7 +196,7 @@ class CrossForeignKeys
     /**
      * @param ForeignKey[] $foreignKeys
      */
-    public function setCrossForeignKeys(array $foreignKeys)
+    public function setCrossForeignKeys(array $foreignKeys): void
     {
         $this->crossForeignKeys = $foreignKeys;
     }
@@ -209,7 +206,7 @@ class CrossForeignKeys
      *
      * @return ForeignKey[]
      */
-    public function getCrossForeignKeys()
+    public function getCrossForeignKeys(): array
     {
         return $this->crossForeignKeys;
     }
@@ -217,7 +214,7 @@ class CrossForeignKeys
     /**
      * @param Table $foreignTable
      */
-    public function setMiddleTable(Table $foreignTable)
+    public function setMiddleTable(Table $foreignTable): void
     {
         $this->middleTable = $foreignTable;
     }
@@ -227,26 +224,8 @@ class CrossForeignKeys
      *
      * @return Table
      */
-    public function getMiddleTable()
+    public function getMiddleTable(): Table
     {
         return $this->middleTable;
-    }
-
-    /**
-     * @param Table $table
-     */
-    public function setTable(Table $table)
-    {
-        $this->table = $table;
-    }
-
-    /**
-     * The source table.
-     *
-     * @return Table
-     */
-    public function getTable()
-    {
-        return $this->table;
     }
 }

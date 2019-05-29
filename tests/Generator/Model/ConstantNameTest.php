@@ -8,7 +8,7 @@
  * @license MIT License
  */
 
-namespace Propel\Tests\Generator\Model;
+namespace Propel\Tests\Generator\Model_old;
 
 use Propel\Tests\TestCase;
 use Propel\Generator\Util\QuickBuilder;

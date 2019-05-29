@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
@@ -29,30 +29,12 @@ class InheritanceTest extends TestCase
         ;
 
         $inheritance = new Inheritance();
-        $inheritance->setPackage('Foo');
         $inheritance->setAncestor('BaseObject');
         $inheritance->setKey('baz');
         $inheritance->setClassName('Foo\Bar');
         $inheritance->setColumn($column);
 
         $this->assertInstanceOf('Propel\Generator\Model\Column', $inheritance->getColumn());
-        $this->assertSame('Foo', $inheritance->getPackage());
-        $this->assertSame('BaseObject', $inheritance->getAncestor());
-        $this->assertSame('baz', $inheritance->getKey());
-        $this->assertSame('Foo\Bar', $inheritance->getClassName());
-    }
-
-    public function testSetupObject()
-    {
-        $inheritance = new Inheritance();
-        $inheritance->loadMapping([
-            'key' => 'baz',
-            'extends' => 'BaseObject',
-            'class' => 'Foo\Bar',
-            'package' => 'Foo',
-        ]);
-
-        $this->assertSame('Foo', $inheritance->getPackage());
         $this->assertSame('BaseObject', $inheritance->getAncestor());
         $this->assertSame('baz', $inheritance->getKey());
         $this->assertSame('Foo\Bar', $inheritance->getClassName());

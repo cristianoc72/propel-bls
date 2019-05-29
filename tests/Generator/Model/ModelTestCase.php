@@ -1,17 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
 
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Generator\Model\Behavior;
+use Propel\Generator\Model\Database;
+use Propel\Generator\Model\Domain;
+use Propel\Generator\Model\Table;
+use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Index;
+use Propel\Generator\Model\ForeignKey;
+use Propel\Generator\Model\Schema;
+use Propel\Generator\Model\Unique;
+use Propel\Generator\Platform\PlatformInterface;
+use Propel\Common\Collection\UniqueList;
 use Propel\Tests\TestCase;
+use Propel\Tests\VfsTrait;
 
 /**
  * This class provides methods for mocking Table, Database and Platform objects.
@@ -20,14 +31,17 @@ use Propel\Tests\TestCase;
  */
 abstract class ModelTestCase extends TestCase
 {
+    use VfsTrait;
+
     /**
      * Returns a dummy Behavior object.
      *
      * @param  string   $name    The behavior name
      * @param  array    $options An array of options
+     *
      * @return Behavior
      */
-    protected function getBehaviorMock($name, array $options = [])
+    protected function getBehaviorMock($name, array $options = []): Behavior
     {
         $defaults = [
             'additional_builders' => [],
@@ -97,7 +111,7 @@ abstract class ModelTestCase extends TestCase
     protected function getForeignKeyMock($name = null, array $options = [])
     {
         $defaults = [
-            'foreign_table_name' => '',
+            'target' => '',
             'table' => null,
             'other_fks' => [],
             'local_columns' => [],
@@ -126,13 +140,13 @@ abstract class ModelTestCase extends TestCase
         $fk
             ->expects($this->any())
             ->method('getForeignTableName')
-            ->will($this->returnValue($options['foreign_table_name']))
+            ->will($this->returnValue($options['target']))
         ;
 
         $fk
             ->expects($this->any())
             ->method('getLocalColumns')
-            ->will($this->returnValue($options['local_columns']))
+            ->will($this->returnValue(new UniqueList($options['local_columns'])))
         ;
 
         $fk
@@ -154,7 +168,7 @@ abstract class ModelTestCase extends TestCase
     protected function getIndexMock($name = null, array $options = [])
     {
         $defaults = [
-            'foreign_table_name' => '',
+            'table' => null
         ];
 
         $options = array_merge($defaults, $options);
@@ -165,13 +179,18 @@ abstract class ModelTestCase extends TestCase
             ->getMock()
         ;
         $index
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('setTable')
         ;
         $index
             ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name))
+        ;
+        $index
+            ->expects($this->any())
+            ->method('getTable')
+            ->will($this->returnValue($options['table']))
         ;
 
         return $index;
@@ -186,19 +205,30 @@ abstract class ModelTestCase extends TestCase
      */
     protected function getUniqueIndexMock($name = null, array $options = [])
     {
+        $defaults = [
+            'table' => null
+        ];
+
+        $options = array_merge($defaults, $options);
+
         $unique = $this
             ->getMockBuilder('Propel\Generator\Model\Unique')
             ->disableOriginalConstructor()
             ->getMock()
         ;
         $unique
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('setTable')
         ;
         $unique
-            ->expects($this->once())
+            ->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name))
+        ;
+        $unique
+            ->expects($this->any())
+            ->method('getTable')
+            ->will($this->returnValue($options['table']))
         ;
 
         return $unique;
@@ -255,7 +285,7 @@ abstract class ModelTestCase extends TestCase
         $options = array_merge($defaults, $options);
 
         $platform = $this
-            ->getMockBuilder('Propel\Generator\Platform\DefaultPlatform')
+            ->getMockBuilder('Propel\Generator\Platform\SqlDefaultPlatform')
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -319,21 +349,20 @@ abstract class ModelTestCase extends TestCase
     protected function getTableMock($name, array $options = [])
     {
         $defaults = [
-            'php_name'    => str_replace(' ', '', ucwords(str_replace('_', ' ', $name))),
-            'namespace'   => null,
-            'database'    => null,
-            'platform'    => null,
-            'common_name' => $name,
-            'behaviors'   => [],
-            'indices'     => [],
-            'unices'      => [],
+            'name' => $name,
+            'tableName' => $name,
+            'namespace' => null,
+            'database' => null,
+            'platform' => null,
+            'behaviors' => [],
+            'indices' => [],
+            'unices' => [],
         ];
 
         $options = array_merge($defaults, $options);
 
         $table = $this
             ->getMockBuilder('Propel\Generator\Model\Table')
-            ->disableOriginalConstructor()
             ->getMock()
         ;
 
@@ -345,14 +374,14 @@ abstract class ModelTestCase extends TestCase
 
         $table
             ->expects($this->any())
-            ->method('getCommonName')
-            ->will($this->returnValue($options['common_name']))
+            ->method('getFullName')
+            ->will($this->returnValue($options['namespace'] . '\\' . $name))
         ;
 
         $table
             ->expects($this->any())
-            ->method('getPhpName')
-            ->will($this->returnValue($options['php_name']))
+            ->method('getTableName')
+            ->will($this->returnValue($options['tableName']))
         ;
 
         $table
@@ -438,7 +467,8 @@ abstract class ModelTestCase extends TestCase
     protected function getColumnMock($name, array $options = [])
     {
         $defaults = [
-            'size' => null,
+            'size'       => null,
+            'table'     => null
         ];
 
         $options = array_merge($defaults, $options);
@@ -459,6 +489,11 @@ abstract class ModelTestCase extends TestCase
             ->expects($this->any())
             ->method('getSize')
             ->will($this->returnValue($options['size']))
+        ;
+        $column
+            ->expects($this->any())
+            ->method('getTable')
+            ->will($this->returnValue($options['table']))
         ;
 
         return $column;

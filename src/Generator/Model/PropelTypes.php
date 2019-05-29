@@ -13,9 +13,6 @@ namespace Propel\Generator\Model;
 /**
  * A class that maps PropelTypes to PHP native types and PDO types.
  *
- * Support for Creole types have been removed as this DBAL library is no longer
- * supported by the Propel project.
- *
  * @author Hans Lellelid <hans@xmpl.org> (Propel)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  */
@@ -193,8 +190,6 @@ class PropelTypes
         self::DATE          => \PDO::PARAM_STR,
         self::TIME          => \PDO::PARAM_STR,
         self::TIMESTAMP     => \PDO::PARAM_STR,
-        self::BU_DATE       => \PDO::PARAM_STR,
-        self::BU_TIMESTAMP  => \PDO::PARAM_STR,
         self::BOOLEAN       => \PDO::PARAM_BOOL,
         self::BOOLEAN_EMU   => \PDO::PARAM_INT,
         self::OBJECT        => \PDO::PARAM_LOB,
@@ -226,7 +221,7 @@ class PropelTypes
      * @param  string $mappingType
      * @return string
      */
-    public static function getPhpNative($mappingType)
+    public static function getPhpNative(string $mappingType): string
     {
         return self::$mappingToPHPNativeMap[$mappingType];
     }
@@ -234,9 +229,10 @@ class PropelTypes
     /**
      * Returns the PDO type (PDO::PARAM_* constant) value.
      *
+     * @param string $type
      * @return integer
      */
-    public static function getPDOType($type)
+    public static function getPDOType(string $type): int
     {
         return self::$mappingTypeToPDOTypeMap[$type];
     }
@@ -244,9 +240,10 @@ class PropelTypes
     /**
      * Returns the PDO type ('PDO::PARAM_*' constant) name.
      *
+     * @param string $type
      * @return string
      */
-    public static function getPdoTypeString($type)
+    public static function getPdoTypeString(string $type): string
     {
         return self::$pdoTypeNames[self::$mappingTypeToPDOTypeMap[$type]];
     }
@@ -256,7 +253,7 @@ class PropelTypes
      *
      * @return array
      */
-    public static function getPropelTypes()
+    public static function getPropelTypes(): array
     {
         return self::$mappingTypes;
     }
@@ -267,7 +264,7 @@ class PropelTypes
      * @param  string  $type
      * @return boolean
      */
-    public static function isTemporalType($type)
+    public static function isTemporalType(string $type): bool
     {
         return in_array($type, [
             self::DATE,
@@ -284,7 +281,7 @@ class PropelTypes
      * @param  string  $mappingType
      * @return boolean
      */
-    public static function isTextType($mappingType)
+    public static function isTextType(string $mappingType): bool
     {
         return in_array($mappingType, [
             self::CHAR,
@@ -306,7 +303,7 @@ class PropelTypes
      * @param  string  $mappingType
      * @return boolean
      */
-    public static function isNumericType($mappingType)
+    public static function isNumericType(string $mappingType): bool
     {
         return in_array($mappingType, [
             self::SMALLINT,
@@ -327,7 +324,7 @@ class PropelTypes
      * @param  string  $mappingType
      * @return boolean
      */
-    public static function isBooleanType($mappingType)
+    public static function isBooleanType(string $mappingType): bool
     {
         return in_array($mappingType, [ self::BOOLEAN, self::BOOLEAN_EMU ]);
     }
@@ -338,7 +335,7 @@ class PropelTypes
      * @param  string  $mappingType
      * @return boolean
      */
-    public static function isLobType($mappingType)
+    public static function isLobType(string $mappingType): bool
     {
         return in_array($mappingType, [ self::VARBINARY, self::LONGVARBINARY, self::BLOB, self::OBJECT, self::GEOMETRY ]);
     }
@@ -349,7 +346,7 @@ class PropelTypes
      * @param  string  $phpType
      * @return boolean
      */
-    public static function isPhpPrimitiveType($phpType)
+    public static function isPhpPrimitiveType(string $phpType): bool
     {
         return in_array($phpType, [ 'boolean', 'int', 'double', 'float', 'string' ]);
     }
@@ -360,7 +357,7 @@ class PropelTypes
      * @param  string  $phpType
      * @return boolean
      */
-    public static function isPhpPrimitiveNumericType($phpType)
+    public static function isPhpPrimitiveNumericType(string $phpType): bool
     {
         return in_array($phpType, [ 'boolean', 'int', 'double', 'float' ]);
     }
@@ -371,7 +368,7 @@ class PropelTypes
      * @param  string  $phpType
      * @return boolean
      */
-    public static function isPhpObjectType($phpType)
+    public static function isPhpObjectType(string $phpType): bool
     {
         return !self::isPhpPrimitiveType($phpType) && !in_array($phpType, [ 'resource', 'array' ]);
     }
@@ -382,8 +379,29 @@ class PropelTypes
      * @param  string  $phpType The PHP type to check
      * @return boolean
      */
-    public static function isPhpArrayType($phpType)
+    public static function isPhpArrayType(string $phpType): bool
     {
         return strtoupper($phpType) === self::PHP_ARRAY;
+    }
+
+    /**
+     * Converts a value (Boolean, string or numeric) into a Boolean value.
+     *
+     * This is to support the default value when used with a boolean column.
+     *
+     * @param  mixed   $value
+     * @return boolean
+     */
+    public static function booleanValue($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (Boolean) $value;
+        }
+
+        return in_array(strtolower($value), [ 'true', 't', 'y', 'yes' ], true);
     }
 }

@@ -1,14 +1,18 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
+
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Common\Types\ColumnTypeInterface;
+use Propel\Common\Types\SQL\VarcharType;
+use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\PropelTypes;
 
@@ -22,169 +26,26 @@ class ColumnTest extends ModelTestCase
     public function testCreateNewColumn()
     {
         $column = new Column('title');
+        $table = $this->getTableMock('FakeTable');
+        $column->setTable($table);
 
         $this->assertSame('title', $column->getName());
         $this->assertEmpty($column->getAutoIncrementString());
-        $this->assertSame('COL_TITLE', $column->getConstantName());
+        $this->assertSame('COLUMN_TITLE', $column->getConstantName());
         $this->assertSame('public', $column->getMutatorVisibility());
         $this->assertSame('public', $column->getAccessorVisibility());
-        $this->assertFalse($column->getSize());
-        $this->assertFalse($column->hasPlatform());
-        $this->assertFalse($column->hasReferrers());
+        $this->assertEquals(0, $column->getSize());
+        $this->assertTrue($column->getReferrers()->isEmpty());
         $this->assertFalse($column->isAutoIncrement());
         $this->assertFalse($column->isEnumeratedClasses());
         $this->assertFalse($column->isLazyLoad());
         $this->assertFalse($column->isNamePlural());
-        $this->assertFalse($column->isNestedSetLeftKey());
-        $this->assertFalse($column->isNestedSetRightKey());
         $this->assertFalse($column->isNotNull());
-        $this->assertFalse($column->isNodeKey());
         $this->assertFalse($column->isPrimaryKey());
         $this->assertFalse($column->isPrimaryString());
-        $this->assertFalse($column->isTreeScopeKey());
         $this->assertFalse($column->isUnique());
         $this->assertFalse($column->requiresTransactionInPostgres());
-    }
-
-    public function testSetupObjectWithoutPlatformTypeAndDomain()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-
-        $table = $this->getTableMock('books', ['database' => $database]);
-
-        $column = new Column();
-        $column->setTable($table);
-        $column->loadMapping(['name' => 'title']);
-
-        $this->assertSame('title', $column->getName());
-        $this->assertSame('VARCHAR', $column->getDomain()->getType());
-    }
-
-    public function testSetupObjectWithPlatformOnly()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $platform = $this->getPlatformMock();
-        $platform
-            ->expects($this->once())
-            ->method('getDomainForType')
-            ->with($this->equalTo('VARCHAR'))
-            ->will($this->returnValue($this->getDomainMock('VARCHAR')))
-        ;
-        $platform
-            ->expects($this->any())
-            ->method('supportsVarcharWithoutSize')
-            ->will($this->returnValue(false))
-        ;
-
-        $table = $this->getTableMock('books', [
-            'database' => $database,
-            'platform' => $platform,
-        ]);
-
-        $domain = $this->getDomainMock('VARCHAR');
-        $domain
-            ->expects($this->any())
-            ->method('getType')
-            ->will($this->returnValue('VARCHAR'))
-        ;
-
-        $column = new Column();
-        $column->setTable($table);
-        $column->setDomain($domain);
-        $column->loadMapping(['name' => 'title']);
-
-        $this->assertSame('title', $column->getName());
-    }
-
-    public function testSetupObjectWithPlatformAndType()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $platform = $this->getPlatformMock();
-        $platform
-            ->expects($this->once())
-            ->method('getDomainForType')
-            ->with($this->equalTo('DATE'))
-            ->will($this->returnValue($this->getDomainMock('DATE')))
-        ;
-
-        $table = $this->getTableMock('books', [
-            'database' => $database,
-            'platform' => $platform,
-        ]);
-
-        $column = new Column();
-        $column->setTable($table);
-        $column->setDomain($this->getDomainMock('VARCHAR'));
-        $column->loadMapping([
-            'type'        => 'date',
-            'name'        => 'created_at',
-            'defaultExpr' => 'NOW()',
-        ]);
-
-        $this->assertSame('created_at', $column->getName());
-    }
-
-    public function testSetupObjectWithDomain()
-    {
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->once())
-            ->method('getDomain')
-            ->with($this->equalTo('BOOLEAN'))
-            ->will($this->returnValue($this->getDomainMock('INTEGER')))
-        ;
-
-        $table = $this->getTableMock('books', ['database' => $database]);
-
-        $column = new Column();
-        $column->setTable($table);
-        $column->setDomain($this->getDomainMock('BOOLEAN'));
-        $column->loadMapping([
-            'domain'             => 'BOOLEAN',
-            'name'               => 'is_published',
-            'phpName'            => 'IsPublished',
-            'phpType'            => 'boolean',
-            'tableMapName'       => 'IS_PUBLISHED',
-            'prefix'             => 'col_',
-            'accessorVisibility' => 'public',
-            'mutatorVisibility'  => 'public',
-            'primaryString'      => 'false',
-            'primaryKey'         => 'false',
-            'nodeKey'            => 'false',
-            'nestedSetLeftKey'   => 'false',
-            'nestedSetRightKey'  => 'false',
-            'treeScopeKey'       => 'false',
-            'required'           => 'false',
-            'autoIncrement'      => 'false',
-            'lazyLoad'           => 'true',
-            'sqlType'            => 'TINYINT',
-            'size'               => 1,
-            'defaultValue'       => 'true',
-            'valueSet'           => 'FOO, BAR, BAZ',
-        ]);
-
-        $this->assertSame('is_published', $column->getName());
-        $this->assertSame('IsPublished', $column->getPhpName());
-        $this->assertSame('boolean', $column->getPhpType());
-        $this->assertSame('IS_PUBLISHED', $column->getTableMapName());
-        $this->assertSame('public', $column->getAccessorVisibility());
-        $this->assertSame('public', $column->getMutatorVisibility());
-        $this->assertFalse($column->isPrimaryString());
-        $this->assertFalse($column->isPrimaryKey());
-        $this->assertFalse($column->isNodeKey());
-        $this->assertFalse($column->isNestedSetLeftKey());
-        $this->assertFalse($column->isNestedSetRightKey());
-        $this->assertFalse($column->isTreeScopeKey());
-        $this->assertTrue($column->isLazyLoad());
-        $this->assertCount(3, $column->getValueSet());
-    }
-
-    public function testSetPosition()
-    {
-        $column = new Column();
-        $column->setPosition(2);
-
-        $this->assertSame(2, $column->getPosition());
+        $this->assertNull($column->getPlatform());
     }
 
     public function testGetNullDefaultValueString()
@@ -246,7 +107,7 @@ class ColumnTest extends ModelTestCase
     public function provideDefaultValues()
     {
         return [
-            ['DOUBLE', 3.14, 3.14],
+            ['DOUBLE', 3.14, '3.14'],
             ['VARCHAR', 'hello', "'hello'"],
             ['VARCHAR', "john's bike", "'john\\'s bike'"],
             ['BOOLEAN', 1, 'true'],
@@ -273,65 +134,10 @@ class ColumnTest extends ModelTestCase
         $column->addInheritance($inheritance);
 
         $this->assertTrue($column->isEnumeratedClasses());
-        $this->assertCount(1, $column->getChildren());
+        $this->assertEquals(1, $column->getChildren()->size());
 
         $column->clearInheritanceList();
         $this->assertCount(0, $column->getChildren());
-    }
-
-    public function testAddArrayInheritance()
-    {
-        $column = new Column();
-
-        $column->addInheritance([
-            'key' => 'baz',
-            'extends' => 'BaseObject',
-            'class' => 'Foo\Bar',
-            'package' => 'Foo',
-        ]);
-
-        $column->addInheritance([
-            'key' => 'foo',
-            'extends' => 'BaseObject',
-            'class' => 'Acme\Foo',
-            'package' => 'Acme',
-        ]);
-
-        $this->assertCount(2, $column->getChildren());
-    }
-
-    public function testClearForeignKeys()
-    {
-        $fks = [
-            $this->getMockBuilder('Propel\Generator\Model\ForeignKey')->getMock(),
-            $this->getMockBuilder('Propel\Generator\Model\ForeignKey')->getMock(),
-        ];
-
-        $table = $this->getTableMock('books');
-        $table
-            ->expects($this->any())
-            ->method('getColumnForeignKeys')
-            ->with('author_id')
-            ->will($this->returnValue($fks))
-        ;
-
-        $column = new Column('author_id');
-        $column->setTable($table);
-        $column->addReferrer($fks[0]);
-        $column->addReferrer($fks[1]);
-
-        $this->assertTrue($column->isForeignKey());
-        $this->assertTrue($column->hasMultipleFK());
-        $this->assertTrue($column->hasReferrers());
-        $this->assertTrue($column->hasReferrer($fks[0]));
-        $this->assertCount(2, $column->getReferrers());
-
-        // Clone the current column
-        $clone = clone $column;
-
-        $column->clearReferrers();
-        $this->assertCount(0, $column->getReferrers());
-        $this->assertCount(0, $clone->getReferrers());
     }
 
     public function testIsDefaultSqlTypeFromDomain()
@@ -390,7 +196,7 @@ class ColumnTest extends ModelTestCase
         $platform = $this->getPlatformMock();
         $platform
             ->expects($this->once())
-            ->method('getNullString')
+            ->method('getNotNullString')
             ->will($this->returnValue('NOT NULL'))
         ;
 
@@ -451,7 +257,7 @@ class ColumnTest extends ModelTestCase
             ['BOOLEAN_EMU', \PDO::PARAM_INT],
             ['OBJECT', \PDO::PARAM_LOB],
             ['ARRAY', \PDO::PARAM_STR],
-            ['ENUM', \PDO::PARAM_INT],
+            ['ENUM', \PDO::PARAM_STR],
             ['BU_DATE', \PDO::PARAM_STR],
             ['BU_TIMESTAMP', \PDO::PARAM_STR],
         ];
@@ -471,7 +277,7 @@ class ColumnTest extends ModelTestCase
         $column->setType('ENUM');
         $column->setValueSet(['FOO', 'BAR']);
 
-        $this->assertSame('int', $column->getPhpType());
+        $this->assertSame('string', $column->getPhpType());
         $this->assertTrue($column->isPhpPrimitiveType());
         $this->assertTrue($column->isEnumType());
         $this->assertContains('FOO', $column->getValueSet());
@@ -737,25 +543,20 @@ class ColumnTest extends ModelTestCase
 
     public function testGetConstantName()
     {
-        $table = $this->getTableMock('article');
-        $table
-            ->expects($this->once())
-            ->method('getPhpName')
-            ->will($this->returnValue('Article'))
-        ;
+        $table = $this->getTableMock('Article');
 
         $column = new Column('created_at');
         $column->setTable($table);
-        $column->setTableMapName('created_at');
+        $column->setColumnName('created_at');
 
-        $this->assertSame('created_at', $column->getTableMapName());
-        $this->assertSame('COL_CREATED_AT', $column->getConstantName());
-        $this->assertSame('ArticleTableMap::COL_CREATED_AT', $column->getFQConstantName());
+        $this->assertSame('created_at', $column->getColumnName());
+        $this->assertSame('COLUMN_CREATED_AT', $column->getConstantName());
+        $this->assertSame('ArticleTableMap::COLUMN_CREATED_AT', $column->getFQConstantName());
     }
 
     public function testSetDefaultPhpName()
     {
-        $column = new Column('created_at');
+        $column = new Column('createdAt');
 
         $this->assertSame('CreatedAt', $column->getPhpName());
         $this->assertSame('createdAt', $column->getCamelCaseName());
@@ -853,19 +654,6 @@ class ColumnTest extends ModelTestCase
         $this->assertSame('books.TITLE', $column->getFullyQualifiedName());
     }
 
-    public function testHasPlatform()
-    {
-        $table = $this->getTableMock('books', [
-            'platform' => $this->getPlatformMock(),
-        ]);
-
-        $column = new Column();
-        $column->setTable($table);
-
-        $this->assertTrue($column->hasPlatform());
-        $this->assertInstanceOf('Propel\Generator\Platform\PlatformInterface', $column->getPlatform());
-    }
-
     public function testIsPhpArrayType()
     {
         $column = new Column();
@@ -938,7 +726,7 @@ class ColumnTest extends ModelTestCase
         $column->setTable($this->getTableMock('books'));
 
         $this->assertInstanceOf('Propel\Generator\Model\Table', $column->getTable());
-        $this->assertSame('books', $column->getTableName());
+        $this->assertSame('books', $column->getTable()->getName());
     }
 
     public function testSetDomain()
@@ -955,34 +743,6 @@ class ColumnTest extends ModelTestCase
         $column->setDescription('Some description');
 
         $this->assertSame('Some description', $column->getDescription());
-    }
-
-    public function testSetNestedSetLeftKey()
-    {
-        $column = new Column();
-        $column->setNestedSetLeftKey(true);
-        $column->setNodeKeySep(',');
-        $column->setNodeKey(true);
-
-        $this->assertTrue($column->isNestedSetLeftKey());
-        $this->assertTrue($column->isNodeKey());
-        $this->assertSame(',', $column->getNodeKeySep());
-    }
-
-    public function testSetNestedSetRightKey()
-    {
-        $column = new Column();
-        $column->setNestedSetRightKey(true);
-
-        $this->assertTrue($column->isNestedSetRightKey());
-    }
-
-    public function testSetTreeScopeKey()
-    {
-        $column = new Column();
-        $column->setTreeScopeKey(true);
-
-        $this->assertTrue($column->isTreeScopeKey());
     }
 
     public function testSetAutoIncrement()
@@ -1012,16 +772,128 @@ class ColumnTest extends ModelTestCase
     public function testPhpSingularName()
     {
         $column = new Column();
-        $column->setPhpName('Aliases');
+        $column->setName('aliases');
 
-        $this->assertEquals($column->getPhpName(), 'Aliases');
-        $this->assertEquals($column->getPhpSingularName(), 'Aliase');
+        $this->assertEquals($column->getName(), 'aliases');
+        $this->assertEquals($column->getSingularName(), 'aliase');
 
         $column = new Column();
-        $column->setPhpName('Aliases');
-        $column->setPhpSingularName('Alias');
+        $column->setName('Aliases');
+        $column->setSingularName('Alias');
 
-        $this->assertEquals($column->getPhpName(), 'Aliases');
-        $this->assertEquals($column->getPhpSingularName(), 'Alias');
+        $this->assertEquals($column->getName(), 'Aliases');
+        $this->assertEquals($column->getSingularName(), 'Alias');
+    }
+
+    public function testGetMethodName()
+    {
+        $column = new Column('title');
+        $this->assertEquals('Title', $column->getMethodName());
+    }
+
+    public function testSetPhpType()
+    {
+        $column = new Column('title');
+        $column->setType('VARCHAR');
+        $column->setPhpType('string');
+        $this->assertEquals('string', $column->getPhpType());
+    }
+
+    public function testGetPosition()
+    {
+        $column = new Column('foo');
+        $column->setPosition(1);
+
+        $this->assertSame(1, $column->getPosition());
+    }
+
+    public function testGetInheritanceType()
+    {
+        $column = new Column('foo');
+        $column->setInheritanceType('single');
+
+        $this->assertEquals('single', $column->getInheritanceType());
+    }
+
+    public function testIsInheritance()
+    {
+        $column = new Column('foo');
+        $column->setInheritanceType('single');
+        $this->assertTrue($column->isInheritance());
+
+        $column->setInheritanceType('false');
+        $this->assertFalse($column->isInheritance());
+    }
+
+    public function testSetPrimaryKey()
+    {
+        $column= new Column('foo');
+        $this->assertFalse($column->isPrimaryKey());
+
+        $column->setPrimaryKey(true);
+        $this->assertTrue($column->isPrimaryKey());
+    }
+
+    public function testGetForeignKeys()
+    {
+        $table = new Table('book');
+        $column = new Column('author_id');
+        $column->setTable($table);
+        $foreignKey = $this->getForeignKeyMock('author_fk', [
+            'table' => $table,
+            'target' => 'author',
+            'local_columns' => ['author_id']
+        ]);
+        $table->addForeignKey($foreignKey);
+
+        $this->assertTrue($column->isForeignKey());
+        $this->assertSame([$foreignKey], $column->getForeignKeys());
+    }
+
+    public function testHasMultipleFk()
+    {
+        $table = new Table('book');
+        $column = new Column('author_id');
+        $column->setTable($table);
+        $foreignKey = $this->getForeignKeyMock('author_fk', [
+            'table' => $table,
+            'target' => 'author',
+            'local_columns' => ['author_id']
+        ]);
+        $table->addForeignKey($foreignKey);
+        $this->assertFalse($column->hasMultipleFK());
+
+        $foreignKey1 = $this->getForeignKeyMock('author_fk', [
+            'table' => $table,
+            'target' => 'foo',
+            'local_columns' => ['author_id']
+        ]);
+        $table->addForeignKey($foreignKey1);
+        $this->assertTrue($column->hasMultipleFK());
+    }
+
+    public function testGetColumnType()
+    {
+        $generatorConfig = $this
+            ->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
+        $generatorConfig
+            ->expects($this->any())
+            ->method('getColumnType')
+            ->willReturn(new VarcharType())
+        ;
+        $table = $this->getTableMock('book');
+        $table
+            ->expects($this->any())
+            ->method('getGeneratorConfig')
+            ->willReturn($generatorConfig)
+        ;
+
+        $column = new Column('title');
+        $column->setTable($table);
+
+        $this->assertInstanceOf(ColumnTypeInterface::class, $column->getColumnType());
     }
 }

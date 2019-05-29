@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -17,12 +17,21 @@ namespace Propel\Generator\Model;
  * @author John McNally <jmcnally@collab.net> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  */
-class Inheritance extends MappingModel
+class Inheritance
 {
+    /** @var string */
     private $key;
+
+    /** @var string */
     private $className;
+
+    /** @var string */
     private $package;
+
+    /** @var string */
     private $ancestor;
+
+    /** @var Column */
     private $column;
 
     /**
@@ -30,20 +39,9 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
-    }
-
-    /**
-    * Get constant names' safe value of the key name.
-    *
-    * @return string
-    */
-    public function getConstantSuffix()
-    {
-        $separator = PhpNameGenerator::STD_SEPARATOR_CHAR;
-        return strtoupper(rtrim(preg_replace('/(\W|_)+/', $separator, $this->key), $separator));
     }
 
     /**
@@ -51,7 +49,7 @@ class Inheritance extends MappingModel
      *
      * @param string $key
      */
-    public function setKey($key)
+    public function setKey(string $key): void
     {
         $this->key = $key;
     }
@@ -61,7 +59,7 @@ class Inheritance extends MappingModel
      *
      * @return Column
      */
-    public function getColumn()
+    public function getColumn(): Column
     {
         return $this->column;
     }
@@ -71,7 +69,7 @@ class Inheritance extends MappingModel
      *
      * @param Column $column
      */
-    public function setColumn(Column $column)
+    public function setColumn(Column $column): void
     {
         $this->column = $column;
     }
@@ -81,7 +79,7 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
@@ -91,7 +89,7 @@ class Inheritance extends MappingModel
      *
      * @param string $name
      */
-    public function setClassName($name)
+    public function setClassName(string $name): void
     {
         $this->className = $name;
     }
@@ -101,7 +99,7 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getPackage()
+    public function getPackage(): string
     {
         return $this->package;
     }
@@ -111,7 +109,7 @@ class Inheritance extends MappingModel
      *
      * @param string $package
      */
-    public function setPackage($package)
+    public function setPackage(string $package): void
     {
         $this->package = $package;
     }
@@ -121,7 +119,7 @@ class Inheritance extends MappingModel
      *
      * @return string
      */
-    public function getAncestor()
+    public function getAncestor(): string
     {
         return $this->ancestor;
     }
@@ -131,16 +129,8 @@ class Inheritance extends MappingModel
      *
      * @param string $ancestor
      */
-    public function setAncestor($ancestor)
+    public function setAncestor(string $ancestor): void
     {
         $this->ancestor = $ancestor;
-    }
-
-    protected function setupObject()
-    {
-        $this->key       = $this->getAttribute('key');
-        $this->className = $this->getAttribute('class');
-        $this->package   = $this->getAttribute('package');
-        $this->ancestor  = $this->getAttribute('extends');
     }
 }

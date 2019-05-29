@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -8,8 +8,6 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Config;
 
 use Propel\Common\Config\ConfigurationManager;
@@ -18,17 +16,18 @@ use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Exception\ClassNotFoundException;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Manager\BehaviorManager;
 use Propel\Generator\Model\Table;
-use Propel\Generator\Platform\DefaultPlatform;
+use Propel\Generator\Platform\SqlDefaultPlatform;
 use Propel\Generator\Platform\PlatformInterface;
+use Propel\Generator\Reverse\AbstractSchemaParser;
 use Propel\Generator\Reverse\SchemaParserInterface;
 use Propel\Runtime\Adapter\AdapterFactory;
 use Propel\Runtime\Connection\ConnectionFactory;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
 
 /**
- * A class that holds b1uild properties and provide a class loading mechanism for
+ * A class that holds build properties and provide a class loading mechanism for
  * the generator.
  *
  * @author Hans Lellelid <hans@xmpl.org>
@@ -37,9 +36,9 @@ use Propel\Generator\Util\BehaviorLocator;
 class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInterface
 {
     /**
-     * @var BehaviorLocator
+     * @var BehaviorManager
      */
-    protected $behaviorLocator = null;
+    protected $behaviorManager = null;
 
     /**
      * Connections configured in the `generator` section of the configuration file
@@ -49,22 +48,19 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     protected $buildConnections = null;
 
     /**
-     * {@inheritdoc}
+     * Creates and configures a new Platform class.
+     *
+     * @param  string              $platform
+     * @param  ConnectionInterface $con
+     *
+     * @return PlatformInterface
+     *
+     * @throws \Propel\Generator\Exception\ClassNotFoundException if the platform class doesn't exists
+     * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of
+     *                                                            PlatformInterface
      */
-    public function getConfiguredPlatform(ConnectionInterface $con = null, string $database = null): ?PlatformInterface
+    public function createPlatform(string $platform, ConnectionInterface $con = null): PlatformInterface
     {
-        $platform = $this->get()['generator']['platformClass'];
-
-        if (null === $platform) {
-            if ($database) {
-                $platform = $this->getBuildConnection($database)['adapter'];
-            }
-
-            if (!$platform) {
-                $platform = '\\Propel\\Generator\\Platform\\MysqlPlatform';
-            }
-        }
-
         $classes = [
             $platform,
             '\\Propel\\Generator\\Platform\\' . $platform,
@@ -82,11 +78,11 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
         }
 
         if (null === $platformClass) {
-            throw new ClassNotFoundException(sprintf('Platform class for `%s` not found.', $platform));
+            throw new BuildException(sprintf('Platform `%s` not found.', $platform));
         }
 
-        /** @var DefaultPlatform $platform */
-        $platform = $this->getInstance($platformClass);
+        /** @var SqlDefaultPlatform $platform */
+        $platform = new $platformClass;
         $platform->setConnection($con);
         $platform->setGeneratorConfig($this);
 
@@ -96,72 +92,72 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     /**
      * {@inheritdoc}
      */
-    public function getConfiguredSchemaParser(ConnectionInterface $con = null, string $database = null): ?SchemaParserInterface
+    public function createPlatformForDatabase(string $name = null, ConnectionInterface $con = null): PlatformInterface
     {
-        $reverse = $this->get()['migrations']['parserClass'];
-
-        if (null === $reverse) {
-            if ($database) {
-                $reverse = $this->getBuildConnection($database)['adapter'];
-            } else {
-                $connections = $this->getBuildConnections();
-                $connection = $this->get()['generator']['defaultConnection'];
-
-                if (isset($connections[$connection])) {
-                    $reverse = '\\Propel\\Generator\\Reverse\\' . ucfirst($connections[$connection]['adapter']) . 'SchemaParser';
-                } else {
-                    $reverse = '\\Propel\\Generator\\Reverse\\MysqlSchemaParser';
-                }
-            }
+        if (isset($this->get()['generator']['platformClass'])) {
+            $class = $this->get()['generator']['platformClass'];
+            return new $class;
         }
 
-        $classes = [
-            $reverse,
-            '\\Propel\\Generator\\Reverse\\' . $reverse,
-            '\\Propel\\Generator\\Reverse\\' . ucfirst($reverse),
-            '\\Propel\\Generator\\Reverse\\' . ucfirst(strtolower($reverse)) . 'SchemaParser',
-        ];
+        $buildConnection = $this->getBuildConnection($name);
 
-        $reverseClass = null;
+        return $this->createPlatform($buildConnection['adapter'], $con);
+    }
 
-        foreach ($classes as $class) {
-            if (class_exists($class)) {
-                $reverseClass = $class;
-                break;
-            }
-        }
+    /**
+     * Creates and configures a new SchemaParser class for specified platform.
+     *
+     * @param  ConnectionInterface $con
+     *
+     * @return SchemaParserInterface
+     *
+     * @throws \Propel\Generator\Exception\ClassNotFoundException if the class doesn't exists
+     * @throws \Propel\Generator\Exception\BuildException         if the class isn't an implementation of
+     *                                                            SchemaParserInterface
+     */
+    public function getConfiguredSchemaParser(ConnectionInterface $con = null): SchemaParserInterface
+    {
+        $clazz = $this->get()['migrations']['parserClass'];
 
-        if (null === $reverseClass) {
-            throw new ClassNotFoundException(sprintf('Reverse SchemaParser class for `%s` not found.', $reverse));
+        if (null === $clazz) {
+            $clazz = '\\Propel\\Generator\\Reverse\\' . ucfirst(
+                $this->getBuildConnection()['adapter']
+                ) . 'SchemaParser';
         }
 
         /** @var SchemaParserInterface $parser */
-        $parser = $this->getInstance($reverseClass, null, '\\Propel\\Generator\\Reverse\\SchemaParserInterface');
+        $parser = $this->getInstance($clazz, null, '\\Propel\\Generator\\Reverse\\SchemaParserInterface');
         $parser->setConnection($con);
-        $parser->setMigrationTable($this->get()['migrations']['tableName']);
+        if ($parser instanceof AbstractSchemaParser) {
+            $parser->setMigrationTable($this->get()['migrations']['tableName']);
+        }
         $parser->setGeneratorConfig($this);
 
         return $parser;
     }
 
     /**
-     * Returns a configured data model builder class for specified table and
-     * based on type ('object', 'query', 'tableMap' etc.).
+     * Returns a configured data model builder class based on type
+     * ('object', 'query', 'tableMap' etc.).
      *
-     * @param  Table            $table
-     * @param  string           $type
+     * @param  Table $table
+     * @param  string $type
+     *
      * @return DataModelBuilder
      *
-     * @throws \Propel\Generator\Exception\ClassNotFoundException if the type of builder is wrong and the builder class doesn't exists
+     * @throws \Propel\Generator\Exception\ClassNotFoundException if the type of builder is wrong and the builder class
+     *                                                            doesn't exists
      */
     public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder
     {
-        $classname = $this->getConfigProperty('generator.objectModel.builders.' . $type);
-        if (null === $classname) {
-            throw new ClassNotFoundException("The builder of type `$type` does not exists.");
+        $className = $this->getConfigProperty('generator.objectModel.builders.' . $type);
+
+        if (null === $className || !class_exists($className)) {
+            throw new InvalidArgumentException(sprintf('Builder for `%s` not found.', $type));
         }
 
-        $builder = $this->getInstance($classname, $table);
+        /** @var DataModelBuilder $builder */
+        $builder = new $className($table);
         $builder->setGeneratorConfig($this);
 
         return $builder;
@@ -176,7 +172,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     {
         $classname = $this->get()['generator']['objectModel']['pluralizerClass'];
 
-        return $this->getInstance($classname, null, '\\cristianoc72\\Pluralizer\\PluralizerInterface');
+        return $this->getInstance($classname, null, '\\Propel\\Common\\Pluralizer\\PluralizerInterface');
     }
 
     /**
@@ -210,18 +206,21 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
      * If the database name is null, it returns the default connection properties
      *
      * @param  string $databaseName
+     *
      * @return array
      *
      * @throws \Propel\Generator\Exception\InvalidArgumentException if wrong database name
      */
     public function getBuildConnection(string $databaseName = null): array
     {
-        if (null === $databaseName) {
+        if (!$databaseName && isset($this->get()['generator']['defaultConnection'])) {
             $databaseName = $this->get()['generator']['defaultConnection'];
         }
 
         if (!array_key_exists($databaseName, $this->getBuildConnections())) {
-            throw new InvalidArgumentException("Invalid database name: no configured connection named `$databaseName`.");
+            throw new InvalidArgumentException(
+                "Invalid database name: no configured connection named `$databaseName`."
+            );
         }
 
         return $this->getBuildConnections()[$databaseName];
@@ -230,7 +229,8 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     /**
      * Return a connection object of a given database name
      *
-     * @param  string              $database
+     * @param  string $database
+     *
      * @return ConnectionInterface
      */
     public function getConnection(string $database = null): ConnectionInterface
@@ -245,35 +245,38 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
         $username = isset($buildConnection['user']) && $buildConnection['user'] ? $buildConnection['user'] : null;
         $password = isset($buildConnection['password']) && $buildConnection['password'] ? $buildConnection['password'] : null;
 
-        // Get options from and config and default to null
-        $options = isset($buildConnection['options']) && is_array($buildConnection['options']) ? $buildConnection['options'] : null;
-
-        $con = ConnectionFactory::create(['dsn' => $dsn, 'user' => $username, 'password' => $password, 'options' => $options], AdapterFactory::create($buildConnection['adapter']));
+        $con = ConnectionFactory::create(
+            ['dsn' => $dsn, 'user' => $username, 'password' => $password],
+            AdapterFactory::create($buildConnection['adapter'])
+        );
 
         return $con;
     }
 
-    public function getBehaviorLocator(): BehaviorLocator
+    public function getBehaviorManager(): BehaviorManager
     {
-        if (!$this->behaviorLocator) {
-            $this->behaviorLocator = new BehaviorLocator($this);
+        if (!$this->behaviorManager) {
+            $this->behaviorManager = new BehaviorManager($this);
         }
 
-        return $this->behaviorLocator;
+        return $this->behaviorManager;
     }
 
     /**
      * Return an instance of $className
      *
-     * @param string $className The name of the class to return an instance
-     * @param array $arguments
+     * @param string $className     The name of the class to return an instance
+     * @param array  $arguments     The name of the interface to be implemented by the returned class
      * @param string $interfaceName The name of the interface to be implemented by the returned class
      *
      * @throws \Propel\Generator\Exception\ClassNotFoundException   if the class doesn't exists
      * @throws \Propel\Generator\Exception\InvalidArgumentException if the interface doesn't exists
-     * @throws \Propel\Generator\Exception\BuildException           if the class isn't an implementation of the given interface
+     * @throws \Propel\Generator\Exception\BuildException           if the class isn't an implementation of the given
+     *                                                              interface
+     *
+     * @return object
      */
-    private function getInstance(string $className, $arguments = null, string $interfaceName = null)
+    private function getInstance(string $className, array $arguments = null, string $interfaceName = null)
     {
         if (!class_exists($className)) {
             throw new ClassNotFoundException("Class $className not found.");

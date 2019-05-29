@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -10,6 +10,7 @@
 
 namespace Propel\Generator\Model\Diff;
 
+use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Column;
 
 /**
@@ -20,9 +21,9 @@ use Propel\Generator\Model\Column;
 class ColumnDiff
 {
     /**
-     * An associative array of modified properties.
+     * A Map of modified properties.
      *
-     * @var array
+     * @var Map
      */
     protected $changedProperties;
 
@@ -56,25 +57,26 @@ class ColumnDiff
             $this->setToColumn($toColumn);
         }
 
-        $this->changedProperties = [];
+        $this->changedProperties = new Map();
     }
 
     /**
      * Sets for the changed properties.
      *
-     * @param array $properties
+     * @param Map $properties
      */
-    public function setChangedProperties($properties)
+    public function setChangedProperties(Map $properties): void
     {
-        $this->changedProperties = $properties;
+        $this->changedProperties->clear();
+        $this->changedProperties->setAll($properties);
     }
 
     /**
      * Returns the changed properties.
      *
-     * @return array
+     * @return Map
      */
-    public function getChangedProperties()
+    public function getChangedProperties(): Map
     {
         return $this->changedProperties;
     }
@@ -84,7 +86,7 @@ class ColumnDiff
      *
      * @param Column $fromColumn
      */
-    public function setFromColumn(Column $fromColumn)
+    public function setFromColumn(Column $fromColumn): void
     {
         $this->fromColumn = $fromColumn;
     }
@@ -94,7 +96,7 @@ class ColumnDiff
      *
      * @return Column
      */
-    public function getFromColumn()
+    public function getFromColumn(): Column
     {
         return $this->fromColumn;
     }
@@ -104,7 +106,7 @@ class ColumnDiff
      *
      * @param Column $toColumn
      */
-    public function setToColumn(Column $toColumn)
+    public function setToColumn(Column $toColumn): void
     {
         $this->toColumn = $toColumn;
     }
@@ -114,7 +116,7 @@ class ColumnDiff
      *
      * @return Column
      */
-    public function getToColumn()
+    public function getToColumn(): Column
     {
         return $this->toColumn;
     }
@@ -124,7 +126,7 @@ class ColumnDiff
      *
      * @return ColumnDiff
      */
-    public function getReverseDiff()
+    public function getReverseDiff(): ColumnDiff
     {
         $diff = new self();
 
@@ -137,7 +139,7 @@ class ColumnDiff
         foreach ($this->changedProperties as $name => $propertyChange) {
             $changedProperties[$name] = array_reverse($propertyChange);
         }
-        $diff->setChangedProperties($changedProperties);
+        $diff->setChangedProperties(new Map($changedProperties));
 
         return $diff;
     }

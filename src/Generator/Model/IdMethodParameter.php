@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -10,6 +10,9 @@
 
 namespace Propel\Generator\Model;
 
+use Propel\Generator\Model\Parts\TablePart;
+use Propel\Generator\Model\Parts\NamePart;
+
 /**
  * Information related to an ID method strategy.
  *
@@ -18,39 +21,11 @@ namespace Propel\Generator\Model;
  * @author Daniel Rall <dlr@collab.net> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  */
-class IdMethodParameter extends MappingModel
+class IdMethodParameter
 {
-    private $name;
+    use NamePart, TablePart;
+
     private $value;
-
-    /** @var Table */
-    private $parentTable;
-
-    protected function setupObject()
-    {
-        $this->name = $this->getAttribute('name');
-        $this->value = $this->getAttribute('value');
-    }
-
-    /**
-     * Returns the parameter name.
-     *
-     * @param string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Sets the parameter name.
-     *
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
 
     /**
      * Returns the parameter value.
@@ -70,35 +45,5 @@ class IdMethodParameter extends MappingModel
     public function setValue($value)
     {
         $this->value = $value;
-    }
-
-    /**
-     * Sets the parent table.
-     *
-     * @param Table $parent
-     */
-    public function setTable(Table $parent)
-    {
-        $this->parentTable = $parent;
-    }
-
-    /**
-     * Returns the parent table.
-     *
-     * @return Table
-     */
-    public function getTable()
-    {
-        return $this->parentTable;
-    }
-
-    /**
-     * Returns the parent table name.
-     *
-     * @return string
-     */
-    public function getTableName()
-    {
-        return $this->parentTable->getName();
     }
 }

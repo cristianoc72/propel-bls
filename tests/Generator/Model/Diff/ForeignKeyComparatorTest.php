@@ -1,15 +1,16 @@
-<?php
-
-/*
- *	$Id: TableTest.php 1891 2010-08-09 15:03:18Z francois $
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+<?php declare(strict_types=1);
+/**
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
 
+namespace Propel\Tests\Generator\Model\Diff;
+
 use Propel\Generator\Model\Column;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Diff\ForeignKeyComparator;
@@ -19,7 +20,7 @@ use \Propel\Tests\TestCase;
  * Tests for the ColumnComparator service class.
  *
  */
-class PropelForeignComparatorTest extends TestCase
+class ForeignKeyComparatorTest extends TestCase
 {
     public function testCompareNoDifference()
     {
@@ -36,23 +37,6 @@ class PropelForeignComparatorTest extends TestCase
         $t2 = new Table('Baz');
         $t2->addForeignKey($fk2);
         $this->assertFalse(ForeignKeyComparator::computeDiff($fk1, $fk2));
-    }
-
-    public function testCompareCaseInsensitive()
-    {
-        $c1 = new Column('Foo');
-        $c2 = new Column('Bar');
-        $fk1 = new ForeignKey();
-        $fk1->addReference($c1, $c2);
-        $t1 = new Table('Baz');
-        $t1->addForeignKey($fk1);
-        $c3 = new Column('fOO');
-        $c4 = new Column('bAR');
-        $fk2 = new ForeignKey();
-        $fk2->addReference($c3, $c4);
-        $t2 = new Table('bAZ');
-        $t2->addForeignKey($fk2);
-        $this->assertFalse(ForeignKeyComparator::computeDiff($fk1, $fk2, true));
     }
 
     public function testCompareLocalColumn()
@@ -115,14 +99,14 @@ class PropelForeignComparatorTest extends TestCase
         $c2 = new Column('Bar');
         $fk1 = new ForeignKey();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnUpdate(ForeignKey::SETNULL);
+        $fk1->setOnUpdate(Model::ForeignKey_SETNULL);
         $t1 = new Table('Baz');
         $t1->addForeignKey($fk1);
         $c3 = new Column('Foo');
         $c4 = new Column('Bar');
         $fk2 = new ForeignKey();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnUpdate(ForeignKey::RESTRICT);
+        $fk2->setOnUpdate(Model::ForeignKey_RESTRICT);
         $t2 = new Table('Baz');
         $t2->addForeignKey($fk2);
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
@@ -134,14 +118,14 @@ class PropelForeignComparatorTest extends TestCase
         $c2 = new Column('Bar');
         $fk1 = new ForeignKey();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnDelete(ForeignKey::SETNULL);
+        $fk1->setOnDelete(Model::ForeignKey_SETNULL);
         $t1 = new Table('Baz');
         $t1->addForeignKey($fk1);
         $c3 = new Column('Foo');
         $c4 = new Column('Bar');
         $fk2 = new ForeignKey();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnDelete(ForeignKey::RESTRICT);
+        $fk2->setOnDelete(Model::ForeignKey_RESTRICT);
         $t2 = new Table('Baz');
         $t2->addForeignKey($fk2);
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));

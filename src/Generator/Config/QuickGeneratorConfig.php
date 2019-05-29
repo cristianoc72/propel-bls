@@ -12,24 +12,30 @@ declare(strict_types=1);
 
 namespace Propel\Generator\Config;
 
-use Propel\Common\Config\ConfigurationManager;
 use cristianoc72\Pluralizer\PluralizerInterface;
 use cristianoc72\Pluralizer\EnglishPluralizer;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Exception\InvalidArgumentException;
+use Propel\Generator\Manager\BehaviorManager;
 use Propel\Generator\Model\Table;
-use Propel\Generator\Platform\PlatformInterface;
-use Propel\Generator\Reverse\SchemaParserInterface;
-use \Propel\Runtime\Connection\ConnectionInterface;
-use Propel\Generator\Util\BehaviorLocator;
 
-class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConfigInterface
+/**
+ * Class QuickGeneratorConfig
+ *
+ * Simple generator config class. It's usually used with QuickBuilder, for testing purpose
+ */
+class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInterface
 {
     /**
-     * @var BehaviorLocator
+     * @var BehaviorManager
      */
-    protected $behaviorLocator = null;
+    protected $behaviorManager = null;
 
+    /**
+     * QuickGeneratorConfig constructor.
+     *
+     * @param array $extraConf
+     */
     public function __construct(array $extraConf = [])
     {
         if (null === $extraConf) {
@@ -66,7 +72,7 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
     }
 
     /**
-     * Gets a configured data model builder class for specified table and based
+     * Gets a configured data model builder class for specified entity and based
      * on type ('ddl', 'sql', etc.).
      *
      * @param  Table            $table
@@ -97,28 +103,12 @@ class QuickGeneratorConfig extends ConfigurationManager implements GeneratorConf
         return new EnglishPluralizer();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfiguredPlatform(ConnectionInterface $con = null, string $database = null): ?PlatformInterface
+    public function getBehaviorManager(): BehaviorManager
     {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfiguredSchemaParser(ConnectionInterface $con = null, string $database = null): ?SchemaParserInterface
-    {
-        return null;
-    }
-
-    public function getBehaviorLocator(): BehaviorLocator
-    {
-        if (!$this->behaviorLocator) {
-            $this->behaviorLocator = new BehaviorLocator($this);
+        if (!$this->behaviorManager) {
+            $this->behaviorManager = new BehaviorManager($this);
         }
 
-        return $this->behaviorLocator;
+        return $this->behaviorManager;
     }
 }

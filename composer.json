@@ -18,6 +18,8 @@
     "require": {
         "php": ">=7.2",
         "ext-simplexml": "*",
+        "ext-json": "*",
+        "ext-pdo": "*",
         "symfony/yaml": "^4.1",
         "symfony/finder": "^4.1",
         "symfony/validator": "^4.1",
@@ -27,7 +29,8 @@
         "symfony/console": "^4.1",
         "symfony/translation": "^4.1",
         "phootwork/json": "^1.2",
-        "cristianoc72/pluralizer": "^1.0"
+        "cristianoc72/pluralizer": "^1.0",
+        "phootwork/lang": "^0.9.0"
     },
     "require-dev": {
         "monolog/monolog": "^1.23",

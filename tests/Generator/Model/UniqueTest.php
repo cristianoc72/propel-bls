@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
@@ -25,15 +25,11 @@ class UniqueTest extends ModelTestCase
      */
     public function testCreateDefaultUniqueIndexName($tableName, $maxColumnNameLength, $indexName)
     {
-        $database = $this->getDatabaseMock('bookstore');
-        $database
-            ->expects($this->any())
-            ->method('getMaxColumnNameLength')
-            ->will($this->returnValue($maxColumnNameLength))
-        ;
+        $platform = $this->getPlatformMock(true, ['max_column_name_length' => $maxColumnNameLength]);
+        $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
 
         $table = $this->getTableMock($tableName, [
-            'common_name' => $tableName,
+            'name' => $tableName,
             'unices'      => [ new Unique(), new Unique() ],
             'database'    => $database,
         ]);
@@ -49,7 +45,7 @@ class UniqueTest extends ModelTestCase
     {
         return [
             [ 'books', 64, 'books_u_no_columns' ],
-            [ 'super_long_table_name', 16, 'super_long_table' ],
+            [ 'super_long_table_name', 17, 'super_long_table' ],
         ];
     }
 }

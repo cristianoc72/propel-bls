@@ -1,13 +1,13 @@
-<?php
-
-/*
- *	$Id: TableTest.php 1891 2010-08-09 15:03:18Z francois $
- * This file is part of the Propel package.
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+<?php declare(strict_types=1);
+/**
+ *  This file is part of the Propel package.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  *
  * @license MIT License
  */
+
+namespace Propel\Tests\Generator\Model\Diff;
 
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Index;
@@ -42,17 +42,6 @@ class IndexComparatorTest extends TestCase
         $i2->addColumn($c3);
         $i2->addColumn($c4);
         $this->assertFalse(IndexComparator::computeDiff($i1, $i2));
-    }
-
-    public function testCompareCaseInsensitive()
-    {
-        $c1 = new Column('Foo');
-        $i1 = new Index('Foo_Index');
-        $i1->addColumn($c1);
-        $c2 = new Column('fOO');
-        $i2 = new Index('fOO_iNDEX');
-        $i2->addColumn($c2);
-        $this->assertFalse(IndexComparator::computeDiff($i1, $i2, true));
     }
 
     public function testCompareType()

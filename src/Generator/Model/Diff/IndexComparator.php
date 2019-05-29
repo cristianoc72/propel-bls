@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -24,29 +24,28 @@ class IndexComparator
      *
      * @param  Index   $fromIndex
      * @param  Index   $toIndex
-     * @param  boolean $caseInsensitive
      * @return boolean
      */
-    public static function computeDiff(Index $fromIndex, Index $toIndex, $caseInsensitive = false)
+    public static function computeDiff(Index $fromIndex, Index $toIndex): bool
     {
         // Check for removed index columns in $toIndex
         $fromIndexColumns = $fromIndex->getColumns();
-        $max = count($fromIndexColumns);
-        for ($i = 0; $i < $max; $i++) {
-            $indexColumn = $fromIndexColumns[$i];
-            if (!$toIndex->hasColumnAtPosition($i, $indexColumn, $fromIndex->getColumnSize($indexColumn), $caseInsensitive)) {
+        $i = 0;
+        foreach ($fromIndexColumns as $indexColumn) {
+            if (!$toIndex->hasColumnAtPosition($i, $indexColumn->getName(), $indexColumn->getSize())) {
                 return true;
             }
+            $i++;
         }
 
         // Check for new index columns in $toIndex
         $toIndexColumns = $toIndex->getColumns();
-        $max = count($toIndexColumns);
-        for ($i = 0; $i < $max; $i++) {
-            $indexColumn = $toIndexColumns[$i];
-            if (!$fromIndex->hasColumnAtPosition($i, $indexColumn, $toIndex->getColumnSize($indexColumn), $caseInsensitive)) {
+        $i = 0;
+        foreach ($toIndexColumns as $indexColumn) {
+            if (!$fromIndex->hasColumnAtPosition($i, $indexColumn->getName(), $indexColumn->getSize())) {
                 return true;
             }
+            $i++;
         }
 
         // Check for difference in unicity

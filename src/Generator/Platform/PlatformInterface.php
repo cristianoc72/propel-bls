@@ -61,7 +61,7 @@ interface PlatformInterface
 
     /**
      * Returns the short name of the database type that this platform represents.
-     * For example MysqlPlatform->getDatabaseType() returns 'mysql'.
+     * For example MysqlPlatformSql->getDatabaseType() returns 'mysql'.
      * @return string
      */
     public function getDatabaseType();
