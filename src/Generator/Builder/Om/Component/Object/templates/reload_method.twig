@@ -1,0 +1,44 @@
+if ($this->isDeleted()) {
+    throw new PropelException("Cannot reload a deleted object.");
+}
+
+if ($this->isNew()) {
+    throw new PropelException("Cannot reload an unsaved object.");
+}
+
+if ($con === null) {
+    $con = Propel::getServiceContainer()->getReadConnection({{ tableMapName }}::DATABASE_NAME);
+}
+
+// We don't need to alter the object instance pool; we're just modifying this instance
+// already in the pool.
+
+$dataFetcher = {{ queryName }}::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+$row = $dataFetcher->fetch();
+$dataFetcher->close();
+if (!$row) {
+    throw new PropelException('Cannot find matching row in the database to reload object values.');
+}
+$this->hydrate($row, 0, true, $dataFetcher->getIndexType()); // rehydrate
+
+{# support for lazy load columns #}
+{% for column in columns %}
+    {%- if column.isLazyLoad %}
+// Reset the {{ column.getName.toLowercase }} lazy-load column
+$this->{{ column.getName.toLowercase }} = null;
+$this->{{ column.getName.toLowercase }}_isLoaded = false;
+    {%- endif %}
+{% endfor %}
+
+if ($deep) {  // also de-associate any related objects?
+{% for varName in foreignKeys %}
+$this->{{ varName }} = null;
+{% endfor %}
+
+{% for referrerName in referrers %}
+$this->{{ referrerName }} = null;
+{% endfor %}
+
+{% for crossFKName %}
+$this->{{ crossFKName }} = null;
+{% endfor %}

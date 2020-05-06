@@ -1,0 +1,11 @@
+// Because BLOB columns are streams in PDO we have to assume that they are
+// always modified when a new value is passed in.  For example, the contents
+// of the stream itself may have changed externally.
+if (!is_resource($v) && $v !== null) {
+    $this->{{ columnName }} = fopen('php://memory', 'r+');
+    fwrite($this->{{ columnName }}, $v);
+    rewind($this->{{ columnName }});
+} else { // it's already a stream
+    $this->{{ columnName }} = $v;
+}
+$this->modifiedColumns->set({{ constantName }}, true);

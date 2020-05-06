@@ -1,0 +1,57 @@
+try {
+{% set n = 0 %}
+{% for column in columns.toArray %}
+    {%- if not column.isLazyLoad %}
+    $col = $row[TableMap::TYPE_NUM == $indexType ? {{ n }} + $startcol : {{ tableMapName }}::translateFieldName('{{ column.phpName }}', TableMap::TYPE_PHPNAME, $indexType)];
+        {%- if column.getType == clob_emu and isOracle %}
+    $this->{{ column.getName.toLowercase }} = stream_get_contents($col);
+        {%- elseif column.isLobType and not hasStreamBlob %}
+    if (null !== $col) {
+        $this->{{ column.getName.toLowercase }} = fopen('php://memory', 'r+');
+        fwrite($this->{{ column.getName.toLowercase }}, $col);
+        rewind($this->{{ column.getName.toLowercase }});
+    } else {
+        $this->{{ column.getName.toLowercase }} = null;
+    }
+        {%- elseif column.isTemporalType %}
+            {%- if isMysql %}
+                {%- if column.getType == "DATE" %}
+    if ($col === '0000-00-00') {
+                {%- elseif column.getType == "TIMESTAMP" %}
+    if($col === '0000-00-00 00:00:00') {
+                {%- endif %}
+        $col = null;
+    }
+            {%- endif %}
+    $this->{{ column.getName.toLowercase }} = (null !== $col) ? PropelDateTime::newInstance($col, null, '{{ dateTimeClass }}') : null;
+        {%- elseif column.isPhpPrimitiveType %}
+    $this->{{ column.getName.toLowercase }} = (null !== $col) ? ({{ column.getPhpType }}) $col : null;
+        {%- elseif column.getType == 'OBJECT' %}
+    $this->{{ column.getName.toLowercase }} = $col;
+        {%- elseif column.getType == 'ARRAY' %}
+    $this->{{ column.getName.toLowercase }} = $col;
+    $this->{{ column.getName.toLowercase }}_unserialized = null;
+        {%- elseif column.isSetType %}
+    $this->{{ column.getName.toLowercase }} = $col;
+    $this->{{ column.getName.toLowercase }}_converted = null;
+        {%- elseif column.isPhpObjectType %}
+    $this->{{ column.getName.toLowercase }} = (null !== $col) ? new {{ column.getPhpType }}($col) : null;
+        {%- else %}
+    $this->{{ column.getName.toLowercase }} = $col;
+        {%- endif %}
+    {%- endif %}
+{% set n = n + 1 %}
+{% endfor %}
+{% if isAddSaveMethod %}
+    $this->resetModified();
+{% endif %}
+    $this->setNew(false);
+
+    if ($rehydrate) {
+        $this->ensureConsistency();
+    }
+
+    return $startcol + {{ n }}; // {{ n }} = {{ tableMapName }}::NUM_HYDRATE_COLUMNS.
+} catch (Exception $e) {
+    throw new PropelException(sprintf('Error populating %s object', {{ populatedObject }}), 0, $e);
+}

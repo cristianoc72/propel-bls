@@ -9,9 +9,10 @@
 
 namespace Propel\Generator\Platform;
 
+use Propel\Generator\Builder\Om\Component\ForeignKeyTrait;
 use Propel\Generator\Exception\BuildException;
+use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Database;
-use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Index;
@@ -27,6 +28,8 @@ use Propel\Generator\Model\Schema;
  */
 trait FinalizationTrait
 {
+    use ForeignKeyTrait;
+
     /**
      * Do final initialization of the whole schema.
      *
@@ -86,6 +89,8 @@ trait FinalizationTrait
                     $this->addExtraIndices($table);
                 }
             }
+
+            $this->validateModel($table);
         }
     }
 
@@ -258,6 +263,49 @@ trait FinalizationTrait
             $idx = new Index();
             $idx->addColumns(array_slice($pk, $i, $size));
             $table->addIndex($idx);
+        }
+    }
+
+    /**
+     * Validates the current table to make sure that it won't result in
+     * generated code that will not parse.
+     *
+     * This method may emit warnings for code which may cause problems
+     * and will throw exceptions for errors that will definitely cause
+     * problems.
+     *
+     * @param Table $table
+     */
+    protected function validateModel(Table $table): void
+    {
+        // Check to see whether any generated foreign key names
+        // will conflict with column names.
+
+        $colPhpNames = [];
+        $fkPhpNames = [];
+
+        foreach ($table->getColumns() as $col) {
+            $colPhpNames[] = $col->getPhpName();
+        }
+
+        foreach ($table->getForeignKeys() as $fk) {
+            $fkPhpNames[] = $this->getForeignKeyPhpName($fk, false);
+        }
+
+        $intersect = array_intersect($colPhpNames, $fkPhpNames);
+        if (!empty($intersect)) {
+            throw new EngineException("One or more of your column names for [{$table->getName()}] table conflict with foreign key names (" . implode(", ", $intersect) . ")");
+        }
+
+        // Check foreign keys to see if there are any foreign keys that
+        // are also matched with an inversed referencing foreign key
+        // (this is currently unsupported behavior)
+        // see: http://propel.phpdb.org/trac/ticket/549
+
+        foreach ($table->getForeignKeys() as $fk) {
+            if ($fk->isMatchedByInverseFK()) {
+                throw new EngineException(sprintf('The 1:1 relationship expressed by foreign key %s is defined in both directions; Propel does not currently support this (if you must have both foreign key constraints, consider adding this constraint with a custom SQL file.)', $fk->getName()));
+            }
         }
     }
 }

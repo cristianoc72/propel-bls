@@ -35,7 +35,7 @@ class AggregateColumnBehavior extends Behavior
      *
      * @return bool
      */
-    public function allowMultiple()
+    public function allowMultiple(): bool
     {
         return true;
     }

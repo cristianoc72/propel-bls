@@ -1,0 +1,9 @@
+if (is_string($v)) {
+    // JSON as string needs to be decoded/encoded to get a reliable comparison (spaces, ...)
+    $v = Json::decode($v);
+}
+$encodedValue = Json::encode($v);
+if ($encodedValue !== $this->{{ columnName }}) {
+    $this->{{ columnName }} = $encodedValue;
+    $this->modifiedColumns->set({{ constantName }}, true);
+}

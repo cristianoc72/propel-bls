@@ -966,7 +966,6 @@ class Column
      * objects.
      *
      * @return string
-     * @deprecated use PropelTypes::getPhpNative()
      */
     public function getPhpNative(): string
     {
@@ -979,7 +978,6 @@ class Column
      *
      * @return boolean
      * @see PropelTypes::isPhpPrimitiveType()
-     * @deprecated use PropelTypes::isPhpPrimitiveType()
      */
     public function isPhpPrimitiveType(): bool
     {
@@ -992,7 +990,6 @@ class Column
      *
      * @return boolean
      * @see PropelTypes::isPhpPrimitiveNumericType()
-     * @deprecated use PropelTypes::isPhpPrimitiveNumericType()
      */
     public function isPhpPrimitiveNumericType(): bool
     {
@@ -1004,7 +1001,6 @@ class Column
      *
      * @return boolean
      * @see PropelTypes::isPhpObjectType()
-     * @deprecated use PropelTypes::isPhpObjectType()
      */
     public function isPhpObjectType(): bool
     {

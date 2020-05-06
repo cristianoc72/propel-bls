@@ -404,4 +404,15 @@ class PropelTypes
 
         return in_array(strtolower($value), [ 'true', 't', 'y', 'yes' ], true);
     }
+
+    /**
+     * Convenience method to indicate whether a passed-in PHP type is a set.
+     *
+     * @param  string  $phpType The PHP type to check
+     * @return boolean
+     */
+    public static function isSetType(string $phpType): bool
+    {
+        return strtoupper($phpType) === self::SET;
+    }
 }

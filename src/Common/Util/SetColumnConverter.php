@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -28,7 +28,7 @@ class SetColumnConverter
      *
      * @throws SetColumnConverterException
      */
-    public static function convertToInt($val, array $valueSet)
+    public static function convertToInt($val, array $valueSet): ?int
     {
         if ($val === null) {
             return 0;
@@ -44,7 +44,7 @@ class SetColumnConverter
             $bitValueArr[array_search($value, $valueSet)] = '1';
         }
         
-        return base_convert(implode(array_reverse($bitValueArr)), 2, 10);
+        return (int) base_convert(implode(array_reverse($bitValueArr)), 2, 10);
     }
 
     /**
@@ -57,7 +57,7 @@ class SetColumnConverter
      *
      * @throws SetColumnConverterException
      */
-    public static function convertIntToArray($val, array $valueSet)
+    public static function convertIntToArray($val, array $valueSet): array
     {
         if ($val === null) {
             return [];

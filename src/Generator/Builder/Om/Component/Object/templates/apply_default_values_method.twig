@@ -1,0 +1,10 @@
+{% for column in columns %}
+{% if column.defaultValue.isExpression %}
+$this->{{ column.name.toLowerCase }} = {{ column.defaultValue.value }};
+{% endif %}
+{% if column.isTemporalType %}
+$this->{{ column.name.toLowerCase }} = PropelDateTime::newInstance({{ column.defaultValueString }}, null, '{{ dateTimeClass }}');
+{% else %}
+$this->{{ column.name.toLowerCase }} = {{ column.defaultValueString }};
+{% endif %}
+{% endfor %}

@@ -137,33 +137,6 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
     }
 
     /**
-     * Returns a configured data model builder class based on type
-     * ('object', 'query', 'tableMap' etc.).
-     *
-     * @param  Table $table
-     * @param  string $type
-     *
-     * @return DataModelBuilder
-     *
-     * @throws \Propel\Generator\Exception\ClassNotFoundException if the type of builder is wrong and the builder class
-     *                                                            doesn't exists
-     */
-    public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder
-    {
-        $className = $this->getConfigProperty('generator.objectModel.builders.' . $type);
-
-        if (null === $className || !class_exists($className)) {
-            throw new InvalidArgumentException(sprintf('Builder for `%s` not found.', $type));
-        }
-
-        /** @var DataModelBuilder $builder */
-        $builder = new $className($table);
-        $builder->setGeneratorConfig($this);
-
-        return $builder;
-    }
-
-    /**
      * Returns a configured Pluralizer class.
      *
      * @return PluralizerInterface

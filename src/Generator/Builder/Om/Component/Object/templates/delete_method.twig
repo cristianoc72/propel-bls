@@ -1,0 +1,17 @@
+if ($this->isDeleted()) {
+    throw new PropelException("This object has already been deleted.");
+}
+
+if ($con === null) {
+    $con = Propel::getServiceContainer()->getWriteConnection({{ tableMap }}::DATABASE_NAME);
+}
+
+$con->transaction(function () use ($con) {
+$deleteQuery = {{ query }}::create()
+    ->filterByPrimaryKey($this->getPrimaryKey());
+$ret = $this->preDelete($con);
+if ($ret) {
+    $deleteQuery->delete($con);
+    $this->postDelete($con);
+    $this->setDeleted(true);
+}

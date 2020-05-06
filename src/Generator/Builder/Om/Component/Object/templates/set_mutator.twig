@@ -1,0 +1,13 @@
+if ($this->{{ columnName }}_converted === null || count(array_diff($this->{{ columnName }}_converted, $v)) > 0 || count(array_diff($v, $this->{{ columnName }}_converted)) > 0) {
+    $valueSet = {{ tableMapName }}::getValueSet({{ constantName }});
+    try {
+        $v = SetColumnConverter::convertToInt($v, $valueSet);
+    } catch (SetColumnConverterException $e) {
+        throw new PropelException(sprintf('Value "%s" is not accepted in this set column', $e->getValue()), $e->getCode(), $e);
+    }
+    if ($this->{{ columnName }} !== $v) {
+        $this->{{ columnName }}_converted = null;
+        $this->{{ columnName }} = $v;
+        $this->modifiedColumns->set({{ constantName }}, true);
+    }
+}

@@ -1,0 +1,101 @@
+<?php declare(strict_types=1);
+/**
+ * This file is part of the Propel package.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @license MIT License
+ *
+ */
+
+namespace Propel\Generator\Builder\Om\Component\EntityMap;
+
+use Propel\Generator\Builder\Om\Component\BuildComponent;
+use Propel\Generator\Builder\Om\Component\CrossRelationTrait;
+
+/**
+ * Adds buildRelations method.
+ *
+ * @author Marc J. Schmidt <marc@marcjschmidt.de>
+ */
+class BuildRelationsMethod extends BuildComponent
+{
+    use CrossRelationTrait;
+
+    public function process()
+    {
+        $body = "";
+
+        $this->getDefinition()->declareUse('Propel\Runtime\Map\RelationMap');
+
+        foreach ($this->getEntity()->getRelations() as $relation) {
+            $relationName = var_export($this->getRelationVarName($relation), true);
+            $target = var_export($relation->getForeignEntity()->getFullName(), true);
+            $columnMapping = var_export($relation->getLocalForeignMapping(), true);
+
+            $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
+            $onUpdate = $relation->hasOnUpdate() ? "'" . $relation->getOnUpdate() . "'" : 'null';
+
+            $type = 'RelationMap::MANY_TO_ONE';
+            if ($relation->isLocalPrimaryKey()) {
+                $type = 'RelationMap::ONE_TO_ONE';
+                $columnMapping = var_export($relation->getForeignLocalMapping(), true);
+            }
+
+            $body .= "
+\$this->addRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate);";
+        }
+
+        foreach ($this->getEntity()->getReferrers() as $relation) {
+            $relationName = var_export($this->getRefRelationCollVarName($relation), true);
+            $target = var_export($relation->getEntity()->getFullName(), true);
+            $columnMapping = var_export($relation->getLocalForeignMapping(), true);
+
+            $onDelete = $relation->hasOnDelete() ? "'" . $relation->getOnDelete() . "'" : 'null';
+            $onUpdate = $relation->hasOnUpdate() ? "'" . $relation->getOnUpdate() . "'" : 'null';
+
+            $type = "RelationMap::ONE_TO_" . ($relation->isLocalPrimaryKey() ? "ONE" : "MANY");
+
+            $refName = var_export($this->getRelationVarName($relation), true);
+
+            $body .= "
+//ref relation
+\$this->addRefRelation($relationName, $target, $type, $columnMapping, $onDelete, $onUpdate, $refName);";
+        }
+
+        foreach ($this->getEntity()->getCrossRelations() as $crossRelation) {
+            $relation = $crossRelation->getOutgoingRelation();
+            $relationName = var_export($this->getRelationVarName($relation, true), true);
+            $refName = $relationName;
+
+            $target = var_export($crossRelation->getForeignEntity()->getFullName(), true);
+            
+            $onDelete = $crossRelation->getIncomingRelation()->hasOnDelete() ? "'" . $crossRelation->getIncomingRelation()->getOnDelete() . "'" : 'null';
+            $onUpdate = $crossRelation->getIncomingRelation()->hasOnUpdate() ? "'" . $crossRelation->getIncomingRelation()->getOnUpdate() . "'" : 'null';
+
+            $fieldMapping = [];
+            foreach ($crossRelation->getRelations() as $relation) {
+                $fieldMapping[$relation->getField()] = array_merge($relation->getLocalForeignMapping(), $fieldMapping);
+            }
+
+            $mapping = [
+                'via' => $crossRelation->getMiddleEntity()->getFullName(),
+                'viaTable' => $crossRelation->getMiddleEntity()->getFullTableName(),
+                'isImplementationDetail' => $crossRelation->getMiddleEntity()->isImplementationDetail(),
+                'fieldMappingIncomingName' => $crossRelation->getIncomingRelation()->getField(),
+                'fieldMappingIncoming' => $crossRelation->getIncomingRelation()->getLocalForeignMapping(),
+                'fieldMappingOutgoing' => $fieldMapping,
+                'fieldMappingPrimaryKeys' => $crossRelation->getUnclassifiedPrimaryKeyNames(),
+            ];
+
+            $mapping = var_export($mapping, true);
+            $polymorphic = var_export($crossRelation->isPolymorphic(), true);
+            $body .= "
+//cross relation
+\$this->addRelation($relationName, $target, RelationMap::MANY_TO_MANY, $mapping, $onDelete, $onUpdate, $refName, $polymorphic);";
+        }
+
+        $this->addMethod('buildRelations')
+            ->setBody($body);
+    }
+}

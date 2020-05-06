@@ -1,5 +1,5 @@
 {
-    "name": "susina/propel",
+    "name": "propel/propel",
     "type": "library",
     "description": "Propel is an open-source Object-Relational Mapping (ORM) for PHP 7.2 and up.",
     "keywords": [
@@ -18,23 +18,22 @@
     "require": {
         "php": ">=7.2",
         "ext-simplexml": "*",
-        "ext-json": "*",
         "ext-pdo": "*",
-        "symfony/yaml": "^4.1",
-        "symfony/finder": "^4.1",
-        "symfony/validator": "^4.1",
-        "symfony/filesystem": "^4.1",
-        "symfony/config": "^4.1",
+        "symfony/yaml": "^5",
+        "symfony/finder": "^5",
+        "symfony/validator": "^5",
+        "symfony/filesystem": "^5",
+        "symfony/config": "^5",
         "psr/log": "^1.0",
-        "symfony/console": "^4.1",
-        "symfony/translation": "^4.1",
-        "phootwork/json": "^1.2",
-        "cristianoc72/pluralizer": "^1.0",
-        "phootwork/lang": "^0.9.0"
+        "symfony/console": "^5",
+        "symfony/translation": "^5",
+        "phootwork/json": "^2",
+        "phootwork/lang": "^2",
+        "twig/twig": "^2"
     },
     "require-dev": {
         "monolog/monolog": "^1.23",
-        "phpunit/phpunit": "^7.3",
+        "phpunit/phpunit": "^8.0",
         "mikey179/vfsstream": "^1.6"
     },
     "suggest": {

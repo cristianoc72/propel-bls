@@ -21,7 +21,7 @@ trait NamespacePart
     use NamePart;
     use SuperordinatePart;
 
-    /** @var string */
+    /** @var Text */
     private $namespace;
 
     /**
@@ -33,7 +33,7 @@ trait NamespacePart
         if ($name->contains('\\')) {
             $namespace = $name->split('\\');
             $this->name = new Text($namespace->pop());
-            $this->namespace = $namespace->join('\\')->toString();
+            $this->namespace = $namespace->join('\\');
         } else {
             $this->name = $name;
         }
@@ -46,27 +46,20 @@ trait NamespacePart
      */
     public function setNamespace(?string $namespace): void
     {
-        if (null !== $namespace) {
-            $namespace = rtrim($namespace, '\\');
-        }
-        $this->namespace = $namespace;
+        $this->namespace = (new Text($namespace))->trimEnd('\\');
     }
 
     /**
      * Returns the namespace
      *
-     * @return string
+     * @return Text
      */
-    public function getNamespace(): string
+    public function getNamespace(): Text
     {
         $namespace = $this->namespace;
 
-        if (null === $namespace && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
+        if ($namespace->isEmpty() && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getNamespace')) {
             $namespace = $this->getSuperordinate()->getNamespace();
-        }
-
-        if (null === $namespace) {
-            $namespace = '';
         }
 
         return $namespace;
@@ -75,17 +68,10 @@ trait NamespacePart
     /**
      * Returns the class name with namespace.
      *
-     * @return string
+     * @return Text
      */
-    public function getFullName(): string
+    public function getFullName(): Text
     {
-        $name = $this->getName();
-        $namespace = $this->getNamespace();
-
-        if ($namespace) {
-            return $namespace . '\\' . $name;
-        } else {
-            return $name->toString();
-        }
+        return $this->getName()->prepend($this->getNamespace()->ensureEnd('\\'));
     }
 }

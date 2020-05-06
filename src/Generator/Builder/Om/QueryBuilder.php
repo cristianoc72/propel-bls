@@ -11,7 +11,7 @@
 namespace Propel\Generator\Builder\Om;
 
 use Propel\Generator\Model\Column;
-use Propel\Generator\Model\CrossForeignKeys;
+use Propel\Generator\Model\CrossForeignKey;
 use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Table;
@@ -1489,7 +1489,7 @@ abstract class ".$this->getUnqualifiedClassName()." extends " . $parentClass . "
 ";
     }
 
-    protected function addFilterByCrossFK(&$script, CrossForeignKeys $crossFKs)
+    protected function addFilterByCrossFK(&$script, CrossForeignKey $crossFKs)
     {
         $relationName = $this->getRefFKPhpNameAffix($crossFKs->getIncomingForeignKey(), $plural = false);
 

@@ -1,0 +1,5 @@
+if ($this->{{ columnName }}_unserialized !== $v) {
+    $this->{{ columnName }}_unserialized = $v;
+    $this->{{ columnName }} = '| ' . implode(' | ', $v) . ' |';
+    $this->modifiedColumns->set({{ columnConstant }}, true);
+}

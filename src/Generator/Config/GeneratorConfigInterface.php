@@ -21,16 +21,6 @@ use Propel\Runtime\Connection\ConnectionInterface;
 interface GeneratorConfigInterface
 {
     /**
-     * Returns a configured data model builder class for specified table and
-     * based on type ('ddl', 'sql', etc.).
-     *
-     * @param  Table            $table
-     * @param  string           $type
-     * @return DataModelBuilder
-     */
-    public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder;
-
-    /**
      * Returns a configured Pluralizer class.
      *
      * @return PluralizerInterface

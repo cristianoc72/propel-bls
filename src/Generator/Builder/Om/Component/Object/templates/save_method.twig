@@ -1,0 +1,27 @@
+if ($this->isDeleted()) {
+    throw new PropelException("You cannot save an object that has been deleted.");
+}
+
+if ($this->alreadyInSave) {
+    return 0;
+}
+
+if ($con === null) {
+    $con = Propel::getServiceContainer()->getWriteConnection({{ tableMap }}::DATABASE_NAME);
+}
+
+return $con->transaction(function () use ($con{% if reloadOnupdate or reloadOnInsert %}, $skipReload{% endif %}) {
+    $ret = $this->preSave($con);
+    $ret = $this->isNew() ? ($ret && $this->preInsert($con)) : ($ret && $this->preUpdate($con));
+
+    if ($ret) {
+        $affectedRows = $this->doSave($con{% if reloadOnupdate or reloadOnInsert %}, $skipReload{% endif %});
+        $c = $this->isNew() ? $this->postInsert($con) : $this->postUpdate($con);
+        $this->postSave($con);
+        {{ tableMap }}::addInstanceToPool($this);
+    } else {
+        $affectedRows = 0;
+    }
+
+    return $affectedRows;
+}

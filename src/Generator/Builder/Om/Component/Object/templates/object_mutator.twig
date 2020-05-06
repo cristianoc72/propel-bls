@@ -1,0 +1,7 @@
+if (null === $this->{{ columnName }} || stream_get_contents($this->{{ columnName }}) !== serialize($v)) {
+$this->{{ columnName }}Unserialized = $v;
+$this->{{ columnName }} = fopen('php://memory', 'r+');
+fwrite($this->{{ columnName }}, serialize($v));
+$this->modifiedColumns[{{ constantName }}] = true;
+}
+rewind($this->{{ columnName }});

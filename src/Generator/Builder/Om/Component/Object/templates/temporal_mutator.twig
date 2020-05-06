@@ -1,0 +1,13 @@
+$dt = PropelDateTime::newInstance($v, null, '{{ dateTimeClass }}');
+if ($this->{{ columnName }} !== null || $dt !== null) {
+{% if column.hasDefaultValue %}
+    if (($dt != $this->{{ columnName }}) // normalized values don't match
+    || ($dt->format({{ format }}) === {{ defaultValue }}) // or the entered value matches the default
+    ) {
+{% else %}
+    if ($this->{{ columnName }} === null || $dt === null || $dt->format("{{ format }}") !== $this->{{ columnName }}->format("{{ format }}")) {
+{% endif %}
+        $this->{{ columnName }} = $dt === null ? null : clone $dt;
+        $this->modifiedColumns->set({{ columnConstant }}, true;
+    }
+} // if either are not null

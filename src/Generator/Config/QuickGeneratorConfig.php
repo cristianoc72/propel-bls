@@ -72,28 +72,6 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
     }
 
     /**
-     * Gets a configured data model builder class for specified entity and based
-     * on type ('ddl', 'sql', etc.).
-     *
-     * @param  Table            $table
-     * @param  string           $type
-     * @return DataModelBuilder
-     */
-    public function getConfiguredBuilder(Table $table, string $type): DataModelBuilder
-    {
-        $class = $this->getConfigProperty('generator.objectModel.builders.' . $type);
-
-        if (null === $class) {
-            throw new InvalidArgumentException("Invalid data model builder type `$type`");
-        }
-
-        $builder = new $class($table);
-        $builder->setGeneratorConfig($this);
-
-        return $builder;
-    }
-
-    /**
      * Returns a configured Pluralizer class.
      *
      * @return PluralizerInterface

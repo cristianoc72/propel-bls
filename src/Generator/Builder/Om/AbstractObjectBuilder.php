@@ -176,7 +176,7 @@ abstract class AbstractObjectBuilder extends AbstractOMBuilder
      */
     public function hasBehaviorModifier($hookName, $modifier = null)
     {
-        return parent::hasBehaviorModifier($hookName, 'ObjectBuilderModifier');
+         return parent::hasBehaviorModifier($hookName, 'ObjectBuilderModifier');
     }
 
     /**

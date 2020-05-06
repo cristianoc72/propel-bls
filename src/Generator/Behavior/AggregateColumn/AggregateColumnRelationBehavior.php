@@ -26,7 +26,7 @@ class AggregateColumnRelationBehavior extends Behavior
         'aggregate_name'    => '',
     ];
 
-    public function allowMultiple()
+    public function allowMultiple(): bool
     {
         return true;
     }

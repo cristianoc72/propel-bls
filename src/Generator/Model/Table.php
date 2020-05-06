@@ -55,6 +55,9 @@ class Table
     /** @var string */
     private $alias;
 
+    /** @var string */
+    private $baseClass;
+
     /** @var Column */
     private $inheritanceColumn;
 
@@ -280,6 +283,22 @@ class Table
     public function getPlatform(): ?PlatformInterface
     {
         return $this->database ? $this->database->getPlatform() : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseClass(): ?string
+    {
+        return $this->baseClass;
+    }
+
+    /**
+     * @param string $baseClass
+     */
+    public function setBaseClass(string $baseClass): void
+    {
+        $this->baseClass = $baseClass;
     }
 
     /**
@@ -550,12 +569,12 @@ class Table
      *
      * @return CrossForeignKey[]
      */
-    public function getCrossForeignKeys()
+    public function getCrossForeignKeys(): Set
     {
         $crossFks = [];
         foreach ($this->referrers as $refForeignKey) {
             if ($refForeignKey->getTable()->isCrossRef()) {
-                $crossForeignKey = new CrossForeignKeys($refForeignKey, $this);
+                $crossForeignKey = new CrossForeignKey($refForeignKey, $this);
                 /** @var ForeignKey $foreignKey */
                 foreach ($refForeignKey->getOtherFks() as $foreignKey) {
                     if ($foreignKey->isAtLeastOneLocalPrimaryKeyIsRequired() &&
@@ -569,7 +588,7 @@ class Table
             }
         }
 
-        return $crossFks;
+        return new Set($crossFks, CrossForeignKey::class);
     }
 
     /**

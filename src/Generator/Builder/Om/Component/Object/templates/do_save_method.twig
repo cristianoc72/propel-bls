@@ -1,0 +1,88 @@
+$affectedRows = 0; // initialize var to track total num of affected rows
+
+if (!$this->alreadyInSave) {
+    $this->alreadyInSave = true;
+    {%- if reloadOnInsert or reloadOnUpdate %}
+    $reloadObject = false;
+    {%- endif %}
+
+    {%- if foreignKeys.size > 0 %}
+    // We call the save method on the following object(s) if they
+    // were passed to this object by their corresponding set
+    // method.  This object relates to these object(s) by a
+    // foreign key reference.
+    {%- for varName in foreignKeys %}
+    if ($this->{{ varName }} !== null) {
+        if ($this->{{ varName }}->isModified() || $this->{{ varName }}->isNew()) {
+            $affectedRows += $this->{{ varName }}->save($con);
+        }
+        $this->set{{ varName.toUpperCaseFirst }}($this->{{ varName }});
+    }
+    {%- endfor %}
+    {%- endif %}
+    if ($this->isNew() || $this->isModified()) {
+        // persist changes
+        if ($this->isNew()) {
+            $this->doInsert($con);
+            $affectedRows += 1;
+            {%- if reloadOnInsert %}
+            if (!$skipReload) {
+                $reloadObject = true;
+            }
+            {%- endif %}
+        } else {
+            $affectedRows += $this->doUpdate($con);
+            {%- if reloadOnUpdate %}
+            if (!$skipReload) {
+                $reloadObject = true;
+            }
+            {%- endif %}
+        }
+
+        {%- for column in columns %}
+            {%- if column.isLobType %}
+        // Rewind the {{ column.getName.toLowercase }} LOB column, since PDO does not rewind after inserting value.
+        if ($this->{{ column.getName.toLowercase }} !== null && is_resource($this->{{ column.getName.toLowercase }})) {
+            rewind($this->{{ column.getName.toLowercase }});
+        }
+            {%- endif %}
+        {%- endfor %}
+
+        $this->resetModified();
+    }
+
+    {%- if crossForeignKeys.size > 0 %}
+        {%- for crossFks in crossForeignKeys  %}
+            {%- include "partials/cross_fk_scheduled_for_deletion.twig" %}
+        {%- endfor %}
+    {%- endif %}
+
+    {%- for referrePk in referrerPks %}
+    if ($this->{{ referrerPk }} !== null) {
+        if (!$this->{{ referrerPk }}->isDeleted() && ($this->{{ referrerPk }}->isNew() || $this->{{ referrerPk }}->isModified())) {
+            $affectedRows += $this->{{ referrerPk }}->save($con);
+        }
+    }
+    {%- endfor %}
+
+    {%- for referrer in referrers %}
+        {%- include "partials/reffk_scheduled_for_deletion.twig" %}
+    if ($this->{{ referrer }} !== null) {
+        foreach ($this->{{ referrer }} as $referrerFK) {
+            if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                $affectedRows += $referrerFK->save($con);
+            }
+        }
+    }
+    {%- endfor %}
+
+    $this->alreadyInSave = false;
+
+    {%- if reloadOnInsert or reloadOnUpdate %}
+    if ($reloadObject) {
+        $this->reload($con);
+    }
+    {%- endif %}
+}
+
+return $affectedRows;
