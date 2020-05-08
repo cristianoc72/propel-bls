@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.4",
         "ext-simplexml": "*",
         "ext-pdo": "*",
         "symfony/yaml": "^5",
@@ -27,14 +27,20 @@
         "psr/log": "^1.0",
         "symfony/console": "^5",
         "symfony/translation": "^5",
+        "phootwork/collection": "^2.0",
         "phootwork/json": "^2",
         "phootwork/lang": "^2",
-        "twig/twig": "^2"
+        "twig/twig": "^3",
+        "susina/psr2-code-generator": "^3.0",
+        "myclabs/deep-copy": "^1.9",
+        "phootwork/file": "^2.0"
     },
     "require-dev": {
         "monolog/monolog": "^1.23",
-        "phpunit/phpunit": "^8.0",
-        "mikey179/vfsstream": "^1.6"
+        "phpunit/phpunit": "^9",
+        "mikey179/vfsstream": "^1.6",
+        "vimeo/psalm": "^3.11",
+        "susina/coding-standard": "^1.2"
     },
     "suggest": {
         "monolog/monolog": "The recommended logging library to use with Propel."
@@ -63,5 +69,27 @@
         "branch-alias": {
             "dev-master": "2.0-dev"
         }
+    },
+    "scripts": {
+        "analytics": "psalm",
+        "check": [
+            "@test",
+            "@analytics",
+            "@cs-fix"
+        ],
+        "coverage:html": "@test --coverage-html coverage/",
+        "coverage:clover": "@test --coverage-clover clover.xml",
+        "cs": "php-cs-fixer fix -v --diff --dry-run",
+        "cs-fix": "php-cs-fixer fix -v --diff",
+        "test": "phpunit"
+    },
+    "scripts-descriptions": {
+        "analytics": "Run static analysis tool",
+        "check": "Perform all tests and analysis, required before submitting a pull request",
+        "coverage:html": "Create a code coverage report in html format, into the `coverage/` directory",
+        "coverage:clover": "Create a code coverage report in xml format, into the `clover.xml` file",
+        "cs": "Run code style analysis, without fixing errors",
+        "cs-fix": "Run code style analysis and fix errors",
+        "test": "Run all tests"
     }
 }

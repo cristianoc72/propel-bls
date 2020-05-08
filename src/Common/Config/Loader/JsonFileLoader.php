@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,12 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Common\Config\Loader;
 
 use phootwork\json\Json;
 use phootwork\json\JsonException;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\JsonParseException;
 
 /**
@@ -25,18 +24,16 @@ class JsonFileLoader extends FileLoader
     /**
      * Loads an Json file.
      *
-     * @param mixed  $file The resource
+     * @param mixed $file The resource
      * @param string $type The resource type
      *
      * @return array
      *
-     * @throws \InvalidArgumentException                            if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
      * @throws JsonException
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $json = file_get_contents($this->getPath($file));
+        $json = file_get_contents($this->getLocator()->locate($file));
         $content = [];
         if ('' !== $json) {
             $content = Json::decode($json);
@@ -54,8 +51,10 @@ class JsonFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        return $this->checkSupports('json', $resource);
+        $resource = new Text($resource);
+
+        return $resource->endsWith('.json') || $resource->endsWith('.json.dist');
     }
 }

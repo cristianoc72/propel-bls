@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,10 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Common\Config\Loader;
 
+use phootwork\lang\Text;
 use Propel\Common\Config\XmlToArrayConverter;
 
 /**
@@ -29,17 +27,12 @@ class XmlFileLoader extends FileLoader
      *
      * @return array
      *
-     * @throws \InvalidArgumentException                                if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid xml file
-     * @throws \Propel\Common\Config\Exception\XmlParseException        if something went wrong while parsing xml file
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $content = XmlToArrayConverter::convert($this->getPath($file));
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
+        $content = XmlToArrayConverter::convert($this->getLocator()->locate($file));
 
-        return $content;
+        return $this->resolveParams($content);
     }
 
     /**
@@ -50,8 +43,10 @@ class XmlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        return $this->checkSupports('xml', $resource);
+        $resource = new Text($resource);
+
+        return $resource->endsWith('xml') || $resource->endsWith('xml.dist');
     }
 }

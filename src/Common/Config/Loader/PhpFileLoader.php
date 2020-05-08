@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,10 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Common\Config\Loader;
 
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 
 /**
@@ -32,32 +33,32 @@ class PhpFileLoader extends FileLoader
     /**
      * Loads a PHP file.
      *
-     * @param mixed  $file The resource
+     * @param mixed $file The resource
      * @param string $type The resource type
      *
      * @return array
      *
-     * @throws \InvalidArgumentException                                if configuration file not found
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if invalid json file
-     * @throws \Propel\Common\Config\Exception\InputOutputException     if configuration file is not readable
+     * @throws FileException if the configuration file not found or not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $path = $this->getPath($file);
+        $file = new File($this->getLocator()->locate($file));
+
+        if (!$file->isReadable()) {
+            throw new FileException("Impossible to read the configuration file: do you have the right permissions?");
+        }
 
         //Use output buffering because in case $file contains invalid non-php content (i.e. plain text), include() function
         //write it on stdoutput
         ob_start();
-        $content = include $path;
+        $content = include $file->getPathname()->toString();
         ob_end_clean();
 
         if (!is_array($content)) {
             throw new InvalidArgumentException("The configuration file '$file' has invalid content.");
         }
 
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
-
-        return $content;
+        return $this->resolveParams($content);
     }
 
     /**
@@ -69,8 +70,11 @@ class PhpFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        return $this->checkSupports(['php', 'inc'], $resource);
+        $resource = new Text($resource);
+
+        return $resource->endsWith('.php') || $resource->endsWith('.php.dist') ||
+            $resource->endsWith('.inc') || $resource->endsWith('.inc.dist');
     }
 }

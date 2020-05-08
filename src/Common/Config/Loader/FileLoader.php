@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,8 +6,6 @@
  *
  * @license MIT License
  */
-
-declare(strict_types=1);
 
 namespace Propel\Common\Config\Loader;
 
@@ -34,16 +31,16 @@ abstract class FileLoader extends BaseFileLoader
      *
      * @var bool
      */
-    private $resolved = false;
+    private bool $resolved = false;
 
     /**
      * Configuration values array.
      * It contains the configuration values array to manipulate while resolving parameters.
-     * It's useful, in particular, resolve() and get() method.
+     * It's useful, in particular, for resolve() and get() method.
      *
      * @var array
      */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Constructor.
@@ -83,26 +80,6 @@ abstract class FileLoader extends BaseFileLoader
         $this->resolved = true;
 
         return $parameters;
-    }
-
-    /**
-     * Get the path of a given resource
-     *
-     * @param mixed $file The resource
-     *
-     * @return array|string
-     * @throws \InvalidArgumentException                            If the file is not found
-     * @throws \Propel\Common\Config\Exception\InputOutputException If the path is not readable
-     */
-    protected function getPath($file)
-    {
-        $path = $this->locator->locate($file);
-
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access configuration file $file.");
-        }
-
-        return $path;
     }
 
     /**

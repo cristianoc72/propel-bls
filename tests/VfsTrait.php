@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -13,6 +12,7 @@ namespace Propel\Tests;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
+use phootwork\file\File;
 
 /**
  * Useful methods to manipulate virtual filesystem, via vfsStream library
@@ -22,14 +22,14 @@ use org\bovigo\vfs\vfsStreamFile;
 trait VfsTrait
 {
     /** @var vfsStreamDirectory */
-    private $root;
+    private vfsStreamDirectory $root;
 
     /**
      * @return vfsStreamDirectory
      */
     public function getRoot(): vfsStreamDirectory
     {
-        if (null === $this->root) {
+        if (!isset($this->root)) {
             $this->root = vfsStream::setup();
         }
 
@@ -48,28 +48,27 @@ trait VfsTrait
      */
     public function newFile(string $filename, string $content = ''): vfsStreamFile
     {
-        $path = pathinfo($filename);
-        $dir = $this->getDir($path['dirname']);
-
-        return vfsStream::newFile($filename)->at($dir)->setContent($content);
+        return vfsStream::newFile($filename)->at($this->getDir($filename))->setContent($content);
     }
 
     /**
      * Return the directory on which append a file.
-     * If the directory does not exists, it'll be created. If the directory name represents
+     * If the directory does not exist, it'll be created. If the directory name represents
      * a structure (e.g. dir/sub_dir/sub_sub_dir) the structure is created.
      *
-     * @param string $dirname
+     * @param string $filename
      *
      * @return vfsStreamDirectory
      */
-    private function getDir(string $dirname): vfsStreamDirectory
+    private function getDir(string $filename): vfsStreamDirectory
     {
-        if ('.' === $dirname) {
+        $file = new File($filename);
+
+        if ($file->getDirname()->toString() === '.') {
             return $this->getRoot();
         }
 
-        $dirs = explode('/', $dirname);
+        $dirs = $file->getDirname()->split('/');
         $parent = $this->getRoot();
         foreach ($dirs as $dir) {
             $current = $parent->getChild($dir);

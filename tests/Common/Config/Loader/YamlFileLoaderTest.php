@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,25 +9,26 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
-use org\bovigo\vfs\vfsStream;
+use phootwork\file\exception\FileException;
 use Propel\Common\Config\Loader\YamlFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Yaml\Exception\ParseException;
 
 class YamlFileLoaderTest extends TestCase
 {
     use VfsTrait;
     
-    protected $loader;
+    protected YamlFileLoader $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new YamlFileLoader(new FileLocator($this->getRoot()->url()));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->loader->supports('foo.yaml'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($this->loader->supports('foo.yml'), '->supports() returns true if the resource is loadable');
@@ -38,7 +38,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports('foo.bar.dist'), '->supports() returns true if the resource is loadable');
     }
 
-    public function testYamlFileCanBeLoaded()
+    public function testYamlFileCanBeLoaded(): void
     {
         $content = <<<EOF
 #test ini
@@ -52,21 +52,19 @@ EOF;
         $this->assertEquals('baz', $test['bar']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "inexistent.yaml" does not exist (in:
-     */
-    public function testYamlFileDoesNotExist()
+    public function testYamlFileDoesNotExist(): void
     {
+        $this->expectException(FileLocatorFileNotFoundException::class);
+        $this->expectExceptionMessage("The file \"inexistent.yaml\" does not exist (in: \"vfs://root\").");
+
         $this->loader->load('inexistent.yaml');
     }
 
-    /**
-     * @expectedException        Symfony\Component\Yaml\Exception\ParseException
-     * @expectedExceptionMessage Unable to parse
-     */
-    public function testYamlFileHasInvalidContent()
+    public function testYamlFileHasInvalidContent(): void
     {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage("Unable to parse");
+
         $content = <<<EOF
 not yaml content
 only plain
@@ -77,7 +75,7 @@ EOF;
     }
 
 
-    public function testYamlFileIsEmpty()
+    public function testYamlFileIsEmpty(): void
     {
         $this->newFile('empty.yaml', '');
 
@@ -86,12 +84,11 @@ EOF;
         $this->assertEquals([], $actual);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.yaml.
-     */
-    public function testYamlFileNotReadableThrowsException()
+    public function testYamlFileNotReadableThrowsException(): void
     {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("You don't have permissions to access notreadable.yaml file");
+
         $content = <<<EOF
 foo: bar
 bar: baz

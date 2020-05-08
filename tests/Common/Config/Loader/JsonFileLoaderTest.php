@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -20,9 +19,9 @@ class JsonFileLoaderTest extends TestCase
 {
     use VfsTrait;
 
-    protected $loader;
+    protected JsonFileLoader $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new JsonFileLoader(new FileLocator($this->getRoot()->url()));
     }

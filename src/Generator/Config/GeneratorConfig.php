@@ -259,7 +259,7 @@ class GeneratorConfig extends ConfigurationManager implements GeneratorConfigInt
 
         if (null !== $interfaceName) {
             if (!interface_exists($interfaceName)) {
-                throw new InvalidArgumentException("Interface $interfaceName does not exists.");
+                throw new InvalidArgumentException("Interface $interfaceName does not exist.");
             }
 
             if (!$object instanceof $interfaceName) {

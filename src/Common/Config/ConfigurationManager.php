@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,14 +7,12 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Common\Config;
 
+use Exception;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\InvalidConfigurationException;
 use Propel\Common\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -35,45 +32,21 @@ class ConfigurationManager
      *
      * @var array
      */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Load and validate configuration values from a file.
      *
-     * @param string $filename  Configuration file name or directory in which resides the configuration file.
-     * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
+     * @param string $filename Configuration file name or directory in which resides the configuration file.
+     * @param array $extraConf Array of configuration properties, to be merged with those loaded from file.
      *                          It's useful when passing configuration parameters from command line.
+     *
+     * @throws Exception If something went wrong
      */
     public function __construct(string $filename = self::CONFIG_FILE_NAME, array $extraConf = [])
     {
         $this->load($filename, $extraConf);
         $this->process();
-    }
-
-    /**
-     * Return the whole configuration array
-     *
-     * @return array
-     */
-    public function get(): array
-    {
-        return $this->config;
-    }
-
-    /**
-     * Return a specific section of the configuration array.
-     * It ca be useful to get, in example, only 'generator' values.
-     *
-     * @param  string $section the section to be returned
-     * @return array
-     */
-    public function getSection(string $section): array
-    {
-        if (!array_key_exists($section, $this->config)) {
-            return null;
-        }
-
-        return $this->config[$section];
     }
 
     /**
@@ -84,14 +57,15 @@ class ConfigurationManager
      * is expressed by:
      * <code>'database.adapter.mysql.tableType</code>
      *
-     * @param  string                                                   $name The name of property, expressed as a dot separated level hierarchy
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException
-     * @return mixed                                                    The configuration property
+     * @param  string $name The name of property, expressed as a dot separated level hierarchy
+     * @return mixed The configuration property
+     *
+     * @throws InvalidArgumentException
      */
-    public function getConfigProperty(string $name)
+    public function get(string $name = '')
     {
         $keys = explode('.', $name);
-        $output = $this->get();
+        $output = $this->config;
         foreach ($keys as $key) {
             if (!array_key_exists($key, $output)) {
                 return null;
@@ -131,21 +105,17 @@ class ConfigurationManager
      * Only one configuration file is supposed to be found.
      * This method also looks for a '.dist' configuration file and loads it.
      *
-     * @param string $fileName  Configuration file name or directory in which resides the configuration file.
-     * @param array  $extraConf Array of configuration properties, to be merged with those loaded from file.
+     * @param string $fileName Configuration file name or directory in which resides the configuration file.
+     * @param array $extraConf Array of configuration properties, to be merged with those loaded from file.
      *
-     * @throws FileLoaderLoadException
+     * @throws Exception
      */
-    protected function load(string $fileName, ?array $extraConf): void
+    protected function load(string $fileName, array $extraConf = []): void
     {
         $dirs = $this->getDirs($fileName);
 
         if ((is_dir($fileName))) {
             $fileName = self::CONFIG_FILE_NAME;
-        }
-
-        if (null === $extraConf) {
-            $extraConf = [];
         }
 
         if (self::CONFIG_FILE_NAME === $fileName) {
@@ -182,10 +152,10 @@ class ConfigurationManager
      *                         the constructor to pass a built-in array of configuration, without load it from file. I.e.
      *                         Propel\Generator\Config\QuickGeneratorConfig class.
      */
-    protected function process(?array $extraConf = null)
+    protected function process(array $extraConf = null): void
     {
         if (null === $extraConf && count($this->config) <= 0) {
-            return null;
+            return;
         }
 
         $processor = new Processor();
@@ -235,14 +205,14 @@ class ConfigurationManager
      * @param string $fileName The configuration file
      *
      * @return array|mixed
-     * @throws \Symfony\Component\Config\Exception\FileLoaderLoadException
+     *
+     * @throws Exception If something goes wrong
      */
     private function loadFile(string $fileName)
     {
         if (!file_exists($fileName)) {
             return [];
         }
-
         $delegatingLoader = new DelegatingLoader();
 
         return $delegatingLoader->load($fileName);
@@ -280,7 +250,7 @@ class ConfigurationManager
     /**
      * Remove empty `slaves` array from configured connections.
      */
-    private function cleanupSlaveConnections()
+    private function cleanupSlaveConnections(): void
     {
         foreach ($this->config['database']['connections'] as $name => $connection) {
             if (count($connection['slaves']) <= 0) {
@@ -293,7 +263,7 @@ class ConfigurationManager
      * If not defined, set `runtime` and `generator` connections, based on `database.connections` property.
      * Check if runtime and generator connections are correctly defined.
      */
-    private function cleanupConnections()
+    private function cleanupConnections(): void
     {
         foreach (['runtime', 'generator'] as $section) {
             if (!isset($this->config[$section]['connections']) || count($this->config[$section]['connections']) === 0) {

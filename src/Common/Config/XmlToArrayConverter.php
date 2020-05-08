@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace Propel\Common\Config;
 
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\XmlParseException;
 use SimpleXMLElement;
@@ -28,30 +31,20 @@ class XmlToArrayConverter
      *
      * @return array
      *
-     * @throws \Propel\Common\Config\Exception\XmlParseException if parse errors occur
+     * @throws FileException if XML file does not exist or not readable
+     * @throws XmlParseException if an error occurs while loading xml file
      */
     public static function convert(string $xmlToParse)
     {
-        $isFile = file_exists($xmlToParse);
-
-        //Empty xml file returns empty array
-        if (
-            ($isFile && 0 === filesize($xmlToParse))
-            or (!$isFile && '' === $xmlToParse)
-        ) {
-            return [];
-        }
-
-        if (
-            ($isFile && file_get_contents($xmlToParse, false, null, 0, 1) !== '<')
-            or (!$isFile && $xmlToParse[0] !== '<')
-        ) {
-            throw new InvalidArgumentException('Invalid xml content');
-        }
+        $xmlFile = new File($xmlToParse);
 
         $currentInternalErrors = libxml_use_internal_errors(true);
 
-        if ($isFile) {
+        if ($xmlFile->exists()) {
+            if ($xmlFile->read()->isEmpty()) {
+                return [];
+            }
+
             $xml = simplexml_load_file($xmlToParse);
             if ($xml instanceof SimpleXMLElement) {
                 dom_import_simplexml($xml)->ownerDocument->xinclude();
@@ -69,17 +62,15 @@ class XmlToArrayConverter
             throw new XmlParseException($errors);
         }
 
-        $conf = self::simpleXmlToArray($xml);
-
-        return $conf;
+        return self::simpleXmlToArray($xml);
     }
 
     /**
      * Recursive function that converts an SimpleXML object into an array.
-     * @author     Christophe VG (based on code form php.net manual comment)
-     *
-     * @param  \SimpleXMLElement $xml SimpleXML object.
+     * @param  SimpleXMLElement $xml SimpleXML object.
      * @return array             Array representation of SimpleXML object.
+     *@author     Christophe VG (based on code form php.net manual comment)
+     *
      */
     protected static function simpleXmlToArray(SimpleXMLElement $xml)
     {
@@ -132,7 +123,7 @@ class XmlToArrayConverter
 
     /**
      * Process XML value, handling boolean, if appropriate.
-     * @param  \SimpleXMLElement $value The simplexml value object.
+     * @param SimpleXMLElement $value The simplexml value object.
      * @return mixed             string or boolean value
      */
     private static function getConvertedXmlValue(SimpleXMLElement $value)

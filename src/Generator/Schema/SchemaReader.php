@@ -109,7 +109,7 @@ class SchemaReader
             $schema->setPlatform($platform);
         }
 
-        $schemaArray = XmlToArrayConverter::convert('<propel>' . $xmlSchema . '</propel>');
+        $schemaArray = XmlToArrayConverter::convertString('<propel>' . $xmlSchema . '</propel>');
         $schemaArray = $this->processSchema($schemaArray);
         $this->parseDatabase($schemaArray, $schema);
         $schema->getPlatform()->doFinalInitialization($schema);

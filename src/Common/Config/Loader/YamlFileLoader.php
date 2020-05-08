@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -7,11 +7,11 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Common\Config\Loader;
 
-use Propel\Common\Config\Exception\InputOutputException;
+use phootwork\file\exception\FileException;
+use phootwork\file\File;
+use phootwork\lang\Text;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -25,37 +25,25 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a Yaml file.
      *
-     * @param mixed  $file The resource
+     * @param mixed $file The resource
      * @param string $type The resource type
      *
      * @return array
      *
-     * @throws \InvalidArgumentException                            if configuration file not found
-     * @throws \Symfony\Component\Yaml\Exception\ParseException     if something goes wrong in parsing file
-     * @throws \Propel\Common\Config\Exception\InputOutputException if configuration file is not readable
+     * @throws ParseException if something goes wrong in parsing file
+     * @throws FileException if configuration file is not found or not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
-        $path = $this->locator->locate($file);
+        $file = new File($this->getLocator()->locate($file));
 
-        if (!is_readable($path)) {
-            throw new InputOutputException("You don't have permissions to access configuration file $file.");
-        }
-
-        $content = Yaml::parse(file_get_contents($path));
-
-        //config file is empty
-        if (null === $content) {
-            $content = [];
-        }
+        $content = Yaml::parse($file->read()->toString()) ?? [];
 
         if (!is_array($content)) {
             throw new ParseException('Unable to parse the configuration file: wrong yaml content.');
         }
 
-        $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
-
-        return $content;
+        return $this->resolveParams($content);
     }
 
     /**
@@ -67,8 +55,11 @@ class YamlFileLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        return $this->checkSupports(['yaml', 'yml'], $resource);
+        $fileName = new Text($resource);
+
+        return $fileName->endsWith('yaml') || $fileName->endsWith('yml') ||
+            $fileName->endsWith('yaml.dist') || $fileName->endsWith('yml.dist');
     }
 }

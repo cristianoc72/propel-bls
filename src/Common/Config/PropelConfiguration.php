@@ -10,6 +10,7 @@
 
 namespace Propel\Common\Config;
 
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -29,11 +30,12 @@ class PropelConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('propel');
+        $treeBuilder = new TreeBuilder('propel');
+        $treeBuilder->getRootNode()
+            ->append($this->addGeneralSection())
+            ->append($this->addExcludeTablesSection())
 
-        $this->addGeneralSection($rootNode);
-        $this->addExcludeTablesSection($rootNode);
+
         $this->addPathsSection($rootNode);
         $this->addDatabaseSection($rootNode);
         $this->addMigrationsSection($rootNode);
@@ -44,19 +46,20 @@ class PropelConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    protected function addGeneralSection(ArrayNodeDefinition $node)
+    protected function addGeneralSection(): NodeDefinition
     {
+        $treeBuilder = new TreeBuilder('general');
+        $node = $treeBuilder->getRootNode();
+
         $node
-            ->children()
-                ->arrayNode('general')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->scalarNode('project')->defaultValue('')->end()
-                        ->scalarNode('version')->defaultValue('2.0.0-dev')->end()
-                    ->end()
+            ->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('project')->defaultValue('')->end()
+                    ->scalarNode('version')->defaultValue('')->end()
                 ->end()
-            ->end()
         ;
+
+        return $node;
     }
 
     protected function addPathsSection(ArrayNodeDefinition $node)
