@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,9 @@
 
 namespace Propel\Tests\Common\Config\Loader;
 
-use org\bovigo\vfs\vfsStream;
+use phootwork\file\exception\FileException;
+use Propel\Common\Config\Exception\IniParseException;
+use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Loader\IniFileLoader;
 use Propel\Common\Config\FileLocator;
 use Propel\Tests\TestCase;
@@ -20,14 +21,14 @@ class IniFileLoaderTest extends TestCase
 {
     use VfsTrait;
 
-    protected $loader;
+    protected IniFileLoader $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->loader = new IniFileLoader(new FileLocator($this->getRoot()->url()));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->loader->supports('foo.ini'), '->supports() returns true if the resource is loadable');
         $this->assertTrue($this->loader->supports('foo.properties'), '->supports() returns true if the resource is loadable');
@@ -37,7 +38,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports('foo.foo.dist'), '->supports() returns true if the resource is loadable');
     }
 
-    public function testIniFileCanBeLoaded()
+    public function testIniFileCanBeLoaded(): void
     {
         $content = <<<EOF
 ;test ini
@@ -51,21 +52,19 @@ EOF;
         $this->assertEquals('baz', $test['bar']);
     }
 
-    /**
-     * @expectedException        \InvalidArgumentException
-     * @expectedExceptionMessage The file "inexistent.ini" does not exist (in:
-     */
-    public function testIniFileDoesNotExist()
+    public function testIniFileDoesNotExist(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("The file \"inexistent.ini\" does not exist (in");
+
         $this->loader->load('inexistent.ini');
     }
 
-    /**
-     * @expectedException        Propel\Common\Config\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The configuration file 'nonvalid.ini' has invalid content.
-     */
-    public function testIniFileHasInvalidContent()
+    public function testIniFileHasInvalidContent(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The configuration file 'vfs://root/nonvalid.ini' has invalid content.");
+
         $content = <<<EOF
 {not ini content}
 only plain
@@ -75,7 +74,7 @@ EOF;
         @$this->loader->load('nonvalid.ini');
     }
 
-    public function testIniFileIsEmpty()
+    public function testIniFileIsEmpty(): void
     {
         $this->newFile('empty.ini');
 
@@ -84,7 +83,7 @@ EOF;
         $this->assertEquals([], $actual);
     }
 
-    public function testWithSections()
+    public function testWithSections(): void
     {
         $content = <<<EOF
 [Cartoons]
@@ -104,7 +103,7 @@ EOF;
         $this->assertEquals('Minnie', $actual['Cartoons']['Mickey']['love']);
     }
 
-    public function testNestedSections()
+    public function testNestedSections(): void
     {
         $content = <<<EOF
 foo.bar.baz   = foobar
@@ -121,7 +120,7 @@ EOF;
         $this->assertEquals('blabar', $actual['bla']['bar']);
     }
 
-    public function testMixedNestedSections()
+    public function testMixedNestedSections(): void
     {
         $content = <<<EOF
 bla.foo.bar = foobar
@@ -139,12 +138,11 @@ EOF;
         $this->assertEquals('foobaz2', $actual['bla']['foo']['baz'][1]);
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\IniParseException
-     * @expectedExceptionMessage Invalid key ".foo"
-     */
-    public function testInvalidSectionThrowsException()
+    public function testInvalidSectionThrowsException(): void
     {
+        $this->expectException(IniParseException::class);
+        $this->expectExceptionMessage("Invalid key \".foo\"");
+
         $content = <<<EOF
 .foo = bar
 bar = baz
@@ -154,12 +152,11 @@ EOF;
         $test = $this->loader->load('parameters.ini');
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\IniParseException
-     * @expectedExceptionMessage Invalid key "foo."
-     */
-    public function testInvalidParamThrowsException()
+    public function testInvalidParamThrowsException(): void
     {
+        $this->expectException(IniParseException::class);
+        $this->expectExceptionMessage("Invalid key \"foo.\"");
+
         $content = <<<EOF
 foo. = bar
 bar = baz
@@ -169,12 +166,11 @@ EOF;
         $test = $this->loader->load('parameters.ini');
     }
 
-    /**
-     * @expectedException \Propel\Common\Config\Exception\IniParseException
-     * @expectedExceptionMessage Cannot create sub-key for "foo", as key already exists
-     */
-    public function testAlreadyExistentParamThrowsException()
+    public function testAlreadyExistentParamThrowsException(): void
     {
+        $this->expectException(IniParseException::class);
+        $this->expectExceptionMessage("Cannot create sub-key for \"foo\", as key already exists");
+
         $content = <<<EOF
 foo = bar
 foo.babar = baz
@@ -184,7 +180,7 @@ EOF;
         $test = $this->loader->load('parameters.ini');
     }
 
-    public function testSectionZero()
+    public function testSectionZero(): void
     {
         $content = <<<EOF
 foo = bar
@@ -195,12 +191,11 @@ EOF;
         $this->assertEquals(['0' => ['foo' => 'bar', 'babar' => 'baz']], $this->loader->load('parameters.ini'));
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InputOutputException
-     * @expectedExceptionMessage You don't have permissions to access configuration file notreadable.ini.
-     */
     public function testIniFileNotReadableThrowsException()
     {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("You don't have permissions to access notreadable.ini file");
+
         $content = <<<EOF
 foo = bar
 bar = baz

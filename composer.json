@@ -77,19 +77,39 @@
             "@analytics",
             "@cs-fix"
         ],
-        "coverage:html": "@test --coverage-html coverage/",
-        "coverage:clover": "@test --coverage-clover clover.xml",
+        "clear-fixtures": "rm -rf tests/Fixtures/fixtures_built; rm -rf tests/Fixtures/*/build; rm -rf tests/Fixtures/reverse/*/build;",
+        "coverage:agnostic:html": "@test:agnostic --coverage-html coverage/",
+        "coverage:agnostic:clover": "@test:agnostic --coverage-clover clover.xml",
+        "coverage:mysql:html": "@test:mysql --coverage-html coverage/",
+        "coverage:mysql:clover": "@test:mysql --coverage-clover clover.xml",
+        "coverage:pgsql:html": "@test:pgsql --coverage-html coverage/",
+        "coverage:pgsql:clover": "@test:pgsql --coverage-clover clover.xml",
+        "coverage:sqlite:html": "@test:sqlite --coverage-html coverage/",
+        "coverage:sqlite:clover": "@test:sqlite --coverage-clover clover.xml",
         "cs": "php-cs-fixer fix -v --diff --dry-run",
         "cs-fix": "php-cs-fixer fix -v --diff",
-        "test": "phpunit"
+        "test:agnostic": "phpunit -c tests/agnostic.phpunit.xml --colors=always",
+        "test:mysql": "phpunit -c tests/mysql.phpunit.xml --colors=always",
+        "test:pgsql": "phpunit -c tests/pgsql.phpunit.xml --colors=always",
+        "test:sqlite": "phpunit -c tests/sqlite.phpunit.xml --colors=always"
     },
     "scripts-descriptions": {
         "analytics": "Run static analysis tool",
         "check": "Perform all tests and analysis, required before submitting a pull request",
-        "coverage:html": "Create a code coverage report in html format, into the `coverage/` directory",
-        "coverage:clover": "Create a code coverage report in xml format, into the `clover.xml` file",
+        "clear-fixtures": "Clean up all fixtures",
         "cs": "Run code style analysis, without fixing errors",
         "cs-fix": "Run code style analysis and fix errors",
-        "test": "Run all tests"
+        "coverage:agnostic:html": "Create an agnostic code coverage report in html format, into the `coverage/` directory",
+        "coverage:agnostic:clover": "Create an agnostic code coverage report in xml format, into the `clover.xml` file",
+        "coverage:mysql:html": "Create a code coverage report in html format, into the `coverage/` directory, for Mysql tests",
+        "coverage:mysql:clover": "Create a code coverage report in xml format, into the `clover.xml` file, for Mysql tests",
+        "coverage:pgsql:html": "Create a code coverage report in html format, into the `coverage/` directory, for Postgresql tests",
+        "coverage:pgsql:clover": "Create a code coverage report in xml format, into the `clover.xml` file, for Postgresql tests",
+        "coverage:sqlite:html": "Create a code coverage report in html format, into the `coverage/` directory, for Sqlite tests",
+        "coverage:sqlite:clover": "Create a code coverage report in xml format, into the `clover.xml` file, for Sqlite tests",
+        "test:agnostic": "Run all agnostic (not database specific) tests",
+        "test:mysql": "Run all tests against Mysql database",
+        "test:pgsql": "Run all tests against Postgresql database",
+        "test:sqlite": "Run all tests against Sqlite database"
     }
 }
