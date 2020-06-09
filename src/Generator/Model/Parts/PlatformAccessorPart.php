@@ -21,11 +21,8 @@ trait PlatformAccessorPart
 {
     use SuperordinatePart;
 
-    /** @var GeneratorConfigInterface */
-    private $generatorConfig;
-
-    /** @var PlatformInterface */
-    private $platform;
+    private GeneratorConfigInterface $generatorConfig;
+    private PlatformInterface $platform;
 
     /**
      * Retrieves the configuration object.
@@ -34,7 +31,7 @@ trait PlatformAccessorPart
      */
     public function getGeneratorConfig(): ?GeneratorConfigInterface
     {
-        if (null !== $this->generatorConfig) {
+        if (isset($this->generatorConfig)) {
             return $this->generatorConfig;
         }
 
@@ -50,7 +47,7 @@ trait PlatformAccessorPart
      */
     public function getPlatform(): ?PlatformInterface
     {
-        if (null !== $this->platform) {
+        if (isset($this->platform)) {
             return $this->platform;
         }
 

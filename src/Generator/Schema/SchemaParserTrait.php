@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -11,6 +10,7 @@
 namespace Propel\Generator\Schema;
 
 use phootwork\file\File;
+use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Column;
@@ -35,14 +35,13 @@ use Propel\Generator\Model\Unique;
  */
 trait SchemaParserTrait
 {
-    /**
-     * @var ModelFactory
-     */
-    private $modelFactory;
+    private ModelFactory $modelFactory;
+
+    abstract public function getGeneratorConfig(): GeneratorConfigInterface;
 
     private function getModelFactory(): ModelFactory
     {
-        if (null === $this->modelFactory) {
+        if (!isset($this->modelFactory)) {
             $this->modelFactory = new ModelFactory($this->getGeneratorConfig());
         }
 
@@ -266,6 +265,6 @@ trait SchemaParserTrait
             return $schemaFile->getDirname() . DIRECTORY_SEPARATOR . $file->getPathname();
         }
 
-        return $file->getPathname();
+        return $file->getPathname()->toString();
     }
 }

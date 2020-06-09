@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -20,7 +19,7 @@ use Propel\Tests\TestCase;
  */
 class InheritanceTest extends TestCase
 {
-    public function testCreateNewInheritance()
+    public function testCreateNewInheritance(): void
     {
         $column = $this
             ->getMockBuilder('Propel\Generator\Model\Column')

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,7 @@
 
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Set;
+use phootwork\collection\Set;
 use Propel\Generator\Model\Database;
 
 /**
@@ -20,34 +19,26 @@ use Propel\Generator\Model\Database;
  */
 class DatabaseComparator
 {
-    /** @var DatabaseDiff */
-    protected $databaseDiff;
-
-    /** @var Database */
-    protected $fromDatabase;
-
-    /** @var Database */
-    protected $toDatabase;
+    protected DatabaseDiff $databaseDiff;
+    protected Database $fromDatabase;
+    protected Database $toDatabase;
 
     /**
      * Whether we should detect renamings and track it via `addRenamedTable` at the
      * DatabaseDiff object.
-     *
-     * @var bool
      */
-    protected $withRenaming = false;
+    protected bool $withRenaming = false;
 
-    /** @var boolean */
-    protected $removeTable = true;
+    protected bool $removeTable = true;
 
     /**
      * @var Set list of excluded tables
      */
-    protected $excludedTables;
+    protected Set $excludedTables;
 
-    public function __construct(?DatabaseDiff $databaseDiff = null)
+    public function __construct(DatabaseDiff $databaseDiff = null)
     {
-        $this->databaseDiff = (null === $databaseDiff) ? new DatabaseDiff() : $databaseDiff;
+        $this->databaseDiff = $databaseDiff ?? new DatabaseDiff();
         $this->excludedTables = new Set();
     }
 
@@ -127,7 +118,7 @@ class DatabaseComparator
             $excludedTables = [];
         }
         $this->excludedTables->clear();
-        $this->excludedTables->addAll($excludedTables);
+        $this->excludedTables->add(...$excludedTables);
     }
 
     /**
@@ -157,7 +148,8 @@ class DatabaseComparator
         bool $withRenaming = false,
         bool $removeTable = true,
         ?Set $excludedTables = null
-    ): ?DatabaseDiff {
+    ): ?DatabaseDiff
+    {
         $databaseComparator = new self();
         $databaseComparator->setFromDatabase($fromDatabase);
         $databaseComparator->setToDatabase($toDatabase);

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -26,9 +25,6 @@ class ForeignKeyComparator
      * @param ForeignKey $fromFk
      * @param ForeignKey $toFk
      *
-     * @param boolean $caseInsensitive Whether the comparison is case insensitive.
-     *                                 False by default.
-     *
      * @return boolean false if the two fks are similar, true if they have differences
      */
     public static function computeDiff(ForeignKey $fromFk, ForeignKey $toFk)
@@ -54,7 +50,7 @@ class ForeignKeyComparator
             return strtolower($element);
         });
 
-        if ($fromFkLocalColumns != $toFkLocalColumns) {
+        if ($fromFkLocalColumns !== $toFkLocalColumns) {
             return true;
         }
 
@@ -72,7 +68,7 @@ class ForeignKeyComparator
 
 
 
-        if ($fromFkForeignColumns != $toFkForeignColumns) {
+        if ($fromFkForeignColumns !== $toFkForeignColumns) {
             return true;
         }
 

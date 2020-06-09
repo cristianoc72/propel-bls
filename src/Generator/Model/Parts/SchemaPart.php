@@ -18,8 +18,7 @@ use Propel\Generator\Model\Schema;
  */
 trait SchemaPart
 {
-    /** @var Schema */
-    private $schema;
+    private Schema $schema;
 
     /**
      * @param Schema $schema
@@ -43,11 +42,7 @@ trait SchemaPart
     public function setSchema(Schema $schema): void
     {
         $this->schema = $schema;
-        if ($schema) {
-            $this->registerSchema($schema);
-        } else {
-            $this->unregisterSchema($schema);
-        }
+        $this->registerSchema($schema);
     }
 
     /**

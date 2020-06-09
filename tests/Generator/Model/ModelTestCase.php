@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,7 @@
 
 namespace Propel\Tests\Generator\Model;
 
+use phootwork\collection\ArrayList;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
@@ -20,7 +20,6 @@ use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Model\Schema;
 use Propel\Generator\Model\Unique;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\UniqueList;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
 
@@ -108,7 +107,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array      $options An array of options
      * @return ForeignKey
      */
-    protected function getForeignKeyMock($name = null, array $options = [])
+    protected function getForeignKeyMock($name = null, array $options = []): ForeignKey
     {
         $defaults = [
             'target' => '',
@@ -146,7 +145,7 @@ abstract class ModelTestCase extends TestCase
         $fk
             ->expects($this->any())
             ->method('getLocalColumns')
-            ->will($this->returnValue(new UniqueList($options['local_columns'])))
+            ->will($this->returnValue(new ArrayList($options['local_columns'])))
         ;
 
         $fk
@@ -165,7 +164,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Index
      */
-    protected function getIndexMock($name = null, array $options = [])
+    protected function getIndexMock($name = null, array $options = []): Index
     {
         $defaults = [
             'table' => null
@@ -203,7 +202,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Unique
      */
-    protected function getUniqueIndexMock($name = null, array $options = [])
+    protected function getUniqueIndexMock($name = null, array $options = []): Unique
     {
         $defaults = [
             'table' => null
@@ -241,7 +240,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Schema
      */
-    protected function getSchemaMock($name = null, array $options = [])
+    protected function getSchemaMock($name = null, array $options = []): Schema
     {
         $defaults = [
             'generator_config' => null,
@@ -276,7 +275,7 @@ abstract class ModelTestCase extends TestCase
      * @param  string            $schemaDelimiter
      * @return PlatformInterface
      */
-    protected function getPlatformMock($supportsSchemas = true, array $options = [], $schemaDelimiter = '.')
+    protected function getPlatformMock(bool $supportsSchemas = true, array $options = [], string $schemaDelimiter = '.'): PlatformInterface
     {
         $defaults = [
             'max_column_name_length' => null,
@@ -318,7 +317,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Domain
      */
-    protected function getDomainMock($name = null, array $options = [])
+    protected function getDomainMock($name = null, array $options = []): Domain
     {
         $defaults = [];
 
@@ -346,7 +345,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Table
      */
-    protected function getTableMock($name, array $options = [])
+    protected function getTableMock($name, array $options = []): Table
     {
         $defaults = [
             'name' => $name,
@@ -430,7 +429,8 @@ abstract class ModelTestCase extends TestCase
      * @param  array    $options An array of options
      * @return Database
      */
-    protected function getDatabaseMock($name, array $options = [])
+    protected function getDatabaseMock($name, array $options = []): Database
+
     {
         $defaults = [
             'platform' => null,
@@ -464,7 +464,7 @@ abstract class ModelTestCase extends TestCase
      * @param  array  $options An array of options
      * @return Column
      */
-    protected function getColumnMock($name, array $options = [])
+    protected function getColumnMock(string $name, array $options = []): Column
     {
         $defaults = [
             'size'       => null,

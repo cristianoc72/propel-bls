@@ -9,11 +9,11 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Set;
 use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Model;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\RuntimeException;
 
 /**
@@ -25,24 +25,15 @@ trait SqlPart
 {
     use SuperordinatePart;
 
-    /** @var bool */
-    protected $heavyIndexing;
+    protected bool $heavyIndexing;
+    protected bool $identifierQuoting;
+    protected string $stringFormat = '';
+    protected string $idMethod = '';
+    protected Set $idMethodParameters;
 
-    /** @var bool */
-    protected $identifierQuoting;
-
-    /** @var string */
-    protected $stringFormat;
-
-    /** @var string */
-    protected $idMethod;
-
-    /** @var Set */
-    protected $idMethodParameters;
-
-    protected function initSql()
+    protected function initSql(): void
     {
-        $this->idMethodParameters = new Set([], IdMethodParameter::class);
+        $this->idMethodParameters = new Set();
     }
 
     /**
@@ -70,7 +61,7 @@ trait SqlPart
      */
     public function getIdMethod(): string
     {
-        if (null !== $this->idMethod) {
+        if ('' !== $this->idMethod) {
             return $this->idMethod;
         }
 
@@ -88,7 +79,7 @@ trait SqlPart
      */
     public function addIdMethodParameter(IdMethodParameter $idMethodParameter): void
     {
-        $idMethodParameter->setEntity($this);
+        $idMethodParameter->setTable($this);
         $this->idMethodParameters->add($idMethodParameter);
     }
 
@@ -110,7 +101,7 @@ trait SqlPart
      */
     public function removeIdMethodParameter(IdMethodParameter $idMethodParameter): void
     {
-        $idMethodParameter->setEntity(null);
+        $idMethodParameter->setTable(null);
         $this->idMethodParameters->remove($idMethodParameter);
     }
 
@@ -119,11 +110,8 @@ trait SqlPart
      *
      * @param bool $heavyIndexing
      */
-    public function setHeavyIndexing(?bool $heavyIndexing = null): void
+    public function setHeavyIndexing(bool $heavyIndexing = true): void
     {
-        if (null === $heavyIndexing) {
-            $heavyIndexing = true;
-        }
         $this->heavyIndexing = $heavyIndexing;
     }
 
@@ -132,7 +120,7 @@ trait SqlPart
      */
     public function isHeavyIndexing(): bool
     {
-        if (null !== $this->heavyIndexing) {
+        if (isset($this->heavyIndexing)) {
             return $this->heavyIndexing;
         }
 

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,8 @@
 
 namespace Propel\Generator\Model;
 
+use InvalidArgumentException;
+use phootwork\collection\Set;
 use phootwork\lang\Text;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\BehaviorPart;
@@ -26,7 +27,6 @@ use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Runtime\Exception\RuntimeException;
-use Propel\Common\Collection\Set;
 
 /**
  * Data about a table used in an application.
@@ -40,87 +40,54 @@ use Propel\Common\Collection\Set;
  * @author Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author Hugo Hamon <webmaster@apprendre-php.com> (Propel)
  * @author Thomas Gossmann
+ * @author Cristiano Cinotti
  */
 class Table
 {
-    use SuperordinatePart, PlatformAccessorPart, ScopePart, BehaviorPart, NamespacePart, SchemaNamePart, SqlPart,
-        GeneratorPart, VendorPart, DatabasePart, DescriptionPart, ColumnsPart;
+    use BehaviorPart, ColumnsPart, DatabasePart, DescriptionPart, GeneratorPart, NamespacePart, PlatformAccessorPart,
+        SchemaNamePart, ScopePart, SqlPart, SuperordinatePart, VendorPart;
 
     //
     // Model properties
     // ------------------------------------------------------------
-    /** @var Text */
-    private $tableName;
-
-    /** @var string */
-    private $alias;
-
-    /** @var string */
-    private $baseClass;
-
-    /** @var Column */
-    private $inheritanceColumn;
+    private Text $tableName;
+    private string $alias;
+    private string $baseClass;
+    private Column $inheritanceColumn;
 
     //
     // Collections to other models
     // ------------------------------------------------------------
 
-    /** @var Set */
-    private $foreignKeys;
-
-    /** @var Set */
-    private $referrers;
-
-    /** @var Set */
-    private $foreignTableNames;
-
-    /** @var Set */
-    private $indices;
-
-    /** @var Set */
-    private $unices;
+    private Set $foreignKeys;
+    private Set $referrers;
+    private Set $foreignTableNames;
+    private Set $indices;
+    private Set $unices;
 
     //
     // Database related options/properties
     // ------------------------------------------------------------
 
-    /** @var bool */
-    private $allowPkInsert;
-
-    /** @var bool */
-    private $containsForeignPK = false;
-
-    /** @var bool */
-    private $needsTransactionInPostgres;
-
-    /** @var bool */
-    private $forReferenceOnly;
-
-    /** @var bool */
-    private $reloadOnInsert;
-
-    /** @var bool */
-    private $reloadOnUpdate;
+    private bool $allowPkInsert;
+    private bool $containsForeignPK = false;
+    private bool $needsTransactionInPostgres;
+    private bool $forReferenceOnly;
+    private bool $reloadOnInsert;
+    private bool $reloadOnUpdate;
 
     //
     // Generator options
     // ------------------------------------------------------------
 
-    /** @var bool */
-    private $readOnly;
-
-    /** @var bool */
-    private $isAbstract;
-
-    /** @var bool */
-    private $skipSql;
+    private bool $readOnly;
+    private bool $isAbstract;
+    private bool $skipSql;
 
     /**
      * @TODO maybe move this to database related options/props section ;)
-     *
-     * @var bool
      */
-    private $isCrossRef;
+    private bool $isCrossRef;
 
     /**
      * Constructs a table object with a name
@@ -134,12 +101,12 @@ class Table
         }
 
         // init
-        $this->tableName = new Text('');
-        $this->foreignKeys = new Set([], ForeignKey::class);
+        $this->tableName = new Text();
+        $this->foreignKeys = new Set();
         $this->foreignTableNames = new Set();
-        $this->indices = new Set([], Index::class);
-        $this->referrers = new Set([], ForeignKey::class);
-        $this->unices = new Set([], Unique::class);
+        $this->indices = new Set();
+        $this->referrers = new Set();
+        $this->unices = new Set();
         $this->initColumns();
         $this->initBehaviors();
         $this->initSql();
@@ -156,30 +123,9 @@ class Table
         $this->forReferenceOnly = false;
     }
 
-    public function __clone()
-    {
-        $this->columns = clone $this->columns;
-        $this->behaviors = clone $this->behaviors;
-        $this->idMethodParameters = clone $this->idMethodParameters;
-        $this->vendor = clone $this->vendor;
-        //Circular reference. Which strategy? Leave the reference to the original database
-        //or set it to null?
-        //$this->database = clone $this->database;
-        $this->foreignKeys = clone $this->foreignKeys;
-        $this->referrers = clone $this->referrers;
-        $this->foreignTableNames = clone $this->foreignTableNames;
-        $this->indices = clone $this->indices;
-        $this->unices = clone $this->unices;
-        foreach ($this->columns as $column) {
-            if ($column->isInheritance()) {
-                $this->inheritanceColumn = $column;
-                break;
-            }
-        }
-    }
-
     /**
      * @inheritdoc
+     *
      * @return Database
      */
     protected function getSuperordinate(): ?Database
@@ -219,9 +165,8 @@ class Table
         if ($this->tableName->isEmpty()) {
             $this->tableName = $this->name->toSnakeCase();
         }
-        $tableName = $this->tableName->isEmpty() ? $this->name->toSnakeCase() : $this->tableName;
 
-        return $tableName;
+        return $this->tableName->isEmpty() ? $this->name->toSnakeCase() : $this->tableName;
     }
 
     /**
@@ -262,17 +207,14 @@ class Table
      * Set the database that contains this table.
      *
      * @param Database $database
-     * @return $this
      */
-    public function setDatabase(Database $database): Table
+    public function setDatabase(Database $database): void
     {
         if ($this->database !== null && $this->database !== $database) {
             $this->database->removeTable($this);
         }
         $this->database = $database;
         $this->database->addTable($this);
-
-        return $this;
     }
 
     /**
@@ -290,7 +232,7 @@ class Table
      */
     public function getBaseClass(): ?string
     {
-        return $this->baseClass;
+        return $this->baseClass ?? null;
     }
 
     /**
@@ -309,7 +251,7 @@ class Table
      */
     public function getChildrenColumn(): ?Column
     {
-        return $this->inheritanceColumn;
+        return $this->inheritanceColumn ?? null;
     }
 
     /**
@@ -330,7 +272,6 @@ class Table
 
         return $names;
     }
-
 
 
     //
@@ -377,9 +318,8 @@ class Table
      * @param Column $column
      *
      * @throws EngineException
-     * @return $this
      */
-    public function addColumn(Column $column): Table
+    public function addColumn(Column $column): void
     {
         //The column must be unique
         if (null !== $this->getColumnByName($column->getName()->toString())) {
@@ -398,8 +338,6 @@ class Table
         if ($column->isInheritance()) {
             $this->inheritanceColumn = $column;
         }
-
-        return $this;
     }
 
     /**
@@ -423,14 +361,7 @@ class Table
      */
     public function getNumLazyLoadColumns(): int
     {
-        $count = 0;
-        foreach ($this->columns as $col) {
-            if ($col->isLazyLoad()) {
-                $count++;
-            }
-        }
-
-        return $count;
+        return $this->columns->findAll(fn(Column $element): bool => $element->isLazyLoad())->count();
     }
 
     /**
@@ -440,13 +371,7 @@ class Table
      */
     public function hasEnumColumns(): bool
     {
-        foreach ($this->columns as $col) {
-            if ($col->isEnumType()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->columns->search(fn(Column $col): bool => $col->isEnumType());
     }
 
 //    Never used: remove?
@@ -464,17 +389,13 @@ class Table
      * Adds a new foreignKey to this table.
      *
      * @param ForeignKey $foreignKey The foreignKey
-     *
-     * @return $this
      */
-    public function addForeignKey(ForeignKey $foreignKey): Table
+    public function addForeignKey(ForeignKey $foreignKey): void
     {
         $foreignKey->setTable($this);
 
         $this->foreignKeys->add($foreignKey);
         $this->foreignTableNames->add($foreignKey->getForeignTableName());
-
-        return $this;
     }
 
     /**
@@ -496,7 +417,7 @@ class Table
      */
     public function hasForeignKeys(): bool
     {
-        return $this->foreignKeys->size() > 0;
+        return !$this->foreignKeys->isEmpty();
     }
 
     /**
@@ -506,7 +427,7 @@ class Table
      */
     public function hasCrossForeignKeys(): bool
     {
-        return count($this->getCrossForeignKeys()) > 0;
+        return !$this->getCrossForeignKeys()->isEmpty();
     }
 
     /**
@@ -567,7 +488,7 @@ class Table
     /**
      * Returns the list of cross foreignKeys.
      *
-     * @return CrossForeignKey[]
+     * @return Set
      */
     public function getCrossForeignKeys(): Set
     {
@@ -588,7 +509,7 @@ class Table
             }
         }
 
-        return new Set($crossFks, CrossForeignKey::class);
+        return new Set($crossFks);
     }
 
     /**
@@ -658,11 +579,11 @@ class Table
     public function addIndex(Index $index): void
     {
         if ($this->hasIndex($index->getName()->toString())) {
-            throw new \InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
+            throw new InvalidArgumentException(sprintf('Index "%s" already exist.', $index->getName()));
         }
 
         if ($index->getColumns()->size() === 0) {
-            throw new \InvalidArgumentException(sprintf('Index "%s" has no columns.', $index->getName()));
+            throw new InvalidArgumentException(sprintf('Index "%s" has no columns.', $index->getName()));
         }
 
         $index->setTable($this);
@@ -724,9 +645,8 @@ class Table
      * Removes an index off this table
      *
      * @param Index|string $index
-     * @return $this
      */
-    public function removeIndex($index): Table
+    public function removeIndex($index): void
     {
         if (is_string($index)) {
             $index = $this->indices->find($index, function (Index $index, string $query) {
@@ -738,8 +658,6 @@ class Table
             $index->setTable(null);
             $this->indices->remove($index);
         }
-
-        return $this;
     }
 
 
@@ -766,7 +684,7 @@ class Table
      *
      * @param Column[]|string[] $keys
      * @return bool
-     * @throws \InvalidArgumentException If a column is not associated to this table
+     * @throws InvalidArgumentException If a column is not associated to this table
      */
     public function isUnique(array $keys): bool
     {
@@ -777,14 +695,14 @@ class Table
                     return true;
                 }
 
-                if ($column->isPrimaryKey() && 1 === count($column->getTable()->getPrimaryKey())) {
+                if ($column->isPrimaryKey() && 1 === $column->getTable()->getPrimaryKey()->count()) {
                     return true;
                 }
             }
         }
 
         // check if pk == $keys
-        if (count($this->getPrimaryKey()) === count($keys)) {
+        if ($this->getPrimaryKey()->count() === count($keys)) {
             $allPk = true;
             $stringArray = is_string($keys[0]);
             foreach ($this->getPrimaryKey() as $pk) {
@@ -809,7 +727,7 @@ class Table
         // check if there is a unique constrains that contains exactly the $keys
         /** @var Unique $unique */
         foreach ($this->unices->toArray() as $unique) {
-            if (count($unique->getColumns()->toArray()) === count($keys)) {
+            if ($unique->getColumns()->count() === count($keys)) {
                 $allAvailable = true;
                 foreach ($keys as $key) {
                     if (!$unique->hasColumn($key instanceof Column ? $key->getName() : $key)) {
@@ -936,7 +854,7 @@ class Table
      */
     public function getIdentifierQuoting(): ?bool
     {
-        return $this->identifierQuoting;
+        return $this->identifierQuoting ?? null;
     }
 
     /**
@@ -1080,13 +998,7 @@ class Table
      */
     public function getFirstPrimaryKeyColumn(): ?Column
     {
-        foreach ($this->columns as $column) {
-            if ($column->isPrimaryKey()) {
-                return $column;
-            }
-        }
-
-        return null;
+        return $this->columns->find(fn(Column $col): bool => $col->isPrimaryKey());
     }
 
     /**
@@ -1145,11 +1057,9 @@ class Table
      */
     public function getAutoIncrementColumnNames(): array
     {
-        return $this->columns->findAll(function(Column $element): string {
-            if ($element->isAutoIncrement()) {
-                return $element->getName()->toString();
-            }
-        });
+        $filteredCols = $this->columns->filter(fn(Column $col): bool => $col->isAutoIncrement());
+
+        return $filteredCols->findAll(fn(Column $element): string => $element->getName()->toString());
     }
 
     /**
@@ -1160,9 +1070,7 @@ class Table
     public function getAutoIncrementPrimaryKey(): ?Column
     {
         if (Model::ID_METHOD_NONE !== $this->getIdMethod()) {
-            return $this->getPrimaryKey()->find(function (Column $element): bool {
-                return $element->isAutoIncrement();
-            });
+            return $this->getPrimaryKey()->find(fn(Column $element): bool => $element->isAutoIncrement());
         }
 
         return null;
@@ -1175,9 +1083,7 @@ class Table
      */
     public function hasAutoIncrement(): bool
     {
-        return $this->columns->search(function(Column $element): bool {
-            return $element->isAutoIncrement();
-        });
+        return $this->columns->search(fn(Column $col): bool => $col->isAutoIncrement());
     }
 
 
@@ -1287,13 +1193,7 @@ class Table
      */
     public function hasAdditionalBuilders(): bool
     {
-        foreach ($this->behaviors as $behavior) {
-            if ($behavior->hasAdditionalBuilders()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->behaviors->search(fn(Behavior $elem): bool => $elem->hasAdditionalBuilders());
     }
 
     /**
@@ -1337,7 +1237,7 @@ class Table
     public function hasSchema(): bool
     {
         return $this->database
-        && ($this->database->getSchema() ?: $this->database->getSchema())
+        && ($this->database->getSchema() ?? false)
         && ($platform = $this->getPlatform())
         && $platform->supportsSchemas();
     }
@@ -1349,7 +1249,7 @@ class Table
      */
     public function getAlias(): ?string
     {
-        return $this->alias;
+        return $this->alias ?? null;
     }
 
     /**
@@ -1360,7 +1260,7 @@ class Table
      */
     public function isAlias(): bool
     {
-        return null !== $this->alias;
+        return isset($this->alias) ?? is_string($this->alias);
     }
 
     /**

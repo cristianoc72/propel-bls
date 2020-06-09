@@ -10,8 +10,7 @@
 
 namespace Propel\Generator\Builder\Om;
 
-use cristianoc72\codegen\generator\CodeFileGenerator;
-use cristianoc72\codegen\model\PhpMethod;
+use Susina\Codegen\Generator\CodeFileGenerator;
 use phootwork\lang\Text;
 use Propel\Generator\Builder\DataModelBuilder;
 use Propel\Generator\Builder\Om\Component\ComponentTrait;

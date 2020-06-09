@@ -8,9 +8,9 @@
  * @license MIT License
  */
 
-namespace Propel\Tests\Generator\Model\Diff\DatabaseTableComparatorTest;
+namespace Propel\Tests\Generator\Model\Diff;
 
-use Propel\Common\Collection\Set;
+use phootwork\collection\Set;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\ColumnDefaultValue;
 use Propel\Generator\Model\Database;
@@ -27,25 +27,22 @@ use Propel\Tests\TestCase;
  */
 class PropelDatabaseTableComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameTables()
+    public function testCompareSameTables(): void
     {
         $d1 = new Database();
         $d1->setPlatform($this->platform);
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -58,8 +55,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -70,7 +67,7 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertNull(DatabaseComparator::computeDiff($d1, $d2));
     }
 
-    public function testCompareNotSameTables()
+    public function testCompareNotSameTables(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo');
@@ -83,14 +80,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertTrue($diff instanceof DatabaseDiff);
     }
 
-    public function testCompareAddedTable()
+    public function testCompareAddedTable(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -100,8 +97,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -119,14 +116,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(['Bar' => $t4], $databaseDiff->getAddedTables()->toArray());
     }
 
-    public function testCompareAddedTableSkipSql()
+    public function testCompareAddedTableSkipSql(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -136,8 +133,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -153,14 +150,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(0, $nbDiffs);
     }
 
-    public function testCompareRemovedTable()
+    public function testCompareRemovedTable(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -172,8 +169,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -189,14 +186,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(['Bar' => $t2], $databaseDiff->getRemovedTables()->toArray());
     }
 
-    public function testCompareRemovedTableSkipSql()
+    public function testCompareRemovedTableSkipSql(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -209,8 +206,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -224,14 +221,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(0, $nbDiffs);
     }
 
-    public function testCompareModifiedTable()
+    public function testCompareModifiedTable(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -246,8 +243,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -266,14 +263,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(['Foo_Table' => $tableDiff], $databaseDiff->getModifiedTables()->toArray());
     }
 
-    public function testCompareRenamedTable()
+    public function testCompareRenamedTable(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -285,8 +282,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table2');
         $c3 = new Column('Foo');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -307,15 +304,14 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertTrue($databaseDiff->getRemovedTables()->isEmpty());
     }
 
-
-    public function testCompareSeveralTableDifferences()
+    public function testCompareSeveralTableDifferences(): void
     {
         $d1 = new Database();
         $t1 = new Table('Foo_Table');
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -332,8 +328,8 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $t3 = new Table('Foo_Table');
         $c3 = new Column('Foo1');
         $c3->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c3->getDomain()->replaceScale(2);
-        $c3->getDomain()->replaceSize(3);
+        $c3->getDomain()->setScale(2);
+        $c3->getDomain()->setSize(3);
         $c3->setNotNull(true);
         $c3->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t3->addColumn($c3);
@@ -363,7 +359,7 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(['Foo_Table' => $tableDiff], $databaseDiff->getModifiedTables()->toArray());
     }
 
-    public function testCompareSeveralRenamedSameTables()
+    public function testCompareSeveralRenamedSameTables(): void
     {
         $d1 = new Database();
         $t1 = new Table('table1');
@@ -412,7 +408,7 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertEquals(['table1', 'table2'], $databaseDiff->getRemovedTables()->keys()->toArray());
     }
 
-    public function testRemoveTable()
+    public function testRemoveTable(): void
     {
         $dc = new DatabaseComparator();
         $this->assertTrue($dc->getRemoveTable());
@@ -446,7 +442,7 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
     }
 
-    public function testExcludedTablesWithoutRenaming()
+    public function testExcludedTablesWithoutRenaming(): void
     {
         $dc = new DatabaseComparator();
         $this->assertCount(0, $dc->getExcludedTables());
@@ -498,7 +494,7 @@ class PropelDatabaseTableComparatorTest extends TestCase
         $this->assertInstanceOf('Propel\Generator\Model\Diff\DatabaseDiff', $diff);
     }
 
-    public function testExcludedTablesWithRenaming()
+    public function testExcludedTablesWithRenaming(): void
     {
         $dc = new DatabaseComparator();
         $this->assertCount(0, $dc->getExcludedTables());

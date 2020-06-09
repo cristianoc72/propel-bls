@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -20,7 +19,7 @@ use Propel\Generator\Model\Schema;
  */
 class SchemaTest extends ModelTestCase
 {
-    public function testCreateNewSchema()
+    public function testCreateNewSchema(): void
     {
         $platform = $this->getPlatformMock();
 
@@ -30,7 +29,7 @@ class SchemaTest extends ModelTestCase
         $this->assertFalse($schema->hasMultipleDatabases());
     }
 
-    public function testJoinMultipleSchemasWithSameTableTwice()
+    public function testJoinMultipleSchemasWithSameTableTwice(): void
     {
         $database1 = new Database('bookstore');
         $database1->addTable($this->getTableMock('books'));
@@ -49,7 +48,7 @@ class SchemaTest extends ModelTestCase
         $schema->joinSchemas([$subSchema1]);
     }
 
-    public function testJoinMultipleSchemasWithSameDatabase()
+    public function testJoinMultipleSchemasWithSameDatabase(): void
     {
         $behavior = $this->getBehaviorMock('sluggable');
 
@@ -85,7 +84,7 @@ class SchemaTest extends ModelTestCase
         $this->assertSame(2, $schema->countTables());
     }
 
-    public function testJoinMultipleSchemasWithoutTables()
+    public function testJoinMultipleSchemasWithoutTables(): void
     {
         $subSchema1 = new Schema($this->getPlatformMock());
         $subSchema1->addDatabase(new Database('bookstore'));
@@ -106,7 +105,7 @@ class SchemaTest extends ModelTestCase
         $this->assertTrue($schema->hasDatabase('skatestore'));
     }
 
-    public function testGetFirstDatabase()
+    public function testGetFirstDatabase(): void
     {
         $db = new Database('bookstore');
         $schema = new Schema($this->getPlatformMock());
@@ -115,7 +114,7 @@ class SchemaTest extends ModelTestCase
         $this->assertSame($db, $schema->getDatabase());
     }
 
-    public function testDatabases()
+    public function testDatabases(): void
     {
         $db1 = new Database('bookstore');
         $db2 = new Database('shoestore');
@@ -131,14 +130,14 @@ class SchemaTest extends ModelTestCase
         $this->assertTrue($schema->hasMultipleDatabases());
     }
 
-    public function testGetNoDatabase()
+    public function testGetNoDatabase(): void
     {
         $schema = new Schema($this->getPlatformMock());
 
         $this->assertNull($schema->getDatabase('shoestore'));
     }
 
-    public function testExternalSchema()
+    public function testExternalSchema(): void
     {
         $p1 = $this->getPlatformMock();
         $p2 = $this->getPlatformMock();
@@ -155,7 +154,7 @@ class SchemaTest extends ModelTestCase
         $this->assertSame($p2, $child->getPlatform());
     }
 
-    public function testAddArrayDatabase()
+    public function testAddArrayDatabase(): void
     {
         $config = $this
             ->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
@@ -179,18 +178,18 @@ class SchemaTest extends ModelTestCase
         $this->assertFalse($schema->hasMultipleDatabases());
     }
 
-    public function testAddArrayDatabaseWithDefaultPlatform()
+    public function testAddArrayDatabaseWithDefaultPlatform(): void
     {
         $schema = new Schema($this->getPlatformMock());
         $schema->addDatabase(new Database('bookstore'));
 
-        $this->assertCount(1, $schema->getDatabases(false));
+        $this->assertCount(1, $schema->getDatabases());
         $this->assertTrue($schema->hasDatabase('bookstore'));
         $this->assertFalse($schema->hasDatabase('foostore'));
         $this->assertFalse($schema->hasMultipleDatabases());
     }
 
-    public function testAddDatabase()
+    public function testAddDatabase(): void
     {
         $database1 = $this->getDatabaseMock('bookstore');
         $database2 = $this->getDatabaseMock('shoestore');
@@ -202,14 +201,14 @@ class SchemaTest extends ModelTestCase
         $schema->addDatabase($database1);
         $schema->addDatabase($database2);
 
-        $this->assertCount(2, $schema->getDatabases(false));
+        $this->assertCount(2, $schema->getDatabases());
         $this->assertTrue($schema->hasDatabase('bookstore'));
         $this->assertTrue($schema->hasDatabase('shoestore'));
         $this->assertFalse($schema->hasDatabase('foostore'));
         $this->assertTrue($schema->hasMultipleDatabases());
     }
 
-    public function testSetName()
+    public function testSetName(): void
     {
         $schema = new Schema();
         $schema->setName('bookstore-schema');
@@ -217,7 +216,7 @@ class SchemaTest extends ModelTestCase
         $this->assertSame('bookstore-schema', $schema->getName());
     }
 
-    public function testSetGeneratorConfig()
+    public function testSetGeneratorConfig(): void
     {
         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
             ->disableOriginalConstructor()->getMock();

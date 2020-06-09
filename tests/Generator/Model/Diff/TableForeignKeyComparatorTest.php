@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -23,17 +22,15 @@ use \Propel\Tests\TestCase;
  */
 class TableForeignKeyComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    //@TODO Try to use a mock
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameFks()
+    public function testCompareSameFks(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -59,7 +56,7 @@ class TableForeignKeyComparatorTest extends TestCase
         $this->assertNull($diff);
     }
 
-    public function testCompareNotSameFks()
+    public function testCompareNotSameFks(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -76,7 +73,7 @@ class TableForeignKeyComparatorTest extends TestCase
         $this->assertTrue($diff instanceof TableDiff);
     }
 
-    public function testCompareAddedFks()
+    public function testCompareAddedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);
@@ -103,7 +100,7 @@ class TableForeignKeyComparatorTest extends TestCase
         $this->assertEquals(['baz_fk_4e99e8' => $fk2], $tableDiff->getAddedFks()->toArray());
     }
 
-    public function testCompareRemovedFks()
+    public function testCompareRemovedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);
@@ -130,7 +127,7 @@ class TableForeignKeyComparatorTest extends TestCase
         $this->assertEquals(['baz_fk_4e99e8' => $fk1], $tableDiff->getRemovedFks()->toArray());
     }
 
-    public function testCompareModifiedFks()
+    public function testCompareModifiedFks(): void
     {
         $db1 = new Database();
         $db1->setPlatform($this->platform);

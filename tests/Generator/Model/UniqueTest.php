@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -23,7 +22,7 @@ class UniqueTest extends ModelTestCase
      * @dataProvider provideTableSpecificAttributes
      *
      */
-    public function testCreateDefaultUniqueIndexName($tableName, $maxColumnNameLength, $indexName)
+    public function testCreateDefaultUniqueIndexName(string $tableName, int $maxColumnNameLength, string $indexName): void
     {
         $platform = $this->getPlatformMock(true, ['max_column_name_length' => $maxColumnNameLength]);
         $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);

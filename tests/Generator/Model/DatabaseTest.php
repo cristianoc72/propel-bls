@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,7 @@
 
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Platform\PgsqlPlatform;
@@ -22,7 +22,7 @@ use Propel\Generator\Model\Model;
  */
 class DatabaseTest extends ModelTestCase
 {
-    public function testCreateNewDatabase()
+    public function testCreateNewDatabase(): void
     {
         $database = new Database('bookstore');
 
@@ -31,7 +31,6 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame(Model::DEFAULT_ID_METHOD, $database->getIdMethod());
         $this->assertEmpty($database->getScope());
         $this->assertNull($database->getSchema());
-        $this->assertSame('underscore', $database->getDefaultPhpNamingMethod());
         $this->assertNull($database->getDomain('BOOLEAN'));
         $this->assertNull($database->getGeneratorConfig());
         $this->assertEquals(0, $database->getTableSize());
@@ -42,7 +41,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertNull($database->getBehavior('foo'));
     }
 
-    public function testSetParentSchema()
+    public function testSetParentSchema(): void
     {
         $schema = $this->getSchemaMock();
         $database = new Database();
@@ -52,45 +51,28 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame($schema, $database->getSchema());
     }
 
-    public function testAddBehavior()
+    public function testAddBehavior(): void
     {
         $behavior = $this->getBehaviorMock('foo');
 
         $database = new Database();
 
-        $this->assertInstanceOf('Propel\Generator\Model\Database', $database->addBehavior($behavior), 'Fluent api');
         $this->assertInstanceOf('Propel\Generator\Model\Behavior', $database->getBehavior('foo'));
         $this->assertSame($behavior, $database->getBehavior('foo'));
         $this->assertTrue($database->hasBehavior('foo'));
     }
 
-    public function testCantAddInvalidBehavior()
+    public function testCantAddInvalidBehavior(): void
     {
         $this->expectException('Propel\Generator\Exception\BehaviorNotFoundException');
 
+        $behavior = new Behavior();
+        $behavior->setName('foo');
         $database = new Database();
-        $behavior = $database->addBehavior(['name' => 'foo']);
+        $database->addBehavior($behavior);
     }
 
-    /**
-     * @dataProvider provideBehaviors
-     *
-     */
-    public function testAddArrayBehavior($name, $class)
-    {
-        $type = sprintf(
-            'Propel\Generator\Behavior\%s\%sBehavior',
-            $class,
-            $class
-        );
-
-        $database = new Database();
-        $behavior = $database->addBehavior(['name' => $name]);
-
-        $this->assertInstanceOf($type, $behavior);
-    }
-
-    public function testGetNextTableBehavior()
+    public function testGetNextTableBehavior(): void
     {
         $table1 = $this->getTableMock('books', ['behaviors' => [
              $this->getBehaviorMock('foo', [
@@ -121,7 +103,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame('bar', $behavior->getName());
     }
 
-    public function testCantGetNextTableBehavior()
+    public function testCantGetNextTableBehavior(): void
     {
         $table1 = $this->getTableMock('books', ['behaviors' => [
              $this->getBehaviorMock('foo', ['is_table_modified' => true]),
@@ -135,7 +117,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertNull($database->getNextTableBehavior());
     }
 
-    public function testCantGetTable()
+    public function testCantGetTable(): void
     {
         $database = new Database();
 
@@ -143,7 +125,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertNull($database->getTableByName('foo'));
     }
 
-    public function testAddNamespacedTable()
+    public function testAddNamespacedTable(): void
     {
         $table = $this->getTableMock('books', ['namespace' => '\Acme']);
 
@@ -153,14 +135,13 @@ class DatabaseTest extends ModelTestCase
         $this->assertTrue($database->hasTableByName('books'));
     }
 
-    public function testAddTable()
+    public function testAddTable(): void
     {
         $table = $this->getTableMock('books', [
             'namespace' => 'Acme\Model',
         ]);
 
         $database = new Database();
-        $database->setPackage('acme');
         $database->setNamespace('Acme\Model');
         $database->addTable($table);
 
@@ -173,7 +154,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame($table, $database->getTableByName('books'));
     }
 
-    public function testAddSameTableTwice()
+    public function testAddSameTableTwice(): void
     {
         $table = new Table('Author');
         $database = new Database();
@@ -183,7 +164,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertCount(1, $database->getTables(), 'Second call does nothing');
     }
 
-    public function testGetGeneratorConfig()
+    public function testGetGeneratorConfig(): void
     {
         $config = $this->getMockBuilder('Propel\Generator\Config\GeneratorConfig')
             ->disableOriginalConstructor()->getMock();
@@ -199,7 +180,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame($config, $database->getGeneratorConfig());
     }
 
-    public function testAddDomain()
+    public function testAddDomain(): void
     {
         $domain1 = $this->getDomainMock('foo');
         $domain2 = $this->getDomainMock('bar');
@@ -213,7 +194,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertNull($database->getDomain('baz'));
     }
 
-    public function testSetInvalidDefaultStringFormat()
+    public function testSetInvalidDefaultStringFormat(): void
     {
         $this->expectException('Propel\Generator\Exception\InvalidArgumentException');
 
@@ -225,7 +206,7 @@ class DatabaseTest extends ModelTestCase
      * @dataProvider provideSupportedFormats
      *
      */
-    public function testSetDefaultStringFormat($format)
+    public function testSetDefaultStringFormat(string $format): void
     {
         $database = new Database();
         $database->setStringFormat($format);
@@ -243,7 +224,7 @@ class DatabaseTest extends ModelTestCase
         ];
     }
 
-    public function testSetHeavyIndexing()
+    public function testSetHeavyIndexing(): void
     {
         $database = new Database();
         $database->setHeavyIndexing(true);
@@ -251,7 +232,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertTrue($database->isHeavyIndexing());
     }
 
-    public function testSetDefaultIdMethod()
+    public function testSetDefaultIdMethod(): void
     {
         $database = new Database();
         $database->setIdMethod('native');
@@ -259,7 +240,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertSame('native', $database->getIdMethod());
     }
 
-    public function testAddTableWithSameNameOnDifferentSchema()
+    public function testAddTableWithSameNameOnDifferentSchema(): void
     {
         $db = new Database();
         $db->setPlatform(new PgsqlPlatform());
@@ -274,7 +255,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertNotSame($t1b, $db->getTableByName('t1'), 'Tables with same name are not added to the database');
     }
 
-    public function testHasTable()
+    public function testHasTable(): void
     {
         $db = new Database();
         $table = $this->getTableMock('first');
@@ -283,7 +264,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertTrue($db->hasTable($table));
     }
 
-    public function testTableGetters()
+    public function testTableGetters(): void
     {
         $db = new Database();
         $table = $this->getTableMock('First', ['tableName' => 'first_table', 'namespace' => 'my\\namespace']);
@@ -300,7 +281,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertEquals($table, $db->getTableByFullTableName('mySchema.first_table'));
     }
 
-    public function testGetTableNames()
+    public function testGetTableNames(): void
     {
         $db = new Database();
         $db->addTable($this->getTableMock('First'));
@@ -310,7 +291,7 @@ class DatabaseTest extends ModelTestCase
         $this->assertEquals(['First', 'Second', 'Third'], $db->getTableNames());
     }
 
-    public function testAddTables()
+    public function testAddTables(): void
     {
         $tables = [];
         for ($i = 0; $i <= 4; $i++) {
@@ -321,32 +302,5 @@ class DatabaseTest extends ModelTestCase
 
         $this->assertCount(5, $db->getTables());
         $this->assertEquals($tables, $db->getTables());
-    }
-
-    public function testClone()
-    {
-        $generatorConfig = $this->getMockBuilder('Propel\\Generator\\Config\\GeneratorConfig')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $vendor = $this->getMockBuilder('Propel\\Generator\\Model\\Vendor')->getMock();
-
-        $db = new Database();
-        for ($i = 0; $i <= 4; $i++) {
-            $db->addTable(new Table("Table$i"));
-        }
-        $db->setPlatform($this->getPlatformMock());
-        $db->setGeneratorConfig($generatorConfig);
-        $db->setSchema($this->getSchemaMock());
-        $db->addVendor($vendor);
-
-        $clone = clone $db;
-
-        $this->assertEquals($db, $clone, 'The clone object is equal.');
-        $this->assertNotSame($db, $clone, 'The clone object is not the same.');
-
-        $this->assertEquals($db->getTables(), $clone->getTables());
-        $this->assertNotSame($db->getTables(), $clone->getTables());
-        $this->assertEquals($db->getPlatform(), $clone->getPlatform());
-        $this->assertNotSame($db->getPlatform(), $clone->getPlatform());
     }
 }

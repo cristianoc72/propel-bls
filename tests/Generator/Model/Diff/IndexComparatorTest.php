@@ -21,7 +21,7 @@ use \Propel\Tests\TestCase;
  */
 class IndexComparatorTest extends TestCase
 {
-    public function testCompareNoDifference()
+    public function testCompareNoDifference(): void
     {
         $c1 = new Column('Foo');
         $i1 = new Index('Foo_Index');
@@ -44,7 +44,7 @@ class IndexComparatorTest extends TestCase
         $this->assertFalse(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareType()
+    public function testCompareType(): void
     {
         $c1 = new Column('Foo');
         $i1 = new Index('Foo_Index');
@@ -55,7 +55,7 @@ class IndexComparatorTest extends TestCase
         $this->assertTrue(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareDifferentColumns()
+    public function testCompareDifferentColumns(): void
     {
         $c1 = new Column('Foo');
         $i1 = new Index('Foo_Index');
@@ -65,7 +65,7 @@ class IndexComparatorTest extends TestCase
         $this->assertTrue(IndexComparator::computeDiff($i1, $i2));
     }
 
-    public function testCompareDifferentOrder()
+    public function testCompareDifferentOrder(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');

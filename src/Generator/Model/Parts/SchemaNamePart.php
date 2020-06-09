@@ -18,19 +18,16 @@ trait SchemaNamePart
 {
     use SuperordinatePart;
 
-    /**
-     * @var string
-     */
-    private $schemaName;
+    private string $schemaName = '';
 
     /**
      * Returns the schema name.
      *
-     * @return string|null
+     * @return string
      */
-    public function getSchemaName(): ?string
+    public function getSchemaName(): string
     {
-        if (null === $this->schemaName) {
+        if ('' === $this->schemaName) {
             if ($this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getSchemaName')) {
                 return $this->getSuperordinate()->getSchemaName();
             }
@@ -46,10 +43,6 @@ trait SchemaNamePart
      */
     public function setSchemaName(string $schemaName): void
     {
-        if ($schemaName === $this->schemaName) {
-            return;
-        }
-
         $this->schemaName = $schemaName;
     }
 }

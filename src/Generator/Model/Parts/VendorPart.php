@@ -9,8 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Map;
 use Propel\Generator\Model\Vendor;
-use Propel\Common\Collection\Map;
 
 /**
  * Trait VendorPart
@@ -19,14 +19,11 @@ use Propel\Common\Collection\Map;
  */
 trait VendorPart
 {
-    /**
-     * @var Map
-     */
-    private $vendor;
+    private Map $vendor;
 
     protected function initVendor()
     {
-        $this->vendor = new Map([], Vendor::class);
+        $this->vendor = new Map();
     }
 
     /**

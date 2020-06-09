@@ -9,8 +9,11 @@
 
 namespace Propel\Generator\Schema\Loader;
 
+use phootwork\file\exception\FileException;
 use phootwork\file\File;
 use phootwork\json\Json;
+use phootwork\json\JsonException;
+use phootwork\lang\Text;
 use Symfony\Component\Config\Loader\FileLoader;
 
 /**
@@ -27,16 +30,14 @@ class JsonSchemaLoader extends FileLoader
      * @param string $type The resource type
      * @return array
      *
-     * @throws \InvalidArgumentException  if schema file not found
-     * @throws \phootwork\json\JsonException   if invalid json file or error in decoding
-     * @throws \phootwork\file\exception\FileException if schema file is not readable or not found
+     * @throws JsonException if invalid json file or error in decoding
+     * @throws FileException if schema file is not readable or not found
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
         $file = new File($this->locator->locate($file));
-        $content = Json::decode($file->read());
 
-        return $content;
+        return Json::decode($file->read()->toString());
     }
 
     /**
@@ -47,10 +48,10 @@ class JsonSchemaLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        $file = new File($resource);
+        $resource = new Text($resource);
 
-        return 'json' === $file->getExtension();
+        return $resource->endsWith('.json');
     }
 }

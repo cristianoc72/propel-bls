@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -10,8 +9,9 @@
 
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 use phootwork\json\Json;
+use phootwork\json\JsonException;
 use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Model\Table;
 
@@ -24,17 +24,13 @@ class TableDiff
 {
     /**
      * The first Table object.
-     *
-     * @var Table
      */
-    protected $fromTable;
+    protected Table $fromTable;
 
     /**
      * The second Table object.
-     *
-     * @var Table
      */
-    protected $toTable;
+    protected Table $toTable;
 
     /**
      * The list of added columns.
@@ -42,10 +38,8 @@ class TableDiff
      * Map format:
      *  key   => The name of added column
      *  value => The added Column object
-     *
-     * @var Map
      */
-    protected $addedColumns;
+    protected Map $addedColumns;
 
     /**
      * The list of removed columns.
@@ -53,10 +47,8 @@ class TableDiff
      * Map format:
      *  key  => The name of the removed column
      *  value => The removed Column object
-     *
-     * @var Map
      */
-    protected $removedColumns;
+    protected Map $removedColumns;
 
     /**
      * The list of modified columns.
@@ -64,10 +56,8 @@ class TableDiff
      * Map format:
      *  key   => The name of modified column
      *  value => The ColumnDiff object, mapping the modification
-     *
-     * @var Map
      */
-    protected $modifiedColumns;
+    protected Map $modifiedColumns;
 
     /**
      * The list of renamed columns.
@@ -75,31 +65,23 @@ class TableDiff
      * Map format:
      *  key   => The name of the column
      *  value => Array of Column objects [$fromColumn, $toColumn]
-     *
-     * @var Map
      */
-    protected $renamedColumns;
+    protected Map $renamedColumns;
 
     /**
      * The list of added primary key columns.
-     *
-     * @var Map
      */
-    protected $addedPkColumns;
+    protected Map $addedPkColumns;
 
     /**
      * The list of removed primary key columns.
-     *
-     * @var Map
      */
-    protected $removedPkColumns;
+    protected Map $removedPkColumns;
 
     /**
      * The list of renamed primary key columns.
-     *
-     * @var Map
      */
-    protected $renamedPkColumns;
+    protected Map $renamedPkColumns;
 
     /**
      * The list of added indices.
@@ -107,10 +89,8 @@ class TableDiff
      * Map format:
      *  key   => The name of the index
      *  value => The Index object
-     *
-     * @var Map
      */
-    protected $addedIndices;
+    protected Map $addedIndices;
 
     /**
      * The list of removed indices.
@@ -118,10 +98,8 @@ class TableDiff
      * Map format:
      *  key   => The name of the index
      *  value => The Index object
-     *
-     * @var Map
      */
-    protected $removedIndices;
+    protected Map $removedIndices;
 
     /**
      * The list of modified indices.
@@ -129,10 +107,8 @@ class TableDiff
      * Map format:
      *  key   => The name of the modified index
      *  value => array of Index objects [$fromIndex, $toIndex]
-     *
-     * @var Map
      */
-    protected $modifiedIndices;
+    protected Map $modifiedIndices;
 
     /**
      * The list of added foreignKeys.
@@ -140,10 +116,8 @@ class TableDiff
      * Map format:
      *  key   => The name of added foreignKey
      *  value => The ForeignKey object
-     *
-     * @var Map
      */
-    protected $addedFks;
+    protected Map $addedFks;
 
     /**
      * The list of removed foreign keys.
@@ -151,10 +125,8 @@ class TableDiff
      * Map format:
      *  key   => The name of added foreignKey
      *  value => The ForeignKey object
-     *
-     * @var Map
      */
-    protected $removedFks;
+    protected Map $removedFks;
 
     /**
      * The list of modified columns.
@@ -162,10 +134,8 @@ class TableDiff
      * Map format:
      *  key   => The name of the modified foreignKey
      *  value => array of ForeignKey objects [$fromForeignKey, $toForeignKey]
-     *
-     * @var Map
      */
-    protected $modifiedFks;
+    protected Map $modifiedFks;
 
     /**
      * Constructor.
@@ -175,14 +145,8 @@ class TableDiff
      */
     public function __construct(Table $fromTable = null, Table $toTable = null)
     {
-        if (null !== $fromTable) {
-            $this->setFromTable($fromTable);
-        }
-
-        if (null !== $toTable) {
-            $this->setToTable($toTable);
-        }
-
+        $this->fromTable = $fromTable === null ?: $fromTable;
+        $this->toTable = $toTable === null ?: $toTable;
         $this->addedColumns     = new Map();
         $this->removedColumns   = new Map();
         $this->modifiedColumns  = new Map();
@@ -765,23 +729,10 @@ class TableDiff
     }
 
     /**
-     * Clones the current diff object.
-     *
-     */
-    public function __clone()
-    {
-        if ($this->fromTable) {
-            $this->fromTable = clone $this->fromTable;
-        }
-        if ($this->toTable) {
-            $this->toTable = clone $this->toTable;
-        }
-    }
-
-    /**
      * Returns the string representation of this object.
      *
      * @return string
+     * @throws JsonException
      */
     public function __toString(): string
     {
@@ -808,7 +759,7 @@ class TableDiff
         if ($renamedColumns = $this->getRenamedColumns()) {
             $ret .= "    renamedColumns:\n";
             foreach ($renamedColumns as $columnRenaming) {
-                list($fromColumn, $toColumn) = $columnRenaming;
+                [$fromColumn, $toColumn] = $columnRenaming;
                 $ret .= sprintf("      %s: %s\n", $fromColumn->getName(), $toColumn->getName());
             }
         }
@@ -850,7 +801,7 @@ class TableDiff
                  * @var ForeignKey $fromFk
                  * @var ForeignKey $toFk
                  */
-                list($fromFk, $toFk) = $fkFromTo;
+                [$fromFk, $toFk] = $fkFromTo;
                 $fromLocalColumns = Json::encode($fromFk->getLocalColumns()->toArray());
                 $toLocalColumns = Json::encode($toFk->getLocalColumns()->toArray());
 

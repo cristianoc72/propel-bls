@@ -64,6 +64,10 @@ class ConfigurationManager
      */
     public function get(string $name = '')
     {
+        if ($name === '') {
+            return $this->config;
+        }
+
         $keys = explode('.', $name);
         $output = $this->config;
         foreach ($keys as $key) {
@@ -204,11 +208,11 @@ class ConfigurationManager
      *
      * @param string $fileName The configuration file
      *
-     * @return array|mixed
+     * @return array
      *
      * @throws Exception If something goes wrong
      */
-    private function loadFile(string $fileName)
+    private function loadFile(string $fileName): array
     {
         if (!file_exists($fileName)) {
             return [];

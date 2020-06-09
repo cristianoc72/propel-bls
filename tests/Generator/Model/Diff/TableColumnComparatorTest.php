@@ -24,32 +24,28 @@ use \Propel\Tests\TestCase;
  */
 class TableColumnComparatorTest extends TestCase
 {
+    protected MysqlPlatform $platform;
 
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameColumns()
+    public function testCompareSameColumns(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -57,7 +53,7 @@ class TableColumnComparatorTest extends TestCase
         $this->assertNull(TableComparator::computeDiff($t1, $t2));
     }
 
-    public function testCompareNotSameColumns()
+    public function testCompareNotSameColumns(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
@@ -70,14 +66,14 @@ class TableColumnComparatorTest extends TestCase
         $this->assertTrue($diff instanceof TableDiff);
     }
 
-    public function testCompareAddedColumn()
+    public function testCompareAddedColumn(): void
     {
         $t1 = new Table();
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -92,13 +88,13 @@ class TableColumnComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedColumns()->toArray());
     }
 
-    public function testCompareRemovedColumn()
+    public function testCompareRemovedColumn(): void
     {
         $t1 = new Table();
         $c1 = new Column('Bar');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -114,19 +110,19 @@ class TableColumnComparatorTest extends TestCase
         $this->assertEquals(['Bar' => $c1], $tableDiff->getRemovedColumns()->toArray());
     }
 
-    public function testCompareModifiedColumn()
+    public function testCompareModifiedColumn(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addColumn($c1);
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -142,21 +138,21 @@ class TableColumnComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $columnDiff], $tableDiff->getModifiedColumns()->toArray());
     }
 
-    public function testCompareRenamedColumn()
+    public function testCompareRenamedColumn(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
         $t2 = new Table();
         $c2 = new Column('Bar');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -173,12 +169,12 @@ class TableColumnComparatorTest extends TestCase
         $this->assertTrue($tableDiff->getRemovedColumns()->isEmpty());
     }
 
-    public function testCompareSeveralColumnDifferences()
+    public function testCompareSeveralColumnDifferences(): void
     {
         $t1 = new Table();
         $c1 = new Column('col1');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addColumn($c1);
         $c2 = new Column('col2');
@@ -187,14 +183,14 @@ class TableColumnComparatorTest extends TestCase
         $t1->addColumn($c2);
         $c3 = new Column('col3');
         $c3->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c3->getDomain()->replaceSize(255);
+        $c3->getDomain()->setSize(255);
         $t1->addColumn($c3);
 
         $t2 = new Table();
         $c4 = new Column('col1');
         $c4->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c4->getDomain()->replaceScale(2);
-        $c4->getDomain()->replaceSize(3);
+        $c4->getDomain()->setScale(2);
+        $c4->getDomain()->setSize(3);
         $c4->setNotNull(true);
         $c4->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c4);
@@ -221,34 +217,34 @@ class TableColumnComparatorTest extends TestCase
         $this->assertEquals($columnDiff, $tableDiff->getModifiedColumns()->get('col1'));
     }
 
-    public function testCompareSeveralRenamedSameColumns()
+    public function testCompareSeveralRenamedSameColumns(): void
     {
         $t1 = new Table();
         $c1 = new Column('col1');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $t1->addColumn($c1);
         $c2 = new Column('col2');
         $c2->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c2->getDomain()->replaceSize(255);
+        $c2->getDomain()->setSize(255);
         $t1->addColumn($c2);
         $c3 = new Column('col3');
         $c3->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c3->getDomain()->replaceSize(255);
+        $c3->getDomain()->setSize(255);
         $t1->addColumn($c3);
 
         $t2 = new Table();
         $c4 = new Column('col4');
         $c4->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c4->getDomain()->replaceSize(255);
+        $c4->getDomain()->setSize(255);
         $t2->addColumn($c4);
         $c5 = new Column('col5');
         $c5->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c5->getDomain()->replaceSize(255);
+        $c5->getDomain()->setSize(255);
         $t2->addColumn($c5);
         $c6 = new Column('col3');
         $c6->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c6->getDomain()->replaceSize(255);
+        $c6->getDomain()->setSize(255);
         $t2->addColumn($c6);
 
         // col1 and col2 were renamed

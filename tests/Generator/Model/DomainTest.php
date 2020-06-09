@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,7 @@
 
 namespace Propel\Tests\Generator\Model;
 
+use Propel\Generator\Model\ColumnDefaultValue;
 use Propel\Generator\Model\Domain;
 
 /**
@@ -19,7 +19,7 @@ use Propel\Generator\Model\Domain;
  */
 class DomainTest extends ModelTestCase
 {
-    public function testCreateNewDomain()
+    public function testCreateNewDomain(): void
     {
         $domain = new Domain('FLOAT', 'DOUBLE', 10, 2);
 
@@ -29,7 +29,7 @@ class DomainTest extends ModelTestCase
         $this->assertSame(2, $domain->getScale());
     }
 
-    public function testSetDatabase()
+    public function testSetDatabase(): void
     {
         $domain = new Domain();
         $domain->setDatabase($this->getDatabaseMock('bookstore'));
@@ -37,28 +37,28 @@ class DomainTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\Database', $domain->getDatabase());
     }
 
-    public function testReplaceMappingAndSqlTypes()
+    public function testReplaceMappingAndSqlTypes(): void
     {
         $value = $this->getColumnDefaultValueMock();
 
         $domain = new Domain('FLOAT', 'DOUBLE');
-        $domain->replaceType('BOOLEAN');
+        $domain->setType('BOOLEAN');
         $domain->replaceSqlType('INT');
-        $domain->replaceDefaultValue($value);
+        $domain->setDefaultValue($value);
 
         $this->assertSame('BOOLEAN', $domain->getType());
         $this->assertSame('INT', $domain->getSqlType());
         $this->assertInstanceOf('Propel\Generator\Model\ColumnDefaultValue', $value);
     }
 
-    public function testGetNoPhpDefaultValue()
+    public function testGetNoPhpDefaultValue(): void
     {
         $domain = new Domain();
 
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testGetPhpDefaultValue()
+    public function testGetPhpDefaultValue(): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -77,7 +77,7 @@ class DomainTest extends ModelTestCase
      * @dataProvider provideBooleanValues
      *
      */
-    public function testGetBooleanValue($mappingType, $booleanAsString, $expected)
+    public function testGetBooleanValue(string $mappingType, $booleanAsString, bool $expected): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -92,7 +92,7 @@ class DomainTest extends ModelTestCase
         $this->assertSame($expected, $domain->getPhpDefaultValue());
     }
 
-    public function provideBooleanValues()
+    public function provideBooleanValues(): array
     {
         return [
             ['BOOLEAN', 1, true],
@@ -110,7 +110,7 @@ class DomainTest extends ModelTestCase
         ];
     }
 
-    public function testGetPhpDefaultValueArray()
+    public function testGetPhpDefaultValueArray(): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -125,7 +125,7 @@ class DomainTest extends ModelTestCase
         $this->assertSame('||foo | bar | baz | foobar||', $domain->getPhpDefaultValue());
     }
 
-    public function testGetPhpDefaultValueArrayNull()
+    public function testGetPhpDefaultValueArrayNull(): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -140,7 +140,7 @@ class DomainTest extends ModelTestCase
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testGetPhpDefaultValueArrayDelimiter()
+    public function testGetPhpDefaultValueArrayDelimiter(): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -155,7 +155,7 @@ class DomainTest extends ModelTestCase
         $this->assertNull($domain->getPhpDefaultValue());
     }
 
-    public function testCantGetPhpDefaultValue()
+    public function testCantGetPhpDefaultValue(): void
     {
         $value = $this->getColumnDefaultValueMock();
         $value
@@ -175,14 +175,14 @@ class DomainTest extends ModelTestCase
      * @dataProvider provideSizeDefinitions
      *
      */
-    public function testGetSizeDefinition($size, $scale, $definition)
+    public function testGetSizeDefinition($size, $scale, $definition): void
     {
         $domain = new Domain('FLOAT', 'DOUBLE', $size, $scale);
 
         $this->assertSame($definition, $domain->getSizeDefinition());
     }
 
-    public function provideSizeDefinitions()
+    public function provideSizeDefinitions(): array
     {
         return [
             [10, null, '(10)'],
@@ -191,7 +191,7 @@ class DomainTest extends ModelTestCase
         ];
     }
 
-    public function testCopyDomain()
+    public function testCopyDomain(): void
     {
         $value = $this->getColumnDefaultValueMock();
 
@@ -216,36 +216,12 @@ class DomainTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\ColumnDefaultValue', $value);
     }
 
-    public function testCloneWithDefaultValue()
-    {
-        $value = $this->getColumnDefaultValueMock();
-
-        $domain = new Domain();
-        $domain->setDefaultValue($value);
-
-        $clonedDoman = clone $domain;
-
-        $this->assertEquals($domain, $clonedDoman);
-        $this->assertNotSame($domain, $clonedDoman);
-    }
-
-    public function testCloneWithoutDefaultValue()
-    {
-        $domain = new Domain();
-        $clonedDoman = clone $domain;
-
-        $this->assertEquals($domain, $clonedDoman);
-        $this->assertNotSame($domain, $clonedDoman);
-    }
-
     private function getColumnDefaultValueMock()
     {
-        $value = $this
+        return $this
             ->getMockBuilder('Propel\Generator\Model\ColumnDefaultValue')
             ->disableOriginalConstructor()
             ->getMock()
         ;
-
-        return $value;
     }
 }

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -10,6 +9,8 @@
 
 namespace Propel\Generator\Schema\Dumper;
 
+use DOMDocument;
+use DOMNode;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
@@ -33,20 +34,18 @@ class XmlDumper implements DumperInterface
 {
     /**
      * The DOMDocument object.
-     *
-     * @var \DOMDocument
      */
-    private $document;
+    private DOMDocument $document;
 
     /**
      * Constructor.
      *
-     * @param \DOMDocument $document
+     * @param DOMDocument $document
      */
-    public function __construct(\DOMDocument $document = null)
+    public function __construct(DOMDocument $document = null)
     {
         if (null === $document) {
-            $document = new \DOMDocument('1.0', 'utf-8');
+            $document = new DOMDocument('1.0', 'utf-8');
             $document->formatOutput = true;
         }
 
@@ -59,7 +58,7 @@ class XmlDumper implements DumperInterface
      * @param  Database $database The database model
      * @return string   The dumped XML formatted output
      */
-    public function dump(Database $database)
+    public function dump(Database $database): string
     {
         $this->appendDatabaseNode($database, $this->document);
 
@@ -72,7 +71,7 @@ class XmlDumper implements DumperInterface
      * @param  Schema  $schema                The schema object
      * @return string
      */
-    public function dumpSchema(Schema $schema)
+    public function dumpSchema(Schema $schema): string
     {
         $rootNode = $this->document->createElement('app-data');
         $this->document->appendChild($rootNode);
@@ -87,9 +86,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <database> XML node to its parent node.
      *
      * @param Database $database   The Database model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendDatabaseNode(Database $database, \DOMNode $parentNode)
+    private function appendDatabaseNode(Database $database, DOMNode $parentNode): void
     {
         $databaseNode = $parentNode->appendChild($this->document->createElement('database'));
         $databaseNode->setAttribute('name', $database->getName());
@@ -144,9 +143,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <vendor> XML node to its parent node.
      *
      * @param Vendor $vendorInfo The VendorInfo model instance
-     * @param \DOMNode   $parentNode The parent DOMNode object
+     * @param DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendVendorInformationNode(Vendor $vendorInfo, \DOMNode $parentNode)
+    private function appendVendorInformationNode(Vendor $vendorInfo, DOMNode $parentNode): void
     {
         //It's an empty Vendor created by VendorPart::getVendorByType method
         if ([] === $vendorInfo->getParameters()) {
@@ -168,9 +167,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <table> XML node to its parent node.
      *
      * @param Table    $table      The Table model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendTableNode(Table $table, \DOMNode $parentNode)
+    private function appendTableNode(Table $table, DOMNode $parentNode): void
     {
         $tableNode = $parentNode->appendChild($this->document->createElement('table'));
         $tableNode->setAttribute('name', $table->getName());
@@ -273,9 +272,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <behavior> XML node to its parent node.
      *
      * @param Behavior $behavior   The Behavior model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendBehaviorNode(Behavior $behavior, \DOMNode $parentNode)
+    private function appendBehaviorNode(Behavior $behavior, DOMNode $parentNode): void
     {
         $behaviorNode = $parentNode->appendChild($this->document->createElement('behavior'));
         $behaviorNode->setAttribute('name', $behavior->getName());
@@ -295,9 +294,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <column> XML node to its parent node.
      *
      * @param Column   $column     The Column model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendColumnNode(Column $column, \DOMNode $parentNode)
+    private function appendColumnNode(Column $column, DOMNode $parentNode): void
     {
         $columnNode = $parentNode->appendChild($this->document->createElement('column'));
         $columnNode->setAttribute('name', $column->getName());
@@ -356,9 +355,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <inheritance> XML node to its parent node.
      *
      * @param Inheritance $inheritance The Inheritance model instance
-     * @param \DOMNode    $parentNode  The parent DOMNode object
+     * @param DOMNode    $parentNode  The parent DOMNode object
      */
-    private function appendInheritanceNode(Inheritance $inheritance, \DOMNode $parentNode)
+    private function appendInheritanceNode(Inheritance $inheritance, DOMNode $parentNode): void
     {
         $inheritanceNode = $parentNode->appendChild($this->document->createElement('inheritance'));
         $inheritanceNode->setAttribute('key', $inheritance->getKey());
@@ -373,9 +372,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <foreign-key> XML node to its parent node.
      *
      * @param ForeignKey $foreignKey The ForeignKey model instance
-     * @param \DOMNode   $parentNode The parent DOMNode object
+     * @param DOMNode   $parentNode The parent DOMNode object
      */
-    private function appendForeignKeyNode(ForeignKey $foreignKey, \DOMNode $parentNode)
+    private function appendForeignKeyNode(ForeignKey $foreignKey, DOMNode $parentNode): void
     {
         $foreignKeyNode = $parentNode->appendChild($this->document->createElement('foreignKey'));
         $foreignKeyNode->setAttribute('target', $foreignKey->getForeignTableName());
@@ -416,9 +415,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <id-method-parameter> XML node to its parent node.
      *
      * @param IdMethodParameter $parameter  The IdMethodParameter model instance
-     * @param \DOMNode          $parentNode The parent DOMNode object
+     * @param DOMNode          $parentNode The parent DOMNode object
      */
-    private function appendIdMethodParameterNode(IdMethodParameter $parameter, \DOMNode $parentNode)
+    private function appendIdMethodParameterNode(IdMethodParameter $parameter, DOMNode $parentNode): void
     {
         $idMethodParameterNode = $parentNode->appendChild($this->document->createElement('id-method-parameter'));
         $idMethodParameterNode->setAttribute('value', $parameter->getValue());
@@ -428,9 +427,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <index> XML node to its parent node.
      *
      * @param Index    $index      The Index model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendIndexNode(Index $index, \DOMNode $parentNode)
+    private function appendIndexNode(Index $index, DOMNode $parentNode): void
     {
         $this->appendGenericIndexNode('index', $index, $parentNode);
     }
@@ -439,9 +438,9 @@ class XmlDumper implements DumperInterface
      * Appends the generated <unique> XML node to its parent node.
      *
      * @param Unique   $index     The Unique model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendUniqueIndexNode(Unique $index, \DOMNode $parentNode)
+    private function appendUniqueIndexNode(Unique $index, DOMNode $parentNode): void
     {
         $this->appendGenericIndexNode('unique', $index, $parentNode);
     }
@@ -451,9 +450,9 @@ class XmlDumper implements DumperInterface
      *
      * @param string   $nodeType   The node type (index or unique)
      * @param Index    $index      The Index model instance
-     * @param \DOMNode $parentNode The parent DOMNode object
+     * @param DOMNode $parentNode The parent DOMNode object
      */
-    private function appendGenericIndexNode($nodeType, Index $index, \DOMNode $parentNode)
+    private function appendGenericIndexNode($nodeType, Index $index, DOMNode $parentNode): void
     {
         $indexNode = $parentNode->appendChild($this->document->createElement($nodeType));
         $indexNode->setAttribute('name', $index->getName());

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -19,20 +18,11 @@ namespace Propel\Generator\Model;
  */
 class Inheritance
 {
-    /** @var string */
-    private $key;
-
-    /** @var string */
-    private $className;
-
-    /** @var string */
-    private $package;
-
-    /** @var string */
-    private $ancestor;
-
-    /** @var Column */
-    private $column;
+    private string $key;
+    private string $className;
+    private string $package;
+    private string $ancestor;
+    private Column $column;
 
     /**
      * Returns a key name.

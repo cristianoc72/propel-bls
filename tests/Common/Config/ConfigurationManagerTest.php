@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -12,21 +11,23 @@ namespace Propel\Tests\Common\Config;
 
 use org\bovigo\vfs\vfsStream;
 use Propel\Common\Config\ConfigurationManager;
+use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Tests\TestCase;
 use Propel\Tests\VfsTrait;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigurationManagerTest extends TestCase
 {
     use VfsTrait;
     use DataProviderTrait;
 
-    public function testLoadConfigFileInCurrentDirectory()
+    public function testLoadConfigFileInCurrentDirectory(): void
     {
         $yamlConf = <<<EOF
 foo: bar
 bar: baz
 EOF;
-        $this->newFile('propel.yaml', $yamlConf);
+        $file = $this->newFile('propel.yaml', $yamlConf);
 
         $manager = new TestableConfigurationManager($this->getRoot()->url());
         $actual = $manager->get();
@@ -35,7 +36,7 @@ EOF;
         $this->assertEquals('baz', $actual['bar']);
     }
 
-    public function testLoadConfigFileInConfigSubdirectory()
+    public function testLoadConfigFileInConfigSubdirectory(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -49,7 +50,7 @@ EOF;
         $this->assertEquals('baz', $actual['bar']);
     }
 
-    public function testLoadConfigFileInConfSubdirectory()
+    public function testLoadConfigFileInConfSubdirectory(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -63,7 +64,7 @@ EOF;
         $this->assertEquals('baz', $actual['bar']);
     }
 
-    public function testNotExistingConfigFileLoadsDefaultSettingsAndDoesNotThrowExceptions()
+    public function testNotExistingConfigFileLoadsDefaultSettingsAndDoesNotThrowExceptions(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -72,10 +73,10 @@ EOF;
         $this->newFile('doctrine.yaml', $yamlConf);
 
         $manager = new TestableConfigurationManager($this->getRoot()->url());
-        $this->assertNull($manager->getConfigProperty('general.version'));
+        $this->assertNull($manager->get('general.version'));
     }
 
-    public function testBackupConfigFilesAreIgnored()
+    public function testBackupConfigFilesAreIgnored(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -91,7 +92,7 @@ EOF;
         $this->assertArrayNotHasKey('baz', $actual);
     }
 
-    public function testUnsupportedExtensionsAreIgnored()
+    public function testUnsupportedExtensionsAreIgnored(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -106,12 +107,11 @@ EOF;
         $this->assertArrayNotHasKey('baz', $actual);
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @exceptionMessage Propel expects only one configuration file
-     */
-    public function testMoreThanOneConfigurationFileInSameDirectoryThrowsException()
+    public function testMoreThanOneConfigurationFileInSameDirectoryThrowsException(): void
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Propel expects only one configuration file");
+
         $yamlConf = <<<EOF
 foo: bar
 bar: baz
@@ -126,12 +126,10 @@ EOF;
         $manager = new TestableConfigurationManager($this->getRoot()->url());
     }
 
-    /**
-     * @expectedException Propel\Common\Config\Exception\InvalidArgumentException
-     * @exceptionMessage Propel expects only one configuration file
-     */
     public function testMoreThanOneConfigurationFileInDifferentDirectoriesThrowsException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Propel expects only one configuration file");
         $yamlConf = <<<EOF
 foo: bar
 bar: baz
@@ -146,7 +144,7 @@ EOF;
         $manager = new TestableConfigurationManager($this->getRoot()->url());
     }
 
-    public function testGetSection()
+    public function testGetSection(): void
     {
         $yamlConf = <<<EOF
 runtime:
@@ -159,13 +157,13 @@ EOF;
         $this->newFile('propel.yaml', $yamlConf);
 
         $manager = new TestableConfigurationManager($this->getRoot()->url());
-        $actual = $manager->getSection('buildtime');
+        $actual = $manager->get('buildtime');
 
         $this->assertEquals('bbar', $actual['bfoo']);
         $this->assertEquals('bbaz', $actual['bbar']);
     }
 
-    public function testLoadGivenConfigFile()
+    public function testLoadGivenConfigFile(): void
     {
         $yamlConf = <<<EOF
 foo: bar
@@ -179,7 +177,7 @@ EOF;
         $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $actual);
     }
 
-    public function testLoadAlsoDistConfigFile()
+    public function testLoadAlsoDistConfigFile(): void
     {
         $yamlConf = <<<EOF
 buildtime:
@@ -202,7 +200,7 @@ EOF;
         $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $actual['runtime']);
     }
 
-    public function testLoadOnlyDistFile()
+    public function testLoadOnlyDistFile(): void
     {
         $yamlDistConf = <<<EOF
 runtime:
@@ -218,7 +216,7 @@ EOF;
         $this->assertEquals(['runtime' => ['foo' => 'bar', 'bar' => 'baz']], $actual);
     }
 
-    public function testLoadGivenFileAndDist()
+    public function testLoadGivenFileAndDist(): void
     {
         $yamlConf = <<<EOF
 buildtime:
@@ -240,7 +238,7 @@ EOF;
         $this->assertEquals(['bfoo' => 'bbar', 'bbar' => 'bbaz'], $actual['buildtime']);
     }
 
-    public function testLoadDistGivenFileOnly()
+    public function testLoadDistGivenFileOnly(): void
     {
         $yamlDistConf = <<<EOF
 runtime:
@@ -255,7 +253,7 @@ EOF;
         $this->assertEquals(['runtime' => ['foo' => 'bar', 'bar' => 'baz']], $actual);
     }
 
-    public function testLoadInGivenDirectory()
+    public function testLoadInGivenDirectory(): void
     {
         $yamlConf = <<<EOF
 buildtime:
@@ -276,7 +274,7 @@ EOF;
         $this->assertEquals(['bfoo' => 'bbar', 'bbar' => 'bbaz'], $actual['buildtime']);
     }
 
-    public function testMergeExtraProperties()
+    public function testMergeExtraProperties(): void
     {
         $extraConf = [
             'buildtime' => [
@@ -306,12 +304,11 @@ EOF;
         $this->assertEquals($actual['extralevel'], ['extra1' => 'val1', 'extra2' => 'val2']);
     }
 
-    /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unrecognized options "foo, bar" under "propel"
-     */
-    public function testInvalidHierarchyTrowsException()
+    public function testInvalidHierarchyTrowsException(): void
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Unrecognized options "foo, bar" under "propel"');
+
         $yamlConf = <<<EOF
 runtime:
     foo: bar
@@ -325,7 +322,7 @@ EOF;
         $manager = new ConfigurationManager($this->getRoot()->url());
     }
 
-    public function testNotDefineRuntimeAndGeneratorSectionUsesDefaultConnections()
+    public function testNotDefineRuntimeAndGeneratorSectionUsesDefaultConnections(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -348,19 +345,17 @@ EOF;
         $this->assertArrayHasKey('runtime', $manager->get());
         $this->assertArrayHasKey('generator', $manager->get());
 
-        $this->assertArrayHasKey('connections', $manager->getSection('runtime'));
-        $this->assertArrayHasKey('connections', $manager->getSection('generator'));
+        $this->assertArrayHasKey('connections', $manager->get('runtime'));
+        $this->assertArrayHasKey('connections', $manager->get('generator'));
 
         $this->assertEquals(['default'], $manager->get()['runtime']['connections']);
         $this->assertEquals(['default'], $manager->get()['generator']['connections']);
     }
 
-    /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The child node "database" at path "propel" must be configured
-     */
     public function testNotDefineDatabaseSectionTrowsException()
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The child node "database" at path "propel" must be configured');
         $yamlConf = <<<EOF
 propel:
   general:
@@ -372,12 +367,10 @@ EOF;
         $manager = new ConfigurationManager($this->getRoot()->url());
     }
 
-    /**
-     * @expectedException Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Dots are not allowed in connection names
-     */
-    public function testDotInConnectionNamesArentAccepted()
+    public function testDotInConnectionNamesArentAccepted(): void
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Dots are not allowed in connection names');
         $yamlConf = <<<EOF
 propel:
   database:
@@ -406,7 +399,7 @@ EOF;
     /**
      * @dataProvider providerForInvalidConnections
      */
-    public function testRuntimeOrGeneratorConnectionIsNotInConfiguredConnectionsThrowsException($yamlConf, $section)
+    public function testRuntimeOrGeneratorConnectionIsNotInConfiguredConnectionsThrowsException(string $yamlConf, string $section): void
     {
         $this->expectExceptionMessage("`wrongsource` isn't a valid configured connection (Section: propel.$section.connections).");
         $this->expectException("Propel\Common\Config\Exception\InvalidConfigurationException");
@@ -418,7 +411,7 @@ EOF;
     /**
      * @dataProvider providerForInvalidDefaultConnection
      */
-    public function testRuntimeOrGeneratorDefaultConnectionIsNotInConfiguredConnectionsThrowsException($yamlConf, $section)
+    public function testRuntimeOrGeneratorDefaultConnectionIsNotInConfiguredConnectionsThrowsException(string $yamlConf, string $section): void
     {
         $this->expectException("Propel\Common\Config\Exception\InvalidConfigurationException");
         $this->expectExceptionMessage("`wrongsource` isn't a valid configured connection (Section: propel.$section.defaultConnection).");
@@ -427,7 +420,7 @@ EOF;
         $manager = new ConfigurationManager($this->getRoot()->url());
     }
 
-    public function testLoadValidConfigurationFile()
+    public function testLoadValidConfigurationFile(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -461,7 +454,7 @@ EOF;
         $this->newFile('propel.yaml', $yamlConf);
 
         $manager = new ConfigurationManager($this->getRoot()->url());
-        $actual = $manager->getSection('runtime');
+        $actual = $manager->get('runtime');
 
         $this->assertEquals($actual['defaultConnection'], 'mysource');
         $this->assertEquals($actual['connections'], ['mysource', 'yoursource']);
@@ -504,13 +497,11 @@ EOF;
         $actual = $manager->get();
 
         $this->assertTrue($actual['generator']['namespaceAutoPackage']);
-        $this->assertEquals($actual['generator']['dateTime']['dateTimeClass'], 'DateTime');
+        $this->assertEquals($actual['generator']['dateTime']['dateTimeClass'], \DateTime::class);
         $this->assertFalse($actual['generator']['schema']['autoPackage']);
-        $this->assertEquals($actual['generator']['objectModel']['pluralizerClass'], '\cristianoc72\Pluralizer\EnglishPluralizer');
-        $this->assertEquals($actual['generator']['objectModel']['builders']['objectstub'], '\Propel\Generator\Builder\Om\ExtensionObjectBuilder');
     }
 
-    public function testGetConfigProperty()
+    public function testGetConfigProperty(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -544,12 +535,12 @@ EOF;
         $this->newFile('propel.yaml', $yamlConf);
 
         $manager = new ConfigurationManager($this->getRoot()->url());
-        $this->assertEquals('mysource', $manager->getConfigProperty('runtime.defaultConnection'));
-        $this->assertEquals('yoursource', $manager->getConfigProperty('runtime.connections.1'));
-        $this->assertEquals('root', $manager->getConfigProperty('database.connections.mysource.user'));
+        $this->assertEquals('mysource', $manager->get('runtime.defaultConnection'));
+        $this->assertEquals('yoursource', $manager->get('runtime.connections.1'));
+        $this->assertEquals('root', $manager->get('database.connections.mysource.user'));
     }
 
-    public function testGetConfigPropertyBadName()
+    public function testGetConfigPropertyBadName(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -583,12 +574,12 @@ EOF;
         $this->newFile('propel.yaml', $yamlConf);
 
         $manager = new ConfigurationManager($this->getRoot()->url());
-        $value = $manager->getConfigProperty('database.connections.adapter');
+        $value = $manager->get('database.connections.adapter');
 
         $this->assertNull($value);
     }
 
-    public function testProcessWithParam()
+    public function testProcessWithParam(): void
     {
         $configs = [
             'propel' => [
@@ -619,19 +610,50 @@ EOF;
         ];
 
         $manager = new NotLoadingConfigurationManager($configs);
-        $actual = $manager->GetSection('database')['connections'];
+        $actual = $manager->get('database.connections');
 
         $this->assertEquals($configs['propel']['database']['connections'], $actual);
     }
 
-    public function testProcessWrongParameter()
+    public function testProcessWrongParameterThrowsException(): void
     {
-        $manager = new NotLoadingConfigurationManager(null);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Unrecognized option "connectionss" under "propel.database"');
+
+        $configs = [
+            'propel' => [
+                'database' => [
+                    'connectionss' => [
+                        'default' => [
+                            'adapter' => 'sqlite',
+                            'classname' => 'Propel\Runtime\Connection\DebugPDO',
+                            'dsn' => 'sqlite::memory:',
+                            'user' => '',
+                            'password' => '',
+                            'model_paths' => [
+                                'src',
+                                'vendor'
+                            ]
+                        ]
+                    ]
+                ],
+                'runtime' => [
+                    'defaultConnection' => 'default',
+                    'connections' => ['default']
+                ],
+                'generator' => [
+                    'defaultConnection' => 'default',
+                    'connections' => ['default']
+                ]
+            ]
+        ];
+
+        $manager = new NotLoadingConfigurationManager($configs);
 
         $this->assertEmpty($manager->get());
     }
 
-    public function testGetConfigurationParametersArrayTest()
+    public function testGetConfigurationParametersArrayTest(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -707,7 +729,7 @@ EOF;
         $this->assertNull($manager->getConnectionParametersArray('bad_section'));
     }
 
-    public function testSetConnectionsIfNotDefined()
+    public function testSetConnectionsIfNotDefined(): void
     {
         $yamlConf = <<<EOF
 propel:
@@ -729,16 +751,22 @@ EOF;
         $this->newFile('propel.yaml', $yamlConf);
         $manager = new ConfigurationManager($this->getRoot()->url());
 
-        $this->assertEquals('mysource', $manager->getSection('generator')['defaultConnection']);
-        $this->assertEquals('mysource', $manager->getSection('runtime')['defaultConnection']);
-        $this->assertEquals(['mysource', 'yoursource'], $manager->getSection('generator')['connections']);
-        $this->assertEquals(['mysource', 'yoursource'], $manager->getSection('runtime')['connections']);
+        $this->assertEquals('mysource', $manager->get('generator.defaultConnection'));
+        $this->assertEquals('mysource', $manager->get('runtime.defaultConnection'));
+        $this->assertEquals(['mysource', 'yoursource'], $manager->get('generator.connections'));
+        $this->assertEquals(['mysource', 'yoursource'], $manager->get('runtime.connections'));
+    }
+
+    public function testNullConfigurationManager(): void
+    {
+        $manager = new NullConfigurationManager();
+        $this->assertEquals([], $manager->get());
     }
 }
 
 class TestableConfigurationManager extends ConfigurationManager
 {
-    public function __construct($filename = 'propel', $extraConf = null)
+    public function __construct(string $filename = 'propel', array $extraConf = [])
     {
         $this->load($filename, $extraConf);
     }
@@ -746,8 +774,16 @@ class TestableConfigurationManager extends ConfigurationManager
 
 class NotLoadingConfigurationManager extends ConfigurationManager
 {
-    public function __construct($configs = null)
+    public function __construct(array $configs = [])
     {
         $this->process($configs);
+    }
+}
+
+class NullConfigurationManager extends ConfigurationManager
+{
+    public function __construct()
+    {
+        $this->process();
     }
 }

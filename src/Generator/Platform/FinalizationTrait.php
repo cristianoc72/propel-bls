@@ -69,12 +69,7 @@ trait FinalizationTrait
 
             // if idMethod is "native" and in fact there are no autoIncrement
             // columns in the table, then change it to "none"
-            $anyAutoInc = false;
-            foreach ($table->getColumns() as $column) {
-                if ($column->isAutoIncrement()) {
-                    $anyAutoInc = true;
-                }
-            }
+            $anyAutoInc = $table->getColumns()->search(fn(Column $col): bool => $col->isAutoIncrement());
 
             if (Model::ID_METHOD_NATIVE === $table->getIdMethod() && !$anyAutoInc) {
                 $table->setIdMethod(Model::ID_METHOD_NONE);
@@ -85,7 +80,8 @@ trait FinalizationTrait
 
             //MyISAM engine doesn't create foreign key indices automatically
             if ($this instanceof MysqlPlatform) {
-                if ('MyISAM' === $this->getMysqlTableType($table)) {
+                if ('MyISAM' === $this->getDefaultTableEngine()) {
+                    //@FIXME method not found anywhere
                     $this->addExtraIndices($table);
                 }
             }
@@ -137,7 +133,7 @@ trait FinalizationTrait
             $table->getDatabase()->getTableByFullName($foreignKey->getForeignTableName())
         ;
         $referrers = $foreignTable->getReferrers();
-        if (null === $referrers || !in_array($foreignKey, $referrers, true)) {
+        if ($referrers->isEmpty() || !$referrers->contains($foreignKey)) {
             $foreignTable->addReferrer($foreignKey);
         }
 

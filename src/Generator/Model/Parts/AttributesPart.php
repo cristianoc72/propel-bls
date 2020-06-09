@@ -9,7 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
-use Propel\Common\Collection\Map;
+
+use phootwork\collection\Map;
 
 /**
  * Trait Attributes part.
@@ -19,10 +20,7 @@ use Propel\Common\Collection\Map;
  */
 trait AttributesPart
 {
-    /**
-     * @var Map
-     */
-    private $attributes;
+    private Map $attributes;
 
     /**
      * Returns all definition attributes.
@@ -57,6 +55,6 @@ trait AttributesPart
      */
     public function getAttribute($name, $default = null)
     {
-        return $this->attributes->get($name, $default);
+        return $this->attributes->has($name) ? $this->attributes->get($name) : $default;
     }
 }

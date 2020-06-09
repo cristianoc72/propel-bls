@@ -18,10 +18,7 @@ use Propel\Generator\Model\Database;
  */
 trait DatabasePart
 {
-    /**
-     * @var Database
-     */
-    private $database;
+    private Database $database;
 
     /**
      * @param Database $database
@@ -41,6 +38,6 @@ trait DatabasePart
      */
     public function getDatabase(): ?Database
     {
-        return $this->database;
+        return $this->database ?? null;
     }
 }

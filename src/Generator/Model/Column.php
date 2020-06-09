@@ -10,9 +10,9 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Map;
+use phootwork\collection\Set;
 use phootwork\lang\Text;
-use Propel\Common\Collection\Map;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\DescriptionPart;
 use Propel\Generator\Model\Parts\DomainPart;
@@ -49,42 +49,22 @@ class Column
     /**
      * @var Text The name of the mapped column
      */
-    private $columnName;
-
-    /** @var Text */
-    private $singularName;
-
-    /** @var bool  */
-    private $isNotNull;
+    private Text $columnName;
+    private Text $singularName;
+    private bool $isNotNull;
 
     /**
      * Native PHP type (scalar or class name)
      * @var string "string", "boolean", "int", "double"
      */
-    private $phpType;
-
-    /** @var int */
-    private $position;
-
-    /** @var bool  */
-    private $isPrimaryKey;
-
-    /** @var bool  */
-    private $isUnique;
-
-    /** @var bool  */
-    private $isAutoIncrement;
-
-    /** @var bool  */
-    private $skipCodeGeneration = false;
-
-    /** @var bool  */
-    private $isLazyLoad;
-
-    /**
-     * @var bool
-     */
-    private $isPrimaryString;
+    private string $phpType;
+    private int $position;
+    private bool $isPrimaryKey;
+    private bool $isUnique;
+    private bool $isAutoIncrement;
+    private bool $skipCodeGeneration = false;
+    private bool $isLazyLoad;
+    private bool $isPrimaryString;
 
     // only one type is supported currently, which assumes the
     // column either contains the classnames or a key to
@@ -92,30 +72,12 @@ class Column
     // supported later.
 
     /** @var string 'single' or 'false' are accepted values */
-    private $inheritanceType;
-
-    /** @var bool  */
-    private $isEnumeratedClasses;
-
-    /**
-     * @var Map
-     */
-    private $inheritanceList;
-
-    /**
-     * @var bool
-     */
-    private $needsTransactionInPostgres;
-
-    /**
-     * @var Set
-     */
-    protected $valueSet;
-
-    /**
-     * @var Set
-     */
-    protected $referrers;
+    private string $inheritanceType;
+    private bool $isEnumeratedClasses;
+    private Set $inheritanceList;
+    private bool $needsTransactionInPostgres;
+    protected Set $valueSet;
+    protected Set $referrers;
 
     /**
      * Creates a new column and set the name.
@@ -148,7 +110,7 @@ class Column
         $this->valueSet = new Set();
         $this->inheritanceList = new Set();
         $this->referrers =  new Set();
-        $this->vendor = new Map([], Vendor::class);
+        $this->vendor = new Map();
         $this->mutatorVisibility = Model::VISIBILITY_PUBLIC;
         $this->accessorVisibility = Model::VISIBILITY_PUBLIC;
     }
@@ -294,9 +256,9 @@ class Column
      *
      * @param integer $position
      */
-    public function setPosition(int $position)
+    public function setPosition(int $position): void
     {
-        $this->position = (int) $position;
+        $this->position = $position;
     }
 
     /**
@@ -500,7 +462,7 @@ class Column
      */
     public function getForeignKeys(): Set
     {
-        return $this->getTable()->getColumnForeignKeys($this->getName());
+        return $this->getTable()->getColumnForeignKeys($this->getName()->toString());
     }
 
     /**
@@ -1010,28 +972,5 @@ class Column
     public function setSqlType(string $sqlType)
     {
         $this->getDomain()->replaceSqlType($sqlType);
-    }
-
-    /**
-     * Clones the current object.
-     *
-     */
-    public function __clone()
-    {
-        if ($this->referrers) {
-            $this->referrers = clone $this->referrers;
-        }
-        if ($this->valueSet) {
-            $this->valueSet = clone $this->valueSet;
-        }
-        if ($this->inheritanceList) {
-            $this->inheritanceList = clone $this->inheritanceList;
-        }
-        if ($this->vendor) {
-            $this->vendor = clone $this->vendor;
-        }
-        if ($this->domain) {
-            $this->domain = clone $this->domain;
-        }
     }
 }

@@ -9,7 +9,11 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\ArrayList;
+use phootwork\collection\Map;
+use phootwork\collection\Set;
 use Propel\Generator\Model\Parts\BehaviorPart;
+use Propel\Generator\Model\Parts\CopyPart;
 use Propel\Generator\Model\Parts\GeneratorPart;
 use Propel\Generator\Model\Parts\NamespacePart;
 use Propel\Generator\Model\Parts\PlatformMutatorPart;
@@ -19,9 +23,6 @@ use Propel\Generator\Model\Parts\SqlPart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
 use Propel\Generator\Platform\PlatformInterface;
-use Propel\Common\Collection\ArrayList;
-use Propel\Common\Collection\Map;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\SchemaPart;
 
 /**
@@ -39,17 +40,12 @@ use Propel\Generator\Model\Parts\SchemaPart;
  */
 class Database
 {
-    use SuperordinatePart, PlatformMutatorPart, SqlPart, ScopePart, NamespacePart, GeneratorPart, BehaviorPart,
-        SchemaNamePart, SchemaPart, VendorPart;
+    use BehaviorPart, CopyPart, GeneratorPart, NamespacePart, PlatformMutatorPart, SuperordinatePart, SchemaNamePart,
+        SchemaPart, ScopePart, SqlPart, VendorPart;
 
-    /** @var Map */
-    private $domains;
-
-    /** @var Set */
-    private $tables;
-
-    /** @var ArrayList */
-    private $sequences;
+    private Map $domains;
+    private Set $tables;
+    private ArrayList $sequences;
 
     /**
      * Constructs a new Database object.
@@ -57,9 +53,9 @@ class Database
      * @param string $name The database's name
      * @param PlatformInterface $platform The database's platform
      */
-    public function __construct(?string $name = null, ?PlatformInterface $platform = null)
+    public function __construct(string $name = '', PlatformInterface $platform = null)
     {
-        if (null !== $name) {
+        if ('' !== $name) {
             $this->setName($name);
         }
 
@@ -69,34 +65,13 @@ class Database
 
         // init
         $this->sequences = new ArrayList();
-        $this->domains = new Map([], Domain::class);
-        $this->tables = new Set([], Table::class);
+        $this->domains = new Map();
+        $this->tables = new Set();
         $this->initBehaviors();
         $this->initSql();
         $this->initVendor();
 
         $this->identifierQuoting = false;
-    }
-
-    public function __clone()
-    {
-        $this->domains = clone $this->domains;
-        $this->tables = clone $this->tables;
-        $this->sequences = clone $this->sequences;
-        if (null !== $this->generatorConfig) {
-            $this->generatorConfig = clone $this->generatorConfig;
-        }
-        if (null !== $this->platform) {
-            $this->platform = clone $this->platform;
-        }
-        $this->idMethodParameters = clone $this->idMethodParameters;
-        $this->behaviors = clone $this->behaviors;
-        if (null !== $this->schema) {
-            $this->schema = clone $this->schema;
-        }
-        if (null !== $this->vendor) {
-            $this->vendor = clone $this->vendor;
-        }
     }
 
     /**
@@ -263,6 +238,30 @@ class Database
     }
 
     /**
+     * @param string $phpName the phpName of the table
+     *
+     * @return bool
+     */
+    public function hasTableByPhpName(string $phpName): bool
+    {
+        return (bool) $this->tables->find($phpName, function (Table $table, string $query) {
+            return $table->getPhpName() === $query;
+        });
+    }
+
+    /**
+     * @param string $phpName The phpName of the table
+     *
+     * @return Table
+     */
+    public function getTableByPhpName(string $phpName): ?Table
+    {
+        return $this->tables->find($phpName, function (Table $table, string $query) {
+            return $table->getPhpName() === $query;
+        });
+    }
+
+    /**
      * @return string[]
      */
     public function getTableNames(): array
@@ -308,7 +307,7 @@ class Database
     public function setSequences(array $sequences): void
     {
         $this->sequences->clear();
-        $this->sequences->addAll($sequences);
+        $this->sequences->add(...$sequences);
     }
 
     /**
@@ -343,66 +342,6 @@ class Database
     {
         $this->sequences->remove($sequence);
     }
-
-//    /**
-//     * Sets the database's schema.
-//     *
-//     * @param string $schema
-//     */
-//    public function setSchema($schema)
-//    {
-//        $oldSchema = $this->schemaName;
-//        if ($this->schemaName !== $schema && $this->getPlatform()) {
-//            $schemaDelimiter = $this->getPlatform()->getSchemaDelimiter();
-//            $fixHash = function (&$array) use ($schema, $oldSchema, $schemaDelimiter) {
-//                foreach ($array as $k => $v) {
-//                    if ($schema && $this->getPlatform()->supportsSchemas()) {
-//                        if (false === strpos($k, $schemaDelimiter)) {
-//                            $array[$schema . $schemaDelimiter . $k] = $v;
-//                            unset($array[$k]);
-//                        }
-//                    } elseif ($oldSchema) {
-//                        if (false !== strpos($k, $schemaDelimiter)) {
-//                            $array[explode($schemaDelimiter, $k)[1]] = $v;
-//                            unset($array[$k]);
-//                        }
-//                    }
-//                }
-//            };
-//
-//            $fixHash($this->tablesByName);
-//            $fixHash($this->tablesByLowercaseName);
-//        }
-//        parent::setSchema($schema);
-//    }
-
-//    /**
-//     * Computes the table namespace based on the current relative or
-//     * absolute table namespace and the database namespace.
-//     *
-//     * @param  Table  $table
-//     * @return string
-//     */
-//    private function computeTableNamespace(Table $table)
-//    {
-//        $namespace = $table->getNamespace();
-//        if ($this->isAbsoluteNamespace($namespace)) {
-//            $namespace = ltrim($namespace, '\\');
-//            $table->setNamespace($namespace);
-//
-//            return $namespace;
-//        }
-//
-//        if ($namespace = $this->getNamespace()) {
-//            if ($table->getNamespace()) {
-//                $namespace .= '\\'.$table->getNamespace();
-//            }
-//
-//            $table->setNamespace($namespace);
-//        }
-//
-//        return $namespace;
-//    }
 
     /**
      * Sets the parent schema

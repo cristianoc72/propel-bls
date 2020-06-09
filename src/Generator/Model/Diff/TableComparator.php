@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -22,10 +21,8 @@ class TableComparator
 {
     /**
      * The table difference.
-     *
-     * @var TableDiff
      */
-    protected $tableDiff;
+    protected TableDiff $tableDiff;
 
     /**
      * Constructor.
@@ -34,7 +31,7 @@ class TableComparator
      */
     public function __construct(TableDiff $tableDiff = null)
     {
-        $this->tableDiff = (null === $tableDiff) ? new TableDiff() : $tableDiff;
+        $this->tableDiff = $tableDiff ?? new TableDiff();
     }
 
     /**

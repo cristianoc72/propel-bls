@@ -191,7 +191,7 @@ EOF;
         $this->assertEquals(['0' => ['foo' => 'bar', 'babar' => 'baz']], $this->loader->load('parameters.ini'));
     }
 
-    public function testIniFileNotReadableThrowsException()
+    public function testIniFileNotReadableThrowsException(): void
     {
         $this->expectException(FileException::class);
         $this->expectExceptionMessage("You don't have permissions to access notreadable.ini file");
@@ -205,5 +205,37 @@ EOF;
         $actual = $this->loader->load('notreadable.ini');
         $this->assertEquals('bar', $actual['foo']);
         $this->assertEquals('baz', $actual['bar']);
+    }
+
+    public function testTransformStringIntoBool(): void
+    {
+        $content = <<<EOF
+;test ini
+foo = true
+bar = FALSE
+EOF;
+        $this->newFile('parameters.ini', $content);
+
+        $test = $this->loader->load('parameters.ini');
+        $this->assertIsBool($test['foo']);
+        $this->assertIsBool($test['bar']);
+        $this->assertTrue($test['foo'], '`true` string is converted into boolean');
+        $this->assertFalse($test['bar'], 'String to boolean conversion is case insensitive');
+    }
+
+    public function testTransformStringIntoIntOrFloat(): void
+    {
+        $content = <<<EOF
+;test ini
+foo = 1
+bar = 10.42
+EOF;
+        $this->newFile('parameters.ini', $content);
+
+        $test = $this->loader->load('parameters.ini');
+        $this->assertIsInt($test['foo']);
+        $this->assertIsFloat($test['bar']);
+        $this->assertEquals(1, $test['foo'], 'Numeric string are converted into integer');
+        $this->assertEquals(10.42, $test['bar']);
     }
 }

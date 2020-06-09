@@ -18,10 +18,7 @@ trait ScopePart
 {
     use SuperordinatePart;
 
-    /**
-     * @var string
-     */
-    private $scope;
+    private string $scope = '';
 
     /**
      * Sets scope
@@ -42,10 +39,10 @@ trait ScopePart
     {
         $scope = $this->scope;
 
-        if (null === $scope && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
+        if ('' === $scope && $this->getSuperordinate() && method_exists($this->getSuperordinate(), 'getScope')) {
             $scope = $this->getSuperordinate()->getScope();
         }
 
-        return $scope ?? '';
+        return $scope;
     }
 }

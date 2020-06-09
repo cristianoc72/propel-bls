@@ -10,6 +10,7 @@
 namespace Propel\Generator\Schema\Loader;
 
 use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Generator\Schema\Exception\InputOutputException;
 use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -38,11 +39,11 @@ class PhpSchemaLoader extends FileLoader
      * @param string $type The resource type
      * @return array
      *
-     * @throws \InvalidArgumentException                                   if schema file not found
-     * @throws \Propel\Generator\Schema\Exception\InvalidArgumentException if invalid file content
-     * @throws \Propel\Generator\Schema\Exception\InputOutputException     if schema file is not readable
+     * @throws \InvalidArgumentException if schema file not found
+     * @throws InvalidArgumentException if invalid file content
+     * @throws InputOutputException     if schema file is not readable
      */
-    public function load($file, $type = null)
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -71,11 +72,10 @@ class PhpSchemaLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        $file = new File($resource);
-        $extension = $file->getExtension();
+        $resource = new Text($resource);
 
-        return ('php' === $extension) || ('inc') === $extension;
+        return $resource->endsWith('.php') || $resource->endsWith('.inc');
     }
 }

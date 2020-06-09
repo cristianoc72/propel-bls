@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -33,7 +32,7 @@ class ColumnDefaultValueTest extends TestCase
     /**
      * @dataProvider equalsProvider
      */
-    public function testEquals($def1, $def2, $test)
+    public function testEquals(ColumnDefaultValue $def1, ColumnDefaultValue $def2, bool $test): void
     {
         if ($test) {
             $this->assertTrue($def1->equals($def2));
@@ -42,7 +41,7 @@ class ColumnDefaultValueTest extends TestCase
         }
     }
 
-    public function testIsExpression()
+    public function testIsExpression(): void
     {
         $default = new ColumnDefaultValue('SUM', ColumnDefaultValue::TYPE_EXPR);
         $this->assertTrue($default->isExpression());

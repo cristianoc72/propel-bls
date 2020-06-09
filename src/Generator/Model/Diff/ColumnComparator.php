@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,7 @@
 
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 use Propel\Generator\Model\Column;
 
 /**

@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,8 +9,8 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Map;
 use phootwork\lang\Text;
-use Propel\Common\Collection\Map;
 use Propel\Generator\Model\Parts\TablePart;
 use Propel\Generator\Model\Parts\ColumnsPart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -32,12 +31,12 @@ class Index
     /**
      * @var bool
      */
-    protected $autoNaming = false;
+    protected bool $autoNaming = false;
 
     /**
      * @var Map Map of `columnname => size` to use for indexes creation.
      */
-    protected $columnSizes;
+    protected Map $columnSizes;
 
     /**
      * Creates a new Index instance.
@@ -85,7 +84,7 @@ class Index
         $this->doNaming();
 
         if ($this->table && $database = $this->table->getDatabase()) {
-            return substr($this->name, 0, $database->getPlatform()->getMaxColumnNameLength());
+            return $this->name->substring(0, $database->getPlatform()->getMaxColumnNameLength());
         }
 
         return $this->name;

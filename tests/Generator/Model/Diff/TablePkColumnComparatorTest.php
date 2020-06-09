@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -23,17 +22,14 @@ use \Propel\Tests\TestCase;
  */
 class TablePkColumnComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSamePks()
+    public function testCompareSamePks(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
@@ -49,7 +45,7 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertNull(TableComparator::computeDiff($t1, $t2));
     }
 
-    public function testCompareNotSamePks()
+    public function testCompareNotSamePks(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
@@ -63,7 +59,7 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertTrue($diff instanceof TableDiff);
     }
 
-    public function testCompareAddedPkColumn()
+    public function testCompareAddedPkColumn(): void
     {
         $t1 = new Table();
         $t2 = new Table();
@@ -85,7 +81,7 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $c2], $tableDiff->getAddedPkColumns()->toArray());
     }
 
-    public function testCompareRemovedPkColumn()
+    public function testCompareRemovedPkColumn(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
@@ -107,13 +103,13 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertEquals(['Foo' => $c1], $tableDiff->getRemovedPkColumns()->toArray());
     }
 
-    public function testCompareRenamedPkColumn()
+    public function testCompareRenamedPkColumn(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $c1->setPrimaryKey(true);
@@ -121,8 +117,8 @@ class TablePkColumnComparatorTest extends TestCase
         $t2 = new Table();
         $c2 = new Column('Bar');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $c2->setPrimaryKey(true);
@@ -140,12 +136,12 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertTrue($tableDiff->getRemovedPkColumns()->isEmpty());
     }
 
-    public function testCompareSeveralPrimaryKeyDifferences()
+    public function testCompareSeveralPrimaryKeyDifferences(): void
     {
         $t1 = new Table();
         $c1 = new Column('col1');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addColumn($c1);
         $c2 = new Column('col2');
@@ -155,15 +151,15 @@ class TablePkColumnComparatorTest extends TestCase
         $t1->addColumn($c2);
         $c3 = new Column('col3');
         $c3->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c3->getDomain()->replaceSize(255);
+        $c3->getDomain()->setSize(255);
         $c3->setPrimaryKey(true);
         $t1->addColumn($c3);
 
         $t2 = new Table();
         $c4 = new Column('col1');
         $c4->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c4->getDomain()->replaceScale(2);
-        $c4->getDomain()->replaceSize(3);
+        $c4->getDomain()->setScale(2);
+        $c4->getDomain()->setSize(3);
         $c4->setNotNull(true);
         $c4->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c4);
@@ -190,7 +186,7 @@ class TablePkColumnComparatorTest extends TestCase
         $this->assertEquals(['col3' => $c3], $tableDiff->getRemovedPkColumns()->toArray());
     }
 
-    public function testCompareSeveralRenamedSamePrimaryKeys()
+    public function testCompareSeveralRenamedSamePrimaryKeys(): void
     {
         $t1 = new Table();
         $c1 = new Column('col1');

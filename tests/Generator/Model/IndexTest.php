@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -19,7 +18,7 @@ use Propel\Generator\Model\Index;
  */
 class IndexTest extends ModelTestCase
 {
-    public function testCreateNamedIndex()
+    public function testCreateNamedIndex(): void
     {
         $index = new Index('foo_idx');
         $index->setTable($this->getTableMock('db_books'));
@@ -36,7 +35,7 @@ class IndexTest extends ModelTestCase
      * @dataProvider provideTableSpecificAttributes
      *
      */
-    public function testCreateDefaultIndexName($tableName, $maxColumnNameLength, $indexName)
+    public function testCreateDefaultIndexName(string $tableName, int $maxColumnNameLength, string $indexName): void
     {
         $platform = $this->getPlatformMock(true, ['max_column_name_length' => $maxColumnNameLength]);
         $database = $this->getDatabaseMock('bookstore', ['platform' => $platform]);
@@ -53,7 +52,7 @@ class IndexTest extends ModelTestCase
         $this->assertSame($indexName, $index->getName());
     }
 
-    public function provideTableSpecificAttributes()
+    public function provideTableSpecificAttributes(): array
     {
         return [
             [ 'books', 64, 'books_i_no_columns' ],
@@ -61,7 +60,7 @@ class IndexTest extends ModelTestCase
         ];
     }
 
-    public function testAddIndexedColumns()
+    public function testAddIndexedColumns(): void
     {
         $columns = [
             $this->getColumnMock('foo', [ 'size' => 100 ]),
@@ -80,7 +79,7 @@ class IndexTest extends ModelTestCase
         $this->assertEquals(0, $index->getColumn('baz')->getSize());
     }
 
-    public function testNoColumnAtFirstPosition()
+    public function testNoColumnAtFirstPosition(): void
     {
         $index = new Index();
 
@@ -90,24 +89,24 @@ class IndexTest extends ModelTestCase
     /**
      * @dataProvider provideColumnAttributes
      */
-    public function testNoColumnAtPositionCaseSensitivity($name, $case)
+    public function testNoColumnAtPositionCaseSensitivity(string $name): void
     {
         $index = new Index();
         $index->setTable($this->getTableMock('db_books'));
         $index->addColumn($this->getColumnMock('foo', [ 'size' => 5 ]));
 
-        $this->assertFalse($index->hasColumnAtPosition(0, $name, 5, $case));
+        $this->assertFalse($index->hasColumnAtPosition(0, $name, 5));
     }
 
     public function provideColumnAttributes()
     {
         return [
-            [ 'bar', false ],
-            [ 'BAR', true ],
+            [ 'bar' ],
+            [ 'BAR' ],
         ];
     }
 
-    public function testNoSizedColumnAtPosition()
+    public function testNoSizedColumnAtPosition(): void
     {
         $size = 5;
 
@@ -119,7 +118,7 @@ class IndexTest extends ModelTestCase
         $this->assertFalse($index->hasColumnAtPosition(0, 'foo', $size));
     }
 
-    public function testHasColumnAtFirstPosition()
+    public function testHasColumnAtFirstPosition(): void
     {
         $index = new Index();
         $index->setTable($this->getTableMock('db_books'));
@@ -128,7 +127,7 @@ class IndexTest extends ModelTestCase
         $this->assertTrue($index->hasColumnAtPosition(0, 'foo'));
     }
 
-    public function testGetSuperordinate()
+    public function testGetSuperordinate(): void
     {
         $table = $this->getTableMock('db_books');
         $index = new Index();

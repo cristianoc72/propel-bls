@@ -29,12 +29,12 @@ class ColumnDefaultValue
     /**
      * @var string The type of value represented by this object (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR).
      */
-    private $type = ColumnDefaultValue::TYPE_VALUE;
+    private string $type = ColumnDefaultValue::TYPE_VALUE;
 
     /**
      * Creates a new DefaultValue object.
      *
-     * @param string $value The default value, as specified in the schema.
+     * @param mixed $value The default value, as specified in the schema.
      * @param string $type  The type of default value (DefaultValue::TYPE_VALUE or DefaultValue::TYPE_EXPR)
      */
     public function __construct($value, ?string $type = null)
@@ -81,7 +81,7 @@ class ColumnDefaultValue
     }
 
     /**
-     * @param string $value The value, as specified in the schema.
+     * @param mixed $value The value, as specified in the schema.
      */
     public function setValue($value): void
     {

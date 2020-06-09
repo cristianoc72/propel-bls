@@ -9,7 +9,9 @@
 
 namespace Propel\Generator\Schema\Loader;
 
+use phootwork\file\exception\FileException;
 use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\XmlToArrayConverter;
 use Propel\Generator\Schema\Exception\InvalidArgumentException;
 use Symfony\Component\Config\Loader\FileLoader;
@@ -28,11 +30,11 @@ class XmlSchemaLoader extends FileLoader
      * @param string $type The resource type
      * @return array
      *
-     * @throws \InvalidArgumentException                                   if schema file not found
-     * @throws \phootwork\file\exception\FileException                     if schema file is not readable
-     * @throws \Propel\Generator\Schema\Exception\InvalidArgumentException if invalid xml file
+     * @throws \InvalidArgumentException if schema file not found
+     * @throws FileException if schema file is not readable
+     * @throws InvalidArgumentException if invalid xml file
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
         $file = new File($this->locator->locate($file));
         $content = XmlToArrayConverter::convert($this->normalize($file));
@@ -52,11 +54,11 @@ class XmlSchemaLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        $file = new File($resource);
+        $resource = new Text($resource);
 
-        return 'xml' === $file->getExtension();
+        return $resource->endsWith('.xml');
     }
 
     /**
@@ -65,7 +67,7 @@ class XmlSchemaLoader extends FileLoader
      * @param File $file
      *
      * @return string
-     * @throws \phootwork\file\exception\FileException
+     * @throws FileException
      */
     private function normalize(File $file): string
     {

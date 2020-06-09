@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,7 @@
 
 namespace Propel\Generator\Model\Diff;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 use Propel\Generator\Model\Model;
 
 /**
@@ -20,20 +19,11 @@ use Propel\Generator\Model\Model;
  */
 class DatabaseDiff
 {
-    /** @var Map */
-    protected $addedTables;
-
-    /** @var Map */
-    protected $removedTables;
-
-    /** @var Map */
-    protected $modifiedTables;
-
-    /** @var Map  */
-    protected $renamedTables;
-
-    /** @var Map  */
-    protected $possibleRenamedTables;
+    protected Map $addedTables;
+    protected Map $removedTables;
+    protected Map $modifiedTables;
+    protected Map $renamedTables;
+    protected Map $possibleRenamedTables;
 
     public function __construct()
     {

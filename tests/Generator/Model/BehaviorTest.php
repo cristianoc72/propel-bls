@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -11,8 +10,9 @@
 namespace Propel\Tests\Generator\Model;
 
 use org\bovigo\vfs\vfsStream;
+use phootwork\collection\Map;
 use phootwork\lang\Text;
-use Propel\Common\Collection\Map;
+use Propel\Generator\Exception\BehaviorNotFoundException;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Schema\SchemaReader;
@@ -24,7 +24,7 @@ use Propel\Generator\Schema\SchemaReader;
  */
 class BehaviorTest extends ModelTestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $b = new Behavior();
         $this->assertInstanceOf(Text::class,$b->getName(), 'Behavio name is a Text object');
@@ -33,7 +33,7 @@ class BehaviorTest extends ModelTestCase
         $this->assertEquals('foo', $b->getName()->toString(), 'setName() sets the name, and getName() gets it');
     }
 
-    public function testTable()
+    public function testTable(): void
     {
         $b = new Behavior();
         $this->assertNull($b->getTable(), 'Behavior Table is null by default');
@@ -43,11 +43,11 @@ class BehaviorTest extends ModelTestCase
         $this->assertEquals($b->getTable(), $t, 'setTable() sets the name, and getTable() gets it');
     }
 
-    public function testParameters()
+    public function testParameters(): void
     {
         $b = new Behavior();
         $this->assertInstanceOf(Map::class, $b->getParameters());
-        $this->assertEquals($b->getParameters()->toArray(), [], 'Behavior parameters is an empty array by default');
+        $this->assertEquals([], $b->getParameters()->toArray(), 'Behavior parameters is an empty array by default');
         $b->addParameter(['name' => 'foo', 'value' => 'bar']);
         $this->assertEquals($b->getParameters(), new Map(['foo' => 'bar']), 'addParameter() sets a parameter from an associative array');
         $b->addParameter(['name' => 'foo2', 'value' => 'bar2']);
@@ -63,7 +63,7 @@ class BehaviorTest extends ModelTestCase
      * test if the tables get the package name from the properties file
      *
      */
-    public function testSchemaReader()
+    public function testSchemaReader(): void
     {
         $schemaReader = new SchemaReader();
         $content = <<<EOF
@@ -85,7 +85,7 @@ EOF;
         $appData->getPlatform()->doFinalInitialization($appData);
         $table = $appData->getDatabase('test1')->getTableByName('Table1');
         $behaviors = $table->getBehaviors();
-        $this->assertEquals(1, count($behaviors), 'SchemaReader ads as many behaviors as there are behaviors tags');
+        $this->assertCount(1, $behaviors, 'SchemaReader ads as many behaviors as there are behaviors tags');
         $behavior = $table->getBehavior('timestampable');
         $this->assertEquals('Table1', $behavior->getTable()->getName(), 'SchemaReader sets the behavior table correctly');
         $this->assertEquals(
@@ -95,11 +95,10 @@ EOF;
         );
     }
 
-    /**
-     * @expectedException \Propel\Generator\Exception\BehaviorNotFoundException
-     */
-    public function testUnknownBehavior()
+    public function testUnknownBehavior(): void
     {
+        $this->expectException(BehaviorNotFoundException::class);
+
         $schemaReader = new SchemaReader();
         $content = <<<EOF
 <database name="test1">
@@ -113,7 +112,7 @@ EOF;
         $appData = $schemaReader->parse($schema->url());
     }
 
-    public function testModifyTable()
+    public function testModifyTable(): void
     {
         $schemaReader = new SchemaReader();
         $content = <<<EOF
@@ -132,7 +131,7 @@ EOF;
         $this->assertEquals(4, $table->getColumns()->size(), 'A behavior can modify its table by implementing modifyTable()');
     }
 
-    public function testModifyDatabase()
+    public function testModifyDatabase(): void
     {
         $schemaReader = new SchemaReader();
         $content = <<<EOF
@@ -147,10 +146,10 @@ EOF;
         $appData = $schemaReader->parse($schema->url());
         $appData->getPlatform()->doFinalInitialization($appData);
         $table = $appData->getDatabase('test1')->getTableByName('Table1');
-        $this->assertTrue(array_key_exists('timestampable', $table->getBehaviors()), 'A database behavior is automatically copied to all its table');
+        $this->assertTrue($table->getBehaviors()->has('timestampable'), 'A database behavior is automatically copied to all its table');
     }
 
-    public function testGetColumnForParameter()
+    public function testGetColumnForParameter(): void
     {
         $schemaReader = new SchemaReader();
         $content = <<<EOF

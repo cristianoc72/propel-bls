@@ -9,7 +9,6 @@
 
 namespace Propel\Generator\Model;
 
-use phootwork\lang\ArrayObject;
 use phootwork\lang\Text;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\DatabasePart;
@@ -26,30 +25,19 @@ class Domain
 {
     use DatabasePart, NamePart;
 
-    /** @var string */
-    private $description;
-
-    /** @var int */
-    private $size;
-
-    /** @var int */
-    private $scale;
-
-    /** @var string */
-    private $mappingType;
-
-    /** @var string */
-    private $sqlType;
-
-    /** @var ColumnDefaultValue */
-    private $defaultValue;
+    private string $description = '';
+    private ?int $size;
+    private ?int $scale;
+    private ?string $mappingType;
+    private ?string $sqlType = '';
+    private ?ColumnDefaultValue $defaultValue = null;
 
     /**
      * If a property was manually replaced.
      *
      * @var bool
      */
-    private $replaced = false;
+    private bool $replaced = false;
 
     /**
      * Creates a new Domain object.
@@ -63,23 +51,10 @@ class Domain
      */
     public function __construct(string $type = null, string $sqlType = null, int $size = null, int $scale = null)
     {
-        if (null !== $type) {
-            $this->setType($type);
-        }
-
-        if (null !== $size) {
-            $this->setSize($size);
-        }
-
-        if (null !== $scale) {
-            $this->setScale($scale);
-        }
-
-        if (null !== $sqlType) {
-            $this->setSqlType($sqlType);
-        } elseif (null !== $type) {
-            $this->setSqlType($type);
-        }
+        $this->mappingType = $type;
+        $this->size = $size;
+        $this->scale = $scale;
+        $this->sqlType = $sqlType ?? $type;
     }
 
     /**
@@ -103,7 +78,7 @@ class Domain
      *
      * @return string
      */
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
@@ -283,10 +258,6 @@ class Domain
      */
     public function getSqlType(): ?string
     {
-        if (null === $this->sqlType) {
-            return $this->getType();
-        }
-
         return $this->sqlType;
     }
 
@@ -334,32 +305,22 @@ class Domain
         return $this->replaced;
     }
 
-    public function __clone()
-    {
-        if ($this->defaultValue) {
-            $this->defaultValue = clone $this->defaultValue;
-        }
-    }
-
     protected function getDefaultValueForArray(?string $stringValue): ?string
     {
-        $stringValue = trim($stringValue);
-
-        if (empty($stringValue)) {
+        $stringValue = (new Text($stringValue))->trim();
+        if ($stringValue->isEmpty()) {
             return null;
         }
 
-        $values = [];
-        foreach (explode(',', $stringValue) as $v) {
-            $values[] = trim($v);
-        }
+        $values = $stringValue->split(',');
+        $values->each('trim');
+        $stringValue = $values->join(' | ');
 
-        $value = implode($values, ' | ');
-        if (empty($value) || '|' === trim($value)) {
+        if ($stringValue->isEmpty() || $stringValue->trim()->toString() === '|') {
             return null;
         }
 
-        return sprintf('||%s||', $value);
+        return sprintf('||%s||', (string) $stringValue);
     }
 
     /**
@@ -384,41 +345,4 @@ class Domain
 
         return $arraySet->toArray();
     }
-
-    /**
-     * @todo Remove? This method is never called.
-     * @param \DOMNode $node
-     *//*
-    public function appendXml(\DOMNode $node)
-    {
-        $doc = ($node instanceof \DOMDocument) ? $node : $node->ownerDocument;
-
-        $domainNode = $node->appendChild($doc->createElement('domain'));
-        $domainNode->setAttribute('type', $this->getType());
-        $domainNode->setAttribute('name', $this->getName());
-
-        if ($this->getType() !== $this->sqlType) {
-            $domainNode->setAttribute('sqlType', $this->sqlType);
-        }
-
-        if ($def = $this->getDefaultValue()) {
-            if ($def->isExpression()) {
-                $domainNode->setAttribute('defaultExpr', $def->getValue());
-            } else {
-                $domainNode->setAttribute('defaultValue', $def->getValue());
-            }
-        }
-
-        if ($this->size) {
-            $domainNode->setAttribute('size', $this->size);
-        }
-
-        if ($this->scale) {
-            $domainNode->setAttribute('scale', $this->scale);
-        }
-
-        if ($this->description) {
-            $domainNode->setAttribute('description', $this->description);
-        }
-    }*/
 }

@@ -21,12 +21,8 @@ trait NamespacePart
     use NamePart;
     use SuperordinatePart;
 
-    /** @var Text */
-    private $namespace;
+    private Text $namespace;
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $name = new Text($name);

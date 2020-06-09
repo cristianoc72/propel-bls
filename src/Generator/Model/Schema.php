@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,14 +9,14 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\ArrayList;
+use phootwork\collection\Set;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Parts\PlatformMutatorPart;
 use Propel\Generator\Platform\PlatformInterface;
 use Propel\Generator\Schema\Dumper\XmlDumper;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SchemaPart;
-use Propel\Common\Collection\ArrayList;
 
 /**
  * A class for holding application data structures.
@@ -35,32 +34,25 @@ class Schema
     use NamePart;
     use SchemaPart;
 
-    /** @var ArrayList */
-    private $databases;
-
-    /** @var Set */
-    protected $schemas;
-
-    /** @var string */
-    protected $filename;
-
-    /** @var bool */
-    protected $referenceOnly = true;
+    private ArrayList $databases;
+    protected Set $schemas;
+    protected string $filename;
+    protected bool $referenceOnly = true;
 
     /**
      * Creates a new instance for the specified database type.
      *
      * @param PlatformInterface $platform
      */
-    public function __construct(?PlatformInterface $platform = null)
+    public function __construct(PlatformInterface $platform = null)
     {
         if (null !== $platform) {
             $this->setPlatform($platform);
         }
 
         // init
-        $this->databases = new ArrayList([], Database::class);
-        $this->schemas = new Set([], Schema::class);
+        $this->databases = new ArrayList();
+        $this->schemas = new Set();
     }
 
     protected function getSuperordinate(): Schema
@@ -210,9 +202,9 @@ class Schema
      * @param  string  $name
      * @return boolean
      */
-    public function hasDatabase($name): bool
+    public function hasDatabase(string $name): bool
     {
-        return $this->databases->search($name, function (Database $db, $query) {
+        return $this->databases->search($name, function (Database $db, string $query) {
             return $db->getName() === $query;
         });
     }
@@ -233,7 +225,7 @@ class Schema
      * @param string $name
      * @return Database
      */
-    public function getDatabase(?string $name = null): ?Database
+    public function getDatabase(string $name = null): ?Database
     {
         if ($this->databases->size() === 0) {
             return null;
@@ -287,6 +279,8 @@ class Schema
     /**
      * @TODO
      * Merge other Schema objects together into this Schema object.
+     *
+     * @param array $schemas
      */
     public function joinSchemas(array $schemas)
     {
@@ -294,7 +288,7 @@ class Schema
             /** @var Database $addDb */
             foreach ($schema->getDatabases() as $addDb) {
                 $addDbName = $addDb->getName();
-                if ($this->hasDatabase($addDbName)) {
+                if ($this->hasDatabase((string) $addDbName)) {
                     $db = $this->getDatabase($addDbName->toString());
                     // temporarily reset database namespace to avoid double namespace decoration (see ticket #1355)
                     $namespace = $db->getNamespace();
@@ -315,7 +309,7 @@ class Schema
                         }
                     }
                     // restore the database namespace
-                    $db->setNamespace($namespace);
+                    $db->setNamespace((string) $namespace);
                 } else {
                     $this->addDatabase($addDb);
                 }

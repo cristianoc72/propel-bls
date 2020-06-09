@@ -24,19 +24,15 @@ trait GeneratorPart
      * The accessor visibility.
      *
      * It may be one of public, private and protected.
-     *
-     * @var string
      */
-    private $accessorVisibility = null;
+    private string $accessorVisibility = '';
 
     /**
      * The mutator visibility.
      *
      * It may be one of public, private and protected.
-     *
-     * @var string
      */
-    private $mutatorVisibility = null;
+    private string $mutatorVisibility = '';
 
     /**
      * Sets the visibility for mutators
@@ -59,7 +55,7 @@ trait GeneratorPart
      */
     public function getMutatorVisibility(): string
     {
-        if (null !== $this->mutatorVisibility) {
+        if ('' !== $this->mutatorVisibility) {
             return $this->mutatorVisibility;
         }
 
@@ -90,7 +86,7 @@ trait GeneratorPart
      */
     public function getAccessorVisibility(): string
     {
-        if (null !== $this->accessorVisibility) {
+        if ('' !== $this->accessorVisibility) {
             return $this->accessorVisibility;
         }
 

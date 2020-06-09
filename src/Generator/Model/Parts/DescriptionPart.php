@@ -16,17 +16,14 @@ namespace Propel\Generator\Model\Parts;
  */
 trait DescriptionPart
 {
-    /**
-     * @var string
-     */
-    private $description;
+    private string $description;
 
     /**
      * @return string
      */
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description ?? null;
     }
 
     /**

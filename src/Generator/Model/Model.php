@@ -32,7 +32,7 @@ class Model
 
     const SUPPORTED_STRING_FORMATS = ['XML', 'YAML', 'JSON', 'CSV'];
 
-    const FK_NONE = '';           // No 'ON [ DELETE | UPDATE]' behavior
+    const FK_NONE = 'NONE'; // No 'ON [ DELETE | UPDATE]' behavior
     const FK_NOACTION = 'NO ACTION';
     const FK_CASCADE = 'CASCADE';
     const FK_RESTRICT = 'RESTRICT';

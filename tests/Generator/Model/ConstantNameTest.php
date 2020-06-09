@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,7 +7,7 @@
  * @license MIT License
  */
 
-namespace Propel\Tests\Generator\Model_old;
+namespace Propel\Tests\Generator\Model;
 
 use Propel\Tests\TestCase;
 use Propel\Generator\Util\QuickBuilder;
@@ -23,7 +22,7 @@ class ConstantNameTest extends TestCase
     /**
      * Test normal string as single inheritance key
      */
-    public function testSingleInheritanceKeyNormalString()
+    public function testSingleInheritanceKeyNormalString(): void
     {
         $schema = <<<XML
 <database name="constant_name_test" namespace="ConstantNameTest1">
@@ -47,7 +46,7 @@ XML;
      * Test string with dashes as single inheritance key (original cause for this whole test)
      */
 
-    public function testSingleInheritanceKeyStringWithDashes()
+    public function testSingleInheritanceKeyStringWithDashes(): void
     {
         $schema = <<<XML
 <database name="constant_name_test" namespace="ConstantNameTest2">
@@ -71,7 +70,7 @@ XML;
      * Test string with special characters as single inheritance key
      */
 
-    public function testSingleInheritanceKeyStringWithSpecialChars()
+    public function testSingleInheritanceKeyStringWithSpecialChars(): void
     {
         $schema = <<<XML
 <database name="constant_name_test" namespace="ConstantNameTest3">
@@ -91,7 +90,7 @@ XML;
         $this->assertEquals('Key.-_:*', \ConstantNameTest3\Map\UserCheck3TableMap::CLASSKEY_KEY);
     }
 
-    protected function buildClasses($schema)
+    protected function buildClasses($schema): void
     {
         $builder = new QuickBuilder();
         $builder->setSchema($schema);

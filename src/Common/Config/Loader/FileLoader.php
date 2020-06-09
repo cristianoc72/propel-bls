@@ -9,7 +9,6 @@
 
 namespace Propel\Common\Config\Loader;
 
-use Propel\Common\Config\Exception\InputOutputException;
 use Propel\Common\Config\Exception\InvalidArgumentException;
 use Propel\Common\Config\Exception\RuntimeException;
 use Propel\Common\Config\FileLocator;
@@ -82,43 +81,6 @@ abstract class FileLoader extends BaseFileLoader
         return $parameters;
     }
 
-    /**
-     * Check if a resource has a given extension
-     *
-     * @param mixed $ext An extension or an array of extensions
-     * @param string $resource A resource
-     *
-     * @return bool
-     */
-    protected function checkSupports($ext, string $resource): bool
-    {
-        $info = pathinfo($resource);
-        $extension = $info['extension'];
-
-        if ('dist' === $extension) {
-            $extension = pathinfo($info['filename'], PATHINFO_EXTENSION);
-        }
-
-        if (is_string($ext)) {
-            return ($ext === $extension);
-        }
-
-        if (is_array($ext)) {
-            $supported = false;
-
-            foreach ($ext as $value) {
-                if ($value === $extension) {
-                    $supported = true;
-                    break;
-                }
-            }
-
-            return $supported;
-        }
-
-        return false;
-    }
-
     private function isResolved(): bool
     {
         return ($this->resolved);
@@ -157,9 +119,9 @@ abstract class FileLoader extends BaseFileLoader
      * @param string $value     The string to resolve
      * @param array  $resolving An array of keys that are being resolved (used internally to detect circular references)
      *
-     * @return string                                                   The resolved string
-     * @throws \Propel\Common\Config\Exception\RuntimeException         if a problem occurs
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if a parameter is non-existent
+     * @return string                   The resolved string
+     * @throws RuntimeException         if a problem occurs
+     * @throws InvalidArgumentException if a parameter is non-existent
      */
     private function resolveString(string $value, array $resolving = [])
     {
@@ -239,7 +201,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param mixed $property_key The key, in the configuration values array, to return the respective value
      *
      * @return mixed
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException when non-existent key in configuration array
+     * @throws InvalidArgumentException when non-existent key in configuration array
      */
     private function get($property_key)
     {
@@ -291,7 +253,7 @@ abstract class FileLoader extends BaseFileLoader
      * @param string $value The value to parse
      *
      * @return string|null
-     * @throws \Propel\Common\Config\Exception\InvalidArgumentException if the environment variable is not set
+     * @throws InvalidArgumentException if the environment variable is not set
      */
     private function parseEnvironmentParams(string $value): ?string
     {

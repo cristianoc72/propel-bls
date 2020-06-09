@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -19,7 +18,7 @@ use Propel\Generator\Model\ForeignKey;
  */
 class ForeignKeyTest extends ModelTestCase
 {
-    public function testCreateNewForeignKey()
+    public function testCreateNewForeignKey(): void
     {
         $fk = new ForeignKey('book_author');
 
@@ -30,7 +29,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertFalse($fk->isSkipSql());
     }
 
-    public function testForeignKeyIsForeignPrimaryKey()
+    public function testForeignKeyIsForeignPrimaryKey(): void
     {
         $database     = $this->getDatabaseMock('bookstore');
         $platform     = $this->getPlatformMock();
@@ -85,7 +84,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame($idColumn, $fk->getForeignColumn(0));
     }
 
-    public function testForeignKeyDoesNotUseRequiredColumns()
+    public function testForeignKeyDoesNotUseRequiredColumns(): void
     {
         $column = $this->getColumnMock('author_id');
         $column
@@ -109,7 +108,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertFalse($fk->isLocalColumnsRequired());
     }
 
-    public function testForeignKeyUsesRequiredColumns()
+    public function testForeignKeyUsesRequiredColumns(): void
     {
         $column = $this->getColumnMock('author_id');
         $column
@@ -133,7 +132,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertTrue($fk->isLocalColumnsRequired());
     }
 
-    public function testCantGetInverseForeignKey()
+    public function testCantGetInverseForeignKey(): void
     {
         $database = $this->getDatabaseMock('bookstore');
         $platform = $this->getPlatformMock(false);
@@ -171,7 +170,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertFalse($fk->isMatchedByInverseFK());
     }
 
-    public function testGetInverseForeignKey()
+    public function testGetInverseForeignKey(): void
     {
         $database = $this->getDatabaseMock('bookstore');
         $platform = $this->getPlatformMock(true);
@@ -210,7 +209,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertTrue($fk->isMatchedByInverseFK());
     }
 
-    public function testGetLocalColumn()
+    public function testGetLocalColumn(): void
     {
         $column = $this->getColumnMock('id');
 
@@ -230,7 +229,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertInstanceOf('Propel\Generator\Model\Column', $fk->getLocalColumn(0));
     }
 
-    public function testForeignKeyIsNotLocalPrimaryKey()
+    public function testForeignKeyIsNotLocalPrimaryKey(): void
     {
         $pks = [$this->getColumnMock('id')];
 
@@ -248,7 +247,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertFalse($fk->isLocalPrimaryKey());
     }
 
-    public function testForeignKeyIsLocalPrimaryKey()
+    public function testForeignKeyIsLocalPrimaryKey(): void
     {
         $pks = [
             $this->getColumnMock('book_id'),
@@ -270,7 +269,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertTrue($fk->isLocalPrimaryKey());
     }
 
-    public function testGetOtherForeignKeys()
+    public function testGetOtherForeignKeys(): void
     {
         $fk = new ForeignKey();
 
@@ -290,7 +289,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertCount(2, $fk->getOtherFks());
     }
 
-    public function testClearReferences()
+    public function testClearReferences(): void
     {
         $fk = new ForeignKey();
         $fk->addReference('book_id', 'id');
@@ -301,7 +300,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertCount(0, $fk->getForeignColumns());
     }
 
-    public function testAddMultipleReferences()
+    public function testAddMultipleReferences(): void
     {
         $fk = new ForeignKey();
         $fk->addReference('book_id', 'id');
@@ -320,7 +319,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('id', $fk->getMappedForeignColumn('author_id'));
     }
 
-    public function testAddSingleStringReference()
+    public function testAddSingleStringReference(): void
     {
         $fk = new ForeignKey();
         $fk->addReference('author_id', 'id');
@@ -332,7 +331,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('author_id', $fk->getMappedLocalColumn('id'));
     }
 
-    public function testAddSingleArrayReference()
+    public function testAddSingleArrayReference(): void
     {
         $reference = ['local' => 'author_id', 'foreign' => 'id'];
 
@@ -346,7 +345,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame($reference['local'], $fk->getMappedLocalColumn($reference['foreign']));
     }
 
-    public function testAddSingleColumnReference()
+    public function testAddSingleColumnReference(): void
     {
         $fk = new ForeignKey();
         $fk->addReference(
@@ -361,7 +360,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('author_id', $fk->getMappedLocalColumn('id'));
     }
 
-    public function testSetTable()
+    public function testSetTable(): void
     {
         $table = $this->getTableMock('book');
         $table
@@ -378,7 +377,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('book', $fk->getTableName());
     }
 
-    public function testSetDefaultJoin()
+    public function testSetDefaultJoin(): void
     {
         $fk = new ForeignKey();
         $fk->setDefaultJoin('INNER');
@@ -386,7 +385,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('INNER', $fk->getDefaultJoin());
     }
 
-    public function testSetNames()
+    public function testSetNames(): void
     {
         $fk = new ForeignKey();
         $fk->setName('book_author');
@@ -398,7 +397,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertSame('books', $fk->getRefColumn());
     }
 
-    public function testSkipSql()
+    public function testSkipSql(): void
     {
         $fk = new ForeignKey();
         $fk->setSkipSql(true);
@@ -406,7 +405,7 @@ class ForeignKeyTest extends ModelTestCase
         $this->assertTrue($fk->isSkipSql());
     }
 
-    public function testGetOnActionBehaviors()
+    public function testGetOnActionBehaviors(): void
     {
         $fk = new ForeignKey();
         $fk->setOnUpdate('SETNULL');
@@ -423,7 +422,7 @@ class ForeignKeyTest extends ModelTestCase
      * @dataProvider provideOnActionBehaviors
      *
      */
-    public function testNormalizeForeignKey($behavior, $normalized)
+    public function testNormalizeForeignKey(?string $behavior, string $normalized): void
     {
         $fk = new ForeignKey();
 

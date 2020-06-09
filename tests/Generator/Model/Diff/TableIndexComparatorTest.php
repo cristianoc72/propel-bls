@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  *  This file is part of the Propel package.
  *  For the full copyright and license information, please view the LICENSE
@@ -25,23 +24,20 @@ use \Propel\Tests\TestCase;
  */
 class TableIndexComparatorTest extends TestCase
 {
-    /**
-     * @var MysqlPlatform
-     */
-    protected $platform;
+    protected MysqlPlatform $platform;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->platform = new MysqlPlatform();
     }
 
-    public function testCompareSameIndices()
+    public function testCompareSameIndices(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -51,8 +47,8 @@ class TableIndexComparatorTest extends TestCase
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -63,13 +59,13 @@ class TableIndexComparatorTest extends TestCase
         $this->assertNull(TableComparator::computeDiff($t1, $t2));
     }
 
-    public function testCompareNotSameIndices()
+    public function testCompareNotSameIndices(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -79,8 +75,8 @@ class TableIndexComparatorTest extends TestCase
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -92,14 +88,14 @@ class TableIndexComparatorTest extends TestCase
         $this->assertTrue($diff instanceof TableDiff);
     }
 
-    public function testCompareAddedIndices()
+    public function testCompareAddedIndices(): void
     {
         $t1 = new Table();
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);
@@ -117,13 +113,13 @@ class TableIndexComparatorTest extends TestCase
         $this->assertEquals(['Foo_Index' => $i2], $tableDiff->getAddedIndices()->toArray());
     }
 
-    public function testCompareRemovedIndices()
+    public function testCompareRemovedIndices(): void
     {
         $t1 = new Table();
         $c1 = new Column('Bar');
         $c1->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c1->getDomain()->replaceScale(2);
-        $c1->getDomain()->replaceSize(3);
+        $c1->getDomain()->setScale(2);
+        $c1->getDomain()->setSize(3);
         $c1->setNotNull(true);
         $c1->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t1->addColumn($c1);
@@ -142,12 +138,12 @@ class TableIndexComparatorTest extends TestCase
         $this->assertEquals(['Bar_Index' => $i1], $tableDiff->getRemovedIndices()->toArray());
     }
 
-    public function testCompareModifiedIndices()
+    public function testCompareModifiedIndices(): void
     {
         $t1 = new Table();
         $c1 = new Column('Foo');
         $c1->getDomain()->copy($this->platform->getDomainForType('VARCHAR'));
-        $c1->getDomain()->replaceSize(255);
+        $c1->getDomain()->setSize(255);
         $c1->setNotNull(false);
         $t1->addColumn($c1);
         $i1 = new Index('Foo_Index');
@@ -156,8 +152,8 @@ class TableIndexComparatorTest extends TestCase
         $t2 = new Table();
         $c2 = new Column('Foo');
         $c2->getDomain()->copy($this->platform->getDomainForType('DOUBLE'));
-        $c2->getDomain()->replaceScale(2);
-        $c2->getDomain()->replaceSize(3);
+        $c2->getDomain()->setScale(2);
+        $c2->getDomain()->setSize(3);
         $c2->setNotNull(true);
         $c2->getDomain()->setDefaultValue(new ColumnDefaultValue(123, ColumnDefaultValue::TYPE_VALUE));
         $t2->addColumn($c2);

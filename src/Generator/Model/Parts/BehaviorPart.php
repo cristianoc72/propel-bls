@@ -9,9 +9,9 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Map;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Behavior;
-use Propel\Common\Collection\Map;
 
 /**
  * BehaviorableTrait use it on every model that can hold behaviors
@@ -19,12 +19,11 @@ use Propel\Common\Collection\Map;
  */
 trait BehaviorPart
 {
-    /** @var Map */
-    private $behaviors;
+    private Map $behaviors;
 
-    protected function initBehaviors()
+    protected function initBehaviors(): void
     {
-        $this->behaviors = new Map([], Behavior::class);
+        $this->behaviors = new Map();
     }
 
     /**

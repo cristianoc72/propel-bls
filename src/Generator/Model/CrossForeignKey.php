@@ -10,7 +10,6 @@
 
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Set;
 use Propel\Generator\Model\Parts\TablePart;
 
 /**
@@ -53,21 +52,21 @@ class CrossForeignKey
      *
      * @var Table
      */
-    protected $middleTable;
+    protected Table $middleTable;
 
     /**
      * All other outgoing relations from the middle-table to other tables.
      *
      * @var ForeignKey[]
      */
-    protected $foreignKeys;
+    protected array $foreignKeys;
 
     /**
      * The incoming foreign key from the middle-table to this table.
      *
      * @var ForeignKey
      */
-    protected $incomingForeignKey;
+    protected ForeignKey $incomingForeignKey;
 
     /**
      * @param ForeignKey $foreignKey

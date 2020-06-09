@@ -18,15 +18,8 @@ use phootwork\lang\Text;
  */
 trait NamePart
 {
-    /**
-     * @var Text
-     */
-    private $name;
-
-    /**
-     * @var Text
-     */
-    private $phpName;
+    private Text $name;
+    private Text $phpName;
 
     /**
      * Returns the class name without namespace.
@@ -35,7 +28,7 @@ trait NamePart
      */
     public function getName(): Text
     {
-        if (null === $this->name) {
+        if (!isset($this->name)) {
             $this->name = new Text('');
         }
 
@@ -56,10 +49,18 @@ trait NamePart
      */
     public function getPhpName(): Text
     {
-        if (null === $this->phpName) {
+        if (!isset($this->phpName)) {
             $this->phpName = $this->name->toStudlyCase();
         }
 
         return $this->phpName;
+    }
+
+    /**
+     * @param string $phpName
+     */
+    public function setPhpName(string $phpName): void
+    {
+        $this->phpName = new Text($phpName);
     }
 }

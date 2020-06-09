@@ -18,10 +18,7 @@ use Propel\Generator\Model\Domain;
  */
 trait DomainPart
 {
-    /**
-     * @var Domain
-     */
-    private $domain;
+    private Domain $domain;
 
     /**
      * @param Domain $domain

@@ -20,7 +20,7 @@ use Propel\Generator\Manager\BehaviorManager;
  */
 class ModelFactory
 {
-    private $database = ['map' => [
+    private array $database = ['map' => [
         'name' => 'setName',
         'phpName' => 'setPhpName',
         'baseClass' => 'setBaseClass',
@@ -34,7 +34,7 @@ class ModelFactory
 
     ]];
 
-    private $table = ['map' => [
+    private array $table = ['map' => [
         'name' => 'setName',
         'phpName' => 'setPhpName',
         'description' => 'setDescription',
@@ -55,7 +55,7 @@ class ModelFactory
         'namespace' => 'setNamespace'
     ]];
 
-    private $column = ['map' => [
+    private array $column = ['map' => [
         'name' => 'setName',
         'phpName' => 'setPhpName',
         'required' => 'setNotNull',
@@ -77,18 +77,18 @@ class ModelFactory
         'inheritance' => 'setInheritanceType'
     ]];
 
-    private $vendor = ['map' => [
+    private array $vendor = ['map' => [
         'type' => 'setType',
         'parameters' => 'setParameters'
     ]];
 
-    private $inheritance = ['map' => [
+    private array $inheritance = ['map' => [
         'key' => 'setKey',
         'class' => 'setClassName',
         'extends' => 'setAncestor'
     ]];
 
-    private $foreignKey = ['map'=> [
+    private array $foreignKey = ['map'=> [
         'target' => 'setForeignTableName',
         'column' => 'setColumn',
         'name' => 'setName',
@@ -101,20 +101,19 @@ class ModelFactory
         'foreignSchema' => 'setForeignSchema'
     ]];
 
-    /** @var GeneratorConfigInterface */
-    private $config;
-
-    /** @var BehaviorManager */
-    private $behaviorManager;
+    private GeneratorConfigInterface $config;
+    private BehaviorManager $behaviorManager;
 
     /**
      * ModelFactory constructor.
      *
      * @param null|GeneratorConfigInterface $config
      */
-    public function __construct(?GeneratorConfigInterface $config = null)
+    public function __construct(GeneratorConfigInterface $config = null)
     {
-        $this->config = $config;
+        if (null !== $config) {
+            $this->config = $config;
+        }
     }
 
     /**

@@ -9,9 +9,10 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\Map;
+use phootwork\collection\Set;
 use phootwork\lang\Text;
-use Propel\Common\Collection\Set;
-use Propel\Common\Collection\Map;
+use Propel\Generator\Model\Parts\CopyPart;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\TablePart;
 use Propel\Generator\Model\Parts\NamePart;
@@ -25,21 +26,21 @@ use Propel\Generator\Model\Parts\NamePart;
  */
 class Behavior
 {
-    use NamePart, TablePart, DatabasePart;
+    use CopyPart, DatabasePart, NamePart, TablePart;
 
     /**
      * The behavior id.
      *
      * @var string
      */
-    protected $id;
+    protected string $id;
 
     /**
      * A collection of parameters.
      *
      * @var Map
      */
-    protected $parameters;
+    protected Map $parameters;
 
     /**
      * Array of default parameters.
@@ -47,7 +48,7 @@ class Behavior
      *
      * @var array
      */
-    protected $defaultParameters = [];
+    protected array $defaultParameters = [];
 
     /**
      * Whether or not the table has been
@@ -55,7 +56,7 @@ class Behavior
      *
      * @var bool
      */
-    protected $isTableModified = false;
+    protected bool $isTableModified = false;
 
     /**
      * The absolute path to the directory
@@ -64,14 +65,14 @@ class Behavior
      *
      * @var string
      */
-    protected $dirname;
+    protected string $dirname;
 
     /**
      * A collection of additional builders.
      *
      * @var array
      */
-    protected $additionalBuilders = [];
+    protected array $additionalBuilders = [];
 
     /**
      * The order in which the behavior must
@@ -79,7 +80,7 @@ class Behavior
      *
      * @var int
      */
-    protected $tableModificationOrder = 50;
+    protected int $tableModificationOrder = 50;
 
     public function __construct()
     {
@@ -94,7 +95,7 @@ class Behavior
      */
     public function setName(string $name): void
     {
-        if ($this->id === null) {
+        if (!isset($this->id)) {
             $this->setId($name);
         }
 
@@ -186,7 +187,7 @@ class Behavior
     /**
      * Returns a single parameter by its name.
      *
-     * @param string   $name
+     * @param string $name
      *
      * @return mixed
      */
@@ -247,7 +248,8 @@ class Behavior
                 // don't add the same behavior twice
                 continue;
             }
-            $behavior = clone $this;
+
+            $behavior = $this->copy();
             $table->addBehavior($behavior);
         }
     }

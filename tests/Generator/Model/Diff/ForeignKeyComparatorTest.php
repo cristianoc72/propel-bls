@@ -22,7 +22,7 @@ use \Propel\Tests\TestCase;
  */
 class ForeignKeyComparatorTest extends TestCase
 {
-    public function testCompareNoDifference()
+    public function testCompareNoDifference(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -39,7 +39,7 @@ class ForeignKeyComparatorTest extends TestCase
         $this->assertFalse(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareLocalColumn()
+    public function testCompareLocalColumn(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -56,7 +56,7 @@ class ForeignKeyComparatorTest extends TestCase
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareForeignColumn()
+    public function testCompareForeignColumn(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -73,7 +73,7 @@ class ForeignKeyComparatorTest extends TestCase
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareColumnMappings()
+    public function testCompareColumnMappings(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
@@ -93,45 +93,45 @@ class ForeignKeyComparatorTest extends TestCase
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareOnUpdate()
+    public function testCompareOnUpdate(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
         $fk1 = new ForeignKey();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnUpdate(Model::ForeignKey_SETNULL);
+        $fk1->setOnUpdate(Model::FK_SETNULL);
         $t1 = new Table('Baz');
         $t1->addForeignKey($fk1);
         $c3 = new Column('Foo');
         $c4 = new Column('Bar');
         $fk2 = new ForeignKey();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnUpdate(Model::ForeignKey_RESTRICT);
+        $fk2->setOnUpdate(Model::FK_RESTRICT);
         $t2 = new Table('Baz');
         $t2->addForeignKey($fk2);
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareOnDelete()
+    public function testCompareOnDelete(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');
         $fk1 = new ForeignKey();
         $fk1->addReference($c1, $c2);
-        $fk1->setOnDelete(Model::ForeignKey_SETNULL);
+        $fk1->setOnDelete(Model::FK_SETNULL);
         $t1 = new Table('Baz');
         $t1->addForeignKey($fk1);
         $c3 = new Column('Foo');
         $c4 = new Column('Bar');
         $fk2 = new ForeignKey();
         $fk2->addReference($c3, $c4);
-        $fk2->setOnDelete(Model::ForeignKey_RESTRICT);
+        $fk2->setOnDelete(Model::FK_RESTRICT);
         $t2 = new Table('Baz');
         $t2->addForeignKey($fk2);
         $this->assertTrue(ForeignKeyComparator::computeDiff($fk1, $fk2));
     }
 
-    public function testCompareSort()
+    public function testCompareSort(): void
     {
         $c1 = new Column('Foo');
         $c2 = new Column('Bar');

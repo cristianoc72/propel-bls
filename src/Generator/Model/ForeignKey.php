@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,15 +9,14 @@
 
 namespace Propel\Generator\Model;
 
+use phootwork\collection\ArrayList;
 use phootwork\lang\Text;
-use Propel\Common\Collection\ArrayList;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\Parts\DatabasePart;
 use Propel\Generator\Model\Parts\TablePart;
 use Propel\Generator\Model\Parts\NamePart;
 use Propel\Generator\Model\Parts\SuperordinatePart;
 use Propel\Generator\Model\Parts\VendorPart;
-use Propel\Common\Collection\UniqueList;
 
 /**
  * A class for information about table foreign keys.
@@ -33,51 +31,26 @@ class ForeignKey
 {
     use NamePart, DatabasePart, TablePart, SuperordinatePart, VendorPart;
 
-    /** @var string */
-    private $foreignTableName;
+    private string $foreignTableName;
 
     /**
      * If foreignTableName is not given getForeignTable() uses this table directly.
      *
      * @var Table|null
      */
-    private $foreignTable;
-
-    /** @var string */
-    private $column;
-    
-    /** @var string */
-    private $refColumn;
-
-    /** @var string */
-    private $refPhpName;
-
-    /** @var string */
-    private $defaultJoin;
-
-    /** @var string */
-    private $onUpdate = '';
-
-    /** @var string  */
-    private $onDelete = '';
-
-    /** @var UniqueList */
-    private $localColumns;
-
-    /** @var ArrayList */
-    private $foreignColumns;
-
-    /** @var bool */
-    private $skipSql = false;
-
-    /** @var bool */
-    private $skipCodeGeneration = false;
-
-    /** @var bool */
-    private $autoNaming = false;
-
-    /** @var string */
-    private $foreignSchema;
+    private ?Table $foreignTable;
+    private string $column;
+    private string $refColumn;
+    private string $refPhpName;
+    private string $defaultJoin;
+    private string $onUpdate = '';
+    private string $onDelete = '';
+    private ArrayList $localColumns;
+    private ArrayList $foreignColumns;
+    private bool $skipSql = false;
+    private bool $skipCodeGeneration = false;
+    private bool $autoNaming = false;
+    private string $foreignSchema;
 
     /**
      * Constructs a new Relation object.
@@ -93,7 +66,7 @@ class ForeignKey
         $this->onUpdate = Model::FK_NONE;
         $this->onDelete = Model::FK_NONE;
         $this->defaultJoin = 'INNER JOIN';
-        $this->localColumns = new UniqueList();
+        $this->localColumns = new ArrayList();
         $this->foreignColumns = new ArrayList();
         $this->initVendor();
     }
@@ -217,7 +190,7 @@ class ForeignKey
      */
     public function hasLocalColumn(Column $column): bool
     {
-        if ($column = $this->getTable()->getColumn($column->getName())) {
+        if ($column = $this->getTable()->getColumn((string) $column->getName())) {
             return $this->localColumns->search($column->getName(), function ($element, $query) {
                 return $element === $query;
             });
@@ -368,26 +341,10 @@ class ForeignKey
     public function getForeignTableName(): ?string
     {
         if (null === $this->foreignTableName && null !== $this->foreignTable) {
-            $this->foreignTableName = $this->foreignTable->getFullName();
+            $this->foreignTableName = $this->foreignTable->getFullName()->toString();
         }
 
         return $this->foreignTableName;
-
-//        $platform = $this->getPlatform();
-//        if ($this->foreignSchemaName && $platform->supportsSchemas()) {
-//            return $this->foreignSchemaName
-//            . $platform->getSchemaDelimiter()
-//            . $this->foreignTableName;
-//        }
-//
-//        $database = $this->getDatabase();
-//        if ($database && ($schema = $this->parentTable->guessSchemaName()) && $platform->supportsSchemas()) {
-//            return $schema
-//            . $platform->getSchemaDelimiter()
-//            . $this->foreignTableName;
-//        }
-//
-//        return $this->foreignTableName;
     }
 
     /**
@@ -432,7 +389,7 @@ class ForeignKey
      */
     public function getTableName(): string
     {
-        return $this->getTable()->getName();
+        return $this->getTable()->getName()->toString();
     }
 
     /**
@@ -495,9 +452,9 @@ class ForeignKey
     /**
      * Returns an array of local column names.
      *
-     * @return UniqueList
+     * @return ArrayList
      */
-    public function getLocalColumns(): UniqueList
+    public function getLocalColumns(): ArrayList
     {
         return $this->localColumns;
     }
@@ -664,8 +621,8 @@ class ForeignKey
         foreach ($this->foreignColumns as $columnName) {
             $column = null;
             if (false !== strpos($columnName, '.')) {
-                list($relationName, $foreignColumnName) = explode('.', $columnName);
-                $foreignRelation = $this->getForeignTable()->getRelation($relationName);
+                [$relationName, $foreignColumnName] = explode('.', $columnName);
+                $foreignRelation = $this->getForeignTable()->getForeignKey($relationName);
                 if (!$foreignRelation) {
                     throw new BuildException(sprintf(
                         'Relation `%s` in Table %s (%s) in foreign reference of relation `%s` from `%s` to `%s` not found.',
@@ -677,17 +634,6 @@ class ForeignKey
                         $this->getForeignTable()->getName()
                     ));
                 }
-//                foreach ($foreignRelation->getColumnObjectsMapping() as $mapping) {
-//                    /** @var Column $local */
-//                    $local = $mapping['local'];
-//                    /** @var Column $foreign */
-//                    $foreign = $mapping['foreign'];
-//                    if ($foreign->getName() === $foreignColumnName) {
-//                        $column = clone $local;
-//                        $column->foreignRelation = $foreignRelation;
-//                        $column->foreignRelationColumnName = $foreignColumnName;
-//                    }
-//                }
             } else {
                 $column = $foreignTable->getColumn($columnName);
             }
@@ -856,7 +802,7 @@ class ForeignKey
         return (Boolean)$this->getInverseFK();
     }
 
-    public function getInverseFK(): ?Relation
+    public function getInverseFK(): ?ForeignKey
     {
         $foreignTable = $this->getForeignTable();
         $map = $this->getForeignLocalMapping();
@@ -876,7 +822,7 @@ class ForeignKey
      * Returns the list of other foreign keys starting on the same table.
      * Used in many-to-many relationships.
      *
-     * @return Relation[]
+     * @return ForeignKey[]
      */
     public function getOtherFks(): array
     {

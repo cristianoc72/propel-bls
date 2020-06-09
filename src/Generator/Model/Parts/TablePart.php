@@ -18,15 +18,12 @@ use Propel\Generator\Model\Table;
  */
 trait TablePart
 {
-    /**
-     * @var Table
-     */
-    private $table;
+    private ?Table $table = null;
 
     /**
      * @param Table $table
      */
-    public function setTable(?Table $table): void
+    public function setTable(Table $table = null): void
     {
         $this->table = $table;
     }

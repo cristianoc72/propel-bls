@@ -1,5 +1,4 @@
 <?php declare(strict_types=1);
-
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,7 +9,7 @@
 
 namespace Propel\Generator\Model;
 
-use Propel\Common\Collection\Map;
+use phootwork\collection\Map;
 
 /**
  * Object to hold vendor specific information.
@@ -53,11 +52,8 @@ class Vendor
     const ORACLE_PK_PCT_INCREASE = 'PKPCTIncrease';
     const ORACLE_PK_TABLESPACE = 'PKTablespace';
 
-    /** @var string */
-    private $type;
-
-    /** @var Map */
-    private $parameters;
+    private string $type;
+    private Map $parameters;
 
     /**
      * Creates a new VendorInfo instance.
@@ -65,7 +61,7 @@ class Vendor
      * @param string $type       RDBMS type (optional)
      * @param array  $parameters An associative array of vendor's parameters (optional)
      */
-    public function __construct(?string $type = null, array $parameters = [])
+    public function __construct(string $type = null, array $parameters = [])
     {
         $this->parameters = new Map();
 

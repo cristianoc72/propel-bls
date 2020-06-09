@@ -13,10 +13,9 @@ use Propel\Generator\Model\ModelFactory;
 
 class ModelFactoryTest extends ModelTestCase
 {
-    /** @var ModelFactory */
-    private $modelFactory;
+    private ModelFactory $modelFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->modelFactory = new ModelFactory();
     }
@@ -24,7 +23,7 @@ class ModelFactoryTest extends ModelTestCase
     /**
      * @dataProvider provideBehaviors
      */
-    public function testCreateBehavior($name, $class)
+    public function testCreateBehavior(string $name, string $class): void
     {
         $type = sprintf(
             'Propel\Generator\Behavior\%s\%sBehavior',
@@ -37,7 +36,7 @@ class ModelFactoryTest extends ModelTestCase
         $this->assertInstanceOf($type, $behavior);
     }
 
-    public function provideBehaviors()
+    public function provideBehaviors(): array
     {
         return [
             ['aggregate_column', 'AggregateColumn'],

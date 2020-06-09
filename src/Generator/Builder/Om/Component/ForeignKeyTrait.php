@@ -10,19 +10,13 @@
 
 namespace Propel\Generator\Builder\Om\Component;
 
-use cristianoc72\codegen\model\PhpConstant;
 use phootwork\lang\Text;
-use Propel\Generator\Builder\Om\AbstractBuilder;
 use Propel\Generator\Exception\BuildException;
 use Propel\Generator\Model\ForeignKey;
+use Susina\Codegen\Model\PhpConstant;
 
 trait ForeignKeyTrait
 {
-    /**
-     * @return AbstractBuilder
-     */
-    abstract protected function getBuilder(): AbstractBuilder;
-
     /**
      * Gets the PHP name for the given foreignKey.
      *

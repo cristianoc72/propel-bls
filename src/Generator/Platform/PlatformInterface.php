@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -44,13 +43,13 @@ interface PlatformInterface
      * Sets a database connection to use (for quoting, etc.).
      * @param ConnectionInterface $con The database connection to use in this Platform class.
      */
-    public function setConnection(ConnectionInterface $con = null);
+    public function setConnection(ConnectionInterface $con): void;
 
     /**
      * Returns the database connection to use for this Platform class.
      * @return ConnectionInterface The database connection or NULL if none has been set.
      */
-    public function getConnection();
+    public function getConnection(): ConnectionInterface;
 
     /**
      * Sets the GeneratorConfigInterface which contains any generator build properties.
@@ -64,21 +63,21 @@ interface PlatformInterface
      * For example MysqlPlatformSql->getDatabaseType() returns 'mysql'.
      * @return string
      */
-    public function getDatabaseType();
+    public function getDatabaseType(): string;
 
     /**
      * Returns the native IdMethod (sequence|identity)
      *
      * @return string The native IdMethod (PlatformInterface:IDENTITY, PlatformInterface::SEQUENCE).
      */
-    public function getNativeIdMethod();
+    public function getNativeIdMethod(): string;
 
     /**
      * Returns the max column length supported by the db.
      *
      * @return int The max column length
      */
-    public function getMaxColumnNameLength();
+    public function getMaxColumnNameLength(): int;
 
     /**
      * Returns the db specific domain for a propelType.
@@ -86,30 +85,38 @@ interface PlatformInterface
      * @param  string $propelType the Propel type name.
      * @return Domain The db specific domain.
      */
-    public function getDomainForType($propelType);
+    public function getDomainForType(string $propelType): Domain;
 
     /**
+     * @param bool $notNull
+     *
      * @return string The RDBMS-specific SQL fragment for <code>NULL</code>
      *                or <code>NOT NULL</code>.
      */
-    public function getNullString($notNull);
+    public function getNullString(bool $notNull): string;
 
     /**
      * @return string The RDBMS-specific SQL fragment for autoincrement.
      */
-    public function getAutoIncrement();
+    public function getAutoIncrement(): string;
 
     /**
      * Returns the DDL SQL for a Column object.
+     *
+     * @param Column $col
+     *
      * @return string
      */
-    public function getColumnDDL(Column $col);
+    public function getColumnDDL(Column $col): string;
 
     /**
      * Returns the SQL for the default value of a Column object.
+     *
+     * @param Column $col
+     *
      * @return string
      */
-    public function getColumnDefaultValueDDL(Column $col);
+    public function getColumnDefaultValueDDL(Column $col): string;
 
     /**
      * Creates a delimiter-delimited string list of column names, quoted using quoteIdentifier().
@@ -123,13 +130,16 @@ interface PlatformInterface
      *
      * @return string
      */
-    public function getColumnListDDL($columns, $delimiter = ',');
+    public function getColumnListDDL($columns, string $delimiter = ','): string;
 
     /**
      * Returns the SQL for the primary key of a Table object
+     *
+     * @param Table $table
+     *
      * @return string
      */
-    public function getPrimaryKeyDDL(Table $table);
+    public function getPrimaryKeyDDL(Table $table): string;
 
     /**
      * Returns if the RDBMS-specific SQL type has a size attribute.
@@ -137,7 +147,7 @@ interface PlatformInterface
      * @param  string  $sqlType the SQL type
      * @return boolean True if the type has a size attribute
      */
-    public function hasSize($sqlType);
+    public function hasSize(string $sqlType): bool;
 
     /**
      * Returns if the RDBMS-specific SQL type has a scale attribute.
@@ -145,14 +155,14 @@ interface PlatformInterface
      * @param  string  $sqlType the SQL type
      * @return boolean True if the type has a scale attribute
      */
-    public function hasScale($sqlType);
+    public function hasScale(string $sqlType): bool;
 
     /**
      * Quote and escape needed characters in the string for underlying RDBMS.
      * @param  string $text
      * @return string
      */
-    public function quote($text);
+    public function quote(string $text): string;
 
     /**
      * Quotes a identifier.
@@ -160,43 +170,43 @@ interface PlatformInterface
      * @param string $text
      * @return mixed
      */
-    public function doQuoting($text);
+    public function doQuoting(string $text);
 
     /**
      * Whether RDBMS supports native index sizes.
      * @return boolean
      */
-    public function supportsIndexSize();
+    public function supportsIndexSize(): bool;
 
     /**
      * Whether RDBMS supports native ON DELETE triggers (e.g. ON DELETE CASCADE).
      * @return boolean
      */
-    public function supportsNativeDeleteTrigger();
+    public function supportsNativeDeleteTrigger(): bool;
 
     /**
      * Whether RDBMS supports INSERT null values in autoincremented primary keys
      * @return boolean
      */
-    public function supportsInsertNullPk();
+    public function supportsInsertNullPk(): bool;
 
     /**
      * Whether RDBMS supports native schemas for table layout.
      * @return boolean
      */
-    public function supportsSchemas();
+    public function supportsSchemas(): bool;
 
     /**
      * Whether RDBMS supports migrations.
      * @return boolean
      */
-    public function supportsMigrations();
+    public function supportsMigrations(): bool;
 
     /**
      * Whether RDBMS supports VARCHAR without explicit size
      * @return boolean
      */
-    public function supportsVarcharWithoutSize();
+    public function supportsVarcharWithoutSize(): bool;
 
     /**
      * Returns the boolean value for the RDBMS.
@@ -216,30 +226,30 @@ interface PlatformInterface
      * Whether the underlying PDO driver for this platform returns BLOB columns as streams (instead of strings).
      * @return boolean
      */
-    public function hasStreamBlobImpl();
+    public function hasStreamBlobImpl(): bool;
 
     /**
      * Gets the preferred timestamp formatter for setting date/time values.
      * @return string
      */
-    public function getTimestampFormatter();
+    public function getTimestampFormatter(): string;
 
     /**
      * Gets the preferred date formatter for setting time values.
      * @return string
      */
-    public function getDateFormatter();
+    public function getDateFormatter(): string;
 
     /**
      * Gets the preferred time formatter for setting time values.
      * @return string
      */
-    public function getTimeFormatter();
+    public function getTimeFormatter(): string;
 
     /**
      * @return string
      */
-    public function getSchemaDelimiter();
+    public function getSchemaDelimiter(): string;
 
     /**
      * Normalizes a table for the current platform. Very important for the TableComparator to not
@@ -249,7 +259,7 @@ interface PlatformInterface
      *
      * @param Table $table The table object which gets modified.
      */
-    public function normalizeTable(Table $table);
+    public function normalizeTable(Table $table): void;
 
 
     /**
@@ -262,10 +272,10 @@ interface PlatformInterface
     /**
      * @return boolean
      */
-    public function isIdentifierQuotingEnabled();
+    public function isIdentifierQuotingEnabled(): bool;
 
     /**
      * @param boolean $enabled
      */
-    public function setIdentifierQuoting($enabled);
+    public function setIdentifierQuoting(bool $enabled): void;
 }

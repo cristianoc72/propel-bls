@@ -9,7 +9,9 @@
 
 namespace Propel\Generator\Schema\Loader;
 
+use phootwork\file\Exception\FileException;
 use phootwork\file\File;
+use phootwork\lang\Text;
 use Propel\Common\Config\Loader\FileLoader;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -28,15 +30,15 @@ class YamlSchemaLoader extends FileLoader
      * @param string $type The resource type
      * @return array
      *
-     * @throws \InvalidArgumentException                         if schema file not found
-     * @throws \Symfony\Component\Yaml\Exception\ParseException  if something goes wrong in parsing file
-     * @throws \phootwork\file\Exception\FileException           if schema file is not readable
+     * @throws \InvalidArgumentException if schema file not found
+     * @throws ParseException if something goes wrong in parsing file
+     * @throws FileException if schema file is not readable
      */
-    public function load($file, $type = null): array
+    public function load($file, string $type = null): array
     {
         $file =new File($this->locator->locate($file));
 
-        $content = Yaml::parse($file->read());
+        $content = Yaml::parse($file->read()->toString());
 
         if (!is_array($content)) {
             throw new ParseException('The content is not valid yaml.');
@@ -54,11 +56,10 @@ class YamlSchemaLoader extends FileLoader
      *
      * @return Boolean true if this class supports the given resource, false otherwise
      */
-    public function supports($resource, $type = null): bool
+    public function supports($resource, string $type = null): bool
     {
-        $file = new File($resource);
-        $extension = $file->getExtension();
+        $resource = new Text($resource);
 
-        return ('yaml' === $extension) || ('yml' === $extension);
+        return $resource->endsWith('.yaml') || $resource->endsWith('.yml');
     }
 }

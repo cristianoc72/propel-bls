@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -10,14 +9,18 @@
 
 namespace Propel\Generator\Platform;
 
+use phootwork\collection\Map;
+use phootwork\lang\Text;
 use Propel\Common\Util\SetColumnConverter;
+use Propel\Generator\Builder\Om\Component\SimpleTemplateTrait;
 use Propel\Generator\Config\GeneratorConfigInterface;
 use Propel\Generator\Model\Column;
 use Propel\Generator\Model\Database;
 use Propel\Generator\Model\Domain;
 use Propel\Generator\Model\ForeignKey;
-use Propel\Generator\Model\IdMethod;
+use Propel\Generator\Model\IdMethodParameter;
 use Propel\Generator\Model\Index;
+use Propel\Generator\Model\Model;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Unique;
@@ -34,26 +37,18 @@ use Propel\Runtime\Connection\ConnectionInterface;
  */
 class SqlDefaultPlatform implements PlatformInterface
 {
-    use FinalizationTrait;
+    use FinalizationTrait, SimpleTemplateTrait;
 
     /**
      * Mapping from Propel types to Domain objects.
-     *
-     * @var array
      */
-    protected $schemaDomainMap;
+    protected Map $schemaDomainMap;
 
     /**
      * The database connection.
-     *
-     * @var ConnectionInterface Database connection.
      */
-    protected $con;
-
-    /**
-     * @var bool
-     */
-    protected $identifierQuoting = true;
+    protected ConnectionInterface $con;
+    protected bool $identifierQuoting = true;
 
     /**
      * Default constructor.
@@ -65,7 +60,7 @@ class SqlDefaultPlatform implements PlatformInterface
         if (null !== $con) {
             $this->setConnection($con);
         }
-
+        $this->schemaDomainMap = new Map();
         $this->initialize();
     }
 
@@ -75,7 +70,7 @@ class SqlDefaultPlatform implements PlatformInterface
      * @param  string $type
      * @return string
      */
-    public function getObjectBuilderClass($type)
+    public function getObjectBuilderClass(string $type): string
     {
         return '';
     }
@@ -85,7 +80,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @param ConnectionInterface $con Database connection to use in this platform.
      */
-    public function setConnection(ConnectionInterface $con = null)
+    public function setConnection(ConnectionInterface $con): void
     {
         $this->con = $con;
     }
@@ -95,23 +90,17 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return ConnectionInterface
      */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         return $this->con;
     }
 
-    /**
-     * @return boolean
-     */
-    public function isIdentifierQuotingEnabled()
+    public function isIdentifierQuotingEnabled(): bool
     {
         return $this->identifierQuoting;
     }
 
-    /**
-     * @param boolean $enabled
-     */
-    public function setIdentifierQuoting($enabled)
+    public function setIdentifierQuoting(bool $enabled): void
     {
         $this->identifierQuoting = $enabled;
     }
@@ -121,18 +110,17 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @param GeneratorConfigInterface $generatorConfig
      */
-    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
+    public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig): void
     {
     }
 
     /**
      * Initialize the type -> Domain mapping.
      */
-    protected function initialize()
+    protected function initialize(): void
     {
-        $this->schemaDomainMap = [];
         foreach (PropelTypes::getPropelTypes() as $type) {
-            $this->schemaDomainMap[$type] = new Domain($type);
+            $this->schemaDomainMap->set($type, new Domain($type));
         }
         // BU_* no longer needed, so map these to the DATE/TIMESTAMP domains
         $this->schemaDomainMap[PropelTypes::BU_DATE] = new Domain(PropelTypes::DATE);
@@ -146,23 +134,24 @@ class SqlDefaultPlatform implements PlatformInterface
      * Adds a mapping entry for specified Domain.
      * @param Domain $domain
      */
-    protected function setSchemaDomainMapping(Domain $domain)
+    protected function setSchemaDomainMapping(Domain $domain): void
     {
-        $this->schemaDomainMap[$domain->getType()] = $domain;
+        $this->schemaDomainMap->set($domain->getType(), $domain);
     }
 
     /**
      * Returns the short name of the database type that this platform represents.
      * For example MysqlPlatformSql->getDatabaseType() returns 'mysql'.
+     *
      * @return string
+     * @throws \ReflectionException
      */
-    public function getDatabaseType()
+    public function getDatabaseType(): string
     {
         $reflClass = new \ReflectionClass($this);
-        $clazz = $reflClass->getShortName();
-        $pos = strpos($clazz, 'Platform');
+        $clazz = new Text($reflClass->getShortName());
 
-        return strtolower(substr($clazz, 0, $pos));
+        return $clazz->substring(0, $clazz->indexOf('Platform'))->toLowerCase()->toString();
     }
 
     /**
@@ -170,7 +159,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return int The max column length
      */
-    public function getMaxColumnNameLength()
+    public function getMaxColumnNameLength(): int
     {
         return 64;
     }
@@ -178,7 +167,7 @@ class SqlDefaultPlatform implements PlatformInterface
     /**
      * @return string
      */
-    public function getSchemaDelimiter()
+    public function getSchemaDelimiter(): string
     {
         return '.';
     }
@@ -188,12 +177,12 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string The native IdMethod (PlatformInterface:IDENTITY, PlatformInterface::SEQUENCE).
      */
-    public function getNativeIdMethod()
+    public function getNativeIdMethod(): string
     {
         return PlatformInterface::IDENTITY;
     }
 
-    public function isNativeIdMethodAutoIncrement()
+    public function isNativeIdMethodAutoIncrement(): bool
     {
         return PlatformInterface::IDENTITY === $this->getNativeIdMethod();
     }
@@ -204,21 +193,23 @@ class SqlDefaultPlatform implements PlatformInterface
      * @param string
      * @return Domain
      */
-    public function getDomainForType($mappingType)
+    public function getDomainForType(string $mappingType): Domain
     {
-        if (!isset($this->schemaDomainMap[$mappingType])) {
+        if (!$this->schemaDomainMap->has($mappingType)) {
             throw new EngineException(sprintf('Cannot map unknown Propel type %s to native database type.', var_export($mappingType, true)));
         }
 
-        return $this->schemaDomainMap[$mappingType];
+        return $this->schemaDomainMap->get($mappingType);
     }
 
     /**
      * Returns the NOT NULL string for the configured RDBMS.
      *
+     * @param bool $notNull
+     *
      * @return string.
      */
-    public function getNullString($notNull)
+    public function getNullString(bool $notNull): string
     {
         return $notNull ? 'NOT NULL' : '';
     }
@@ -228,7 +219,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string.
      */
-    public function getAutoIncrement()
+    public function getAutoIncrement(): string
     {
         return 'IDENTITY';
     }
@@ -243,19 +234,19 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getSequenceName(Table $table)
+    public function getSequenceName(Table $table): string
     {
         static $longNamesMap = [];
         $result = null;
-        if (IdMethod::NATIVE === $table->getIdMethod()) {
+        if (Model::ID_METHOD_NATIVE === $table->getIdMethod()) {
             $idMethodParams = $table->getIdMethodParameters();
             $maxIdentifierLength = $this->getMaxColumnNameLength();
             if (empty($idMethodParams)) {
                 if (strlen($table->getName() . '_SEQ') > $maxIdentifierLength) {
-                    if (!isset($longNamesMap[$table->getName()])) {
-                        $longNamesMap[$table->getName()] = strval(count($longNamesMap) + 1);
+                    if (!isset($longNamesMap[$table->getName()->toString()])) {
+                        $longNamesMap[$table->getName()->toString()] = strval(count($longNamesMap) + 1);
                     }
-                    $result = substr($table->getName(), 0, $maxIdentifierLength - strlen('_SEQ_' . $longNamesMap[$table->getName()])) . '_SEQ_' . $longNamesMap[$table->getName()];
+                    $result = substr($table->getName(), 0, $maxIdentifierLength - strlen('_SEQ_' . $longNamesMap[$table->getName()->toString()])) . '_SEQ_' . $longNamesMap[$table->getName()->toString()];
                 } else {
                     $result = substr($table->getName(), 0, $maxIdentifierLength -4) . '_SEQ';
                 }
@@ -271,9 +262,11 @@ class SqlDefaultPlatform implements PlatformInterface
      * Returns the DDL SQL to add the tables of a database
      * together with index and foreign keys
      *
+     * @param Database $database
+     *
      * @return string
      */
-    public function getAddTablesDDL(Database $database)
+    public function getAddTablesDDL(Database $database): string
     {
         $ret = $this->getBeginDDL();
         foreach ($database->getTablesForSql() as $table) {
@@ -296,7 +289,7 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getBeginDDL()
+    public function getBeginDDL(): string
     {
     }
 
@@ -305,18 +298,21 @@ class SqlDefaultPlatform implements PlatformInterface
      *
      * @return string
      */
-    public function getEndDDL()
+    public function getEndDDL(): string
     {
     }
 
     /**
      * Builds the DDL SQL to drop a table
+     *
+     * @param Table $table
+     *
      * @return string
      */
-    public function getDropTableDDL(Table $table)
+    public function getDropTableDDL(Table $table): string
     {
         return "
-DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
+DROP TABLE IF EXISTS {$this->quoteIdentifier($table->getName())};
 ";
     }
 
@@ -324,9 +320,11 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
      * Builds the DDL SQL to add a table
      * without index and foreign keys
      *
+     * @param Table $table
+     *
      * @return string
      */
-    public function getAddTableDDL(Table $table)
+    public function getAddTableDDL(Table $table): string
     {
         $tableDescription = $table->hasDescription() ? $this->getCommentLineDDL($table->getDescription()) : '';
 
@@ -364,9 +362,12 @@ DROP TABLE IF EXISTS " . $this->quoteIdentifier($table->getName()) . ";
 
     /**
      * Builds the DDL SQL for a Column object.
+     *
+     * @param Column $col
+     *
      * @return string
      */
-    public function getColumnDDL(Column $col)
+    public function getColumnDDL(Column $col): string
     {
         $domain = $col->getDomain();
 
@@ -788,14 +789,14 @@ ALTER TABLE %s RENAME TO %s;
             $ret .= $this->getDropForeignKeyDDL($fk);
         }
         foreach ($tableDiff->getModifiedFks() as $fkModification) {
-            list($fromFk) = $fkModification;
+            [$fromFk] = $fkModification;
             $ret .= $this->getDropForeignKeyDDL($fromFk);
         }
         foreach ($tableDiff->getRemovedIndices() as $index) {
             $ret .= $this->getDropIndexDDL($index);
         }
         foreach ($tableDiff->getModifiedIndices() as $indexModification) {
-            list($fromIndex) = $indexModification;
+            [$fromIndex] = $indexModification;
             $ret .= $this->getDropIndexDDL($fromIndex);
         }
 
@@ -861,14 +862,14 @@ ALTER TABLE %s%s;
 
         // create indices, foreign keys
         foreach ($tableDiff->getModifiedIndices() as $indexModification) {
-            list($oldIndex, $toIndex) = $indexModification;
+            [$oldIndex, $toIndex] = $indexModification;
             $ret .= $this->getAddIndexDDL($toIndex);
         }
         foreach ($tableDiff->getAddedIndices() as $index) {
             $ret .= $this->getAddIndexDDL($index);
         }
         foreach ($tableDiff->getModifiedFks() as $fkModification) {
-            list(, $toFk) = $fkModification;
+            [, $toFk] = $fkModification;
             $ret .= $this->getAddForeignKeyDDL($toFk);
         }
         foreach ($tableDiff->getAddedFks() as $fk) {
@@ -944,7 +945,7 @@ ALTER TABLE %s%s;
         }
 
         foreach ($tableDiff->getModifiedIndices() as $indexModification) {
-            list($fromIndex, $toIndex) = $indexModification;
+            [$fromIndex, $toIndex] = $indexModification;
             $ret .= $this->getDropIndexDDL($fromIndex);
             $ret .= $this->getAddIndexDDL($toIndex);
         }
@@ -971,7 +972,7 @@ ALTER TABLE %s%s;
         }
 
         foreach ($tableDiff->getModifiedFks() as $fkModification) {
-            list($fromFk, $toFk) = $fkModification;
+            [$fromFk, $toFk] = $fkModification;
             $ret .= $this->getDropForeignKeyDDL($fromFk);
             $ret .= $this->getAddForeignKeyDDL($toFk);
         }

@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -15,6 +14,8 @@ use Propel\Runtime\Propel;
 /**
  * Runtime configuration converter
  * From array to PHP string
+ *
+ * @TODO Remove this class. Use a twig template in ConfigConvertCommand instead.
  */
 class ArrayToPhpConverter
 {

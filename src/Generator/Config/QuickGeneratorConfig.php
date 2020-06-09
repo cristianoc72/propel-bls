@@ -1,5 +1,4 @@
-<?php
-
+<?php declare(strict_types=1);
 /**
  * This file is part of the Propel package.
  * For the full copyright and license information, please view the LICENSE
@@ -8,16 +7,9 @@
  * @license MIT License
  */
 
-declare(strict_types=1);
-
 namespace Propel\Generator\Config;
 
-use cristianoc72\Pluralizer\PluralizerInterface;
-use cristianoc72\Pluralizer\EnglishPluralizer;
-use Propel\Generator\Builder\DataModelBuilder;
-use Propel\Generator\Exception\InvalidArgumentException;
 use Propel\Generator\Manager\BehaviorManager;
-use Propel\Generator\Model\Table;
 
 /**
  * Class QuickGeneratorConfig
@@ -26,10 +18,7 @@ use Propel\Generator\Model\Table;
  */
 class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInterface
 {
-    /**
-     * @var BehaviorManager
-     */
-    protected $behaviorManager = null;
+    protected BehaviorManager $behaviorManager;
 
     /**
      * QuickGeneratorConfig constructor.
@@ -69,24 +58,5 @@ class QuickGeneratorConfig extends GeneratorConfig implements GeneratorConfigInt
 
         $configs = array_replace_recursive($configs, $extraConf);
         $this->process($configs);
-    }
-
-    /**
-     * Returns a configured Pluralizer class.
-     *
-     * @return PluralizerInterface
-     */
-    public function getConfiguredPluralizer(): PluralizerInterface
-    {
-        return new EnglishPluralizer();
-    }
-
-    public function getBehaviorManager(): BehaviorManager
-    {
-        if (!$this->behaviorManager) {
-            $this->behaviorManager = new BehaviorManager($this);
-        }
-
-        return $this->behaviorManager;
     }
 }

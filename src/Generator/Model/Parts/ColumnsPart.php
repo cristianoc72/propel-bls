@@ -9,8 +9,8 @@
 
 namespace Propel\Generator\Model\Parts;
 
+use phootwork\collection\Set;
 use phootwork\lang\Text;
-use Propel\Common\Collection\Set;
 use Propel\Generator\Exception\EngineException;
 use Propel\Generator\Model\Table;
 use Propel\Generator\Model\Column;
@@ -23,17 +23,14 @@ use Propel\Generator\Model\Column;
  */
 trait ColumnsPart
 {
-    /**
-     * @var Set
-     */
-    private $columns;
+    private Set $columns;
 
     abstract public function getTable(): ?Table;
     abstract public function getName(): Text;
 
     public function initColumns()
     {
-        $this->columns =new Set([], Column::class);
+        $this->columns =new Set();
     }
 
     /**
@@ -105,7 +102,7 @@ trait ColumnsPart
             return $this->columns->contains($column);
         }
 
-        return (bool) $this->getColumnByName($column);
+        return null !== $this->getColumnByName($column);
     }
 
     /**

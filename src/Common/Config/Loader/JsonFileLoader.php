@@ -9,6 +9,7 @@
 
 namespace Propel\Common\Config\Loader;
 
+use phootwork\file\File;
 use phootwork\json\Json;
 use phootwork\json\JsonException;
 use phootwork\lang\Text;
@@ -33,10 +34,12 @@ class JsonFileLoader extends FileLoader
      */
     public function load($file, string $type = null): array
     {
-        $json = file_get_contents($this->getLocator()->locate($file));
+        $file = new File($this->getLocator()->locate($file));
+        $json = $file->read();
         $content = [];
-        if ('' !== $json) {
-            $content = Json::decode($json);
+
+        if (!$json->isEmpty()) {
+            $content = Json::decode($json->toString());
             $content = $this->resolveParams($content); //Resolve parameter placeholders (%name%)
         }
 

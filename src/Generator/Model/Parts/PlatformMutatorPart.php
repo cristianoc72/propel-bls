@@ -30,7 +30,7 @@ trait PlatformMutatorPart
     {
         $this->generatorConfig = $generatorConfig;
 
-        if (!$this->platform) {
+        if (!isset($this->platform)) {
             $this->platform = $generatorConfig->createPlatformForDatabase();
         }
     }
