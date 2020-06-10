@@ -9,6 +9,9 @@
 
 namespace Propel\Generator\Builder\Om\Component;
 
+use phootwork\file\File;
+use phootwork\lang\Text;
+use Propel\Generator\Exception\BuildException;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Loader\FilesystemLoader;
@@ -32,18 +35,20 @@ trait SimpleTemplateTrait
      * @throws \ReflectionException
      * @throws Error If something went wrong in loading and processing template
      */
-    protected function renderTemplate(array $context = [], string $template = ''): string
+    protected function renderTemplate(array $context = [], string $template = null): string
     {
         $classReflection = new \ReflectionClass(get_called_class());
-        $currentDir = dirname($classReflection->getFileName());
+        $tplDir = dirname($classReflection->getFileName()) . '/templates';
+        $template = Text::create($template ?? $classReflection->getShortName())->toSnakeCase()->ensureEnd('.twig');
 
-        if (!$template) {
-            $template = "{$classReflection->getShortName()}.twig";
+        $filePath = "$tplDir/$template";
+        if (!file_exists($filePath)) {
+            throw new BuildException("Can not find template `$filePath`.");
         }
 
-        $loader = new FilesystemLoader($currentDir);
+        $loader = new FilesystemLoader($tplDir);
         $twig = new Environment($loader, ['cache' => false, 'strict_variables' => true, 'autoescape' => false]);
 
-        return $twig->render($template, $context);
+        return $twig->render($template->toString(), $context);
     }
 }

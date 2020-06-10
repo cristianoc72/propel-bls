@@ -21,12 +21,8 @@ use phootwork\file\File;
  */
 trait VfsTrait
 {
-    /** @var vfsStreamDirectory */
     private vfsStreamDirectory $root;
 
-    /**
-     * @return vfsStreamDirectory
-     */
     public function getRoot(): vfsStreamDirectory
     {
         if (!isset($this->root)) {
@@ -48,7 +44,9 @@ trait VfsTrait
      */
     public function newFile(string $filename, string $content = ''): vfsStreamFile
     {
-        return vfsStream::newFile($filename)->at($this->getDir($filename))->setContent($content);
+        $file = new File($filename);
+
+        return vfsStream::newFile($file->getFilename()->toString())->at($this->getDir($file))->setContent($content);
     }
 
     /**
@@ -56,14 +54,12 @@ trait VfsTrait
      * If the directory does not exist, it'll be created. If the directory name represents
      * a structure (e.g. dir/sub_dir/sub_sub_dir) the structure is created.
      *
-     * @param string $filename
+     * @param File $file
      *
      * @return vfsStreamDirectory
      */
-    private function getDir(string $filename): vfsStreamDirectory
+    private function getDir(File $file): vfsStreamDirectory
     {
-        $file = new File($filename);
-
         if ($file->getDirname()->toString() === '.') {
             return $this->getRoot();
         }
